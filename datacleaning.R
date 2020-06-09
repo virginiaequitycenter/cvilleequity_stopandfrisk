@@ -79,6 +79,13 @@ google_geo_codes <- geocode(SF2017$ADDRESS)
 
 
 
+SF2017Locations %>%
+  ungroup() %>%
+  select(SFTYPE, NUMBER, STREET, OFFENSE, RACE, lat, lon) %>%
+  write_csv(. , path = "data/finaldata/SF2017.csv")
+
+
+######## 2016 ########
 ## Clean SF 2016 ##
 SF2016WithSF <- read_csv("./data/2016withSF.csv") %>%
   mutate(SFTYPE = "STOP WITH SEARCH OR FRISK",
@@ -91,7 +98,11 @@ SF2016WithoutSF <- read_csv("./data/2016withoutSF.csv") %>%
 SF2016 <-
   SF2016WithSF %>% bind_rows(SF2016WithoutSF) 
 
+SF2016 %>%
+  write_csv(. , path = "data/finaldata/SF2016.csv")
 
+
+###### 2014 #######
 ## Clean SF 2014 ##
 SF2014WithSF <- read_csv("data/2014withSF.csv") %>% 
   mutate(SFTYPE = "STOP WITH SEARCH OR FRISK",
@@ -107,7 +118,9 @@ SF2014WithSF %>% bind_rows(SF2014WithoutSF) %>%
     mutate(Address = str_replace_all(Address, "  ", " ")) %>%
     mutate(Address = str_replace_all(Address, "  ", " "))
 
-View(SF2014)
+SF2014 %>%
+  write_csv(. , path = "data/finaldata/SF2014.csv")
+
 
 
 
