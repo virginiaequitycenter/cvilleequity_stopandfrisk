@@ -5,6 +5,9 @@ library(tidyverse)
 library(openxlsx)
 library(ggmap)
 library(pdftools)
+library(sf)
+library(leaflet)
+library(htmltools)
 
 
 setwd("/Volumes/GoogleDrive/My Drive/Equity Center/Github/cvilleequity_stopandfrisk")
@@ -13,6 +16,18 @@ addresses <- read_csv("data/Master_Address_Points.csv")
 addresses_table <- read_csv("data/Master_Address_Table.csv")
 
 
+####### 2019-2020 #######
+SF1920input <- read_csv("data/SF20192020Input.csv")
+
+SF1920 <-
+SF1920input %>%
+  gather(Month, Number, - c(beat, beatnum, race)) %>%
+  separate(Month, c("Month", "Year"), sep = "-") %>%
+  mutate(Year = as.numeric(paste0(20, Year)))
+
+write_csv(SF1920, path = "data/finaldata/SF1920.csv")
+
+##### 2017 ########
 ## Clean SF 2017 ##
 SF2017_read <- read.xlsx("./data/2017 Stop and Frisk SDP Reviewed.xlsx", sheet = 1)
 
@@ -72,18 +87,50 @@ SF2017Locations %>%
   select(NUMBER, STREET, geo_MAT_ST_NUMBER, address, house_dist) %>% View()
 
 
-## Geocode with Google Maps ##
 
-google_geo_codes <- geocode(SF2017$ADDRESS)
+## Try to get at the beats ##
+beats <- st_read("data/Police_Neighborhood_Area-shp/Police_Neighborhood_Area.shp")
+beats
 
-
-
-
+SF2017Spatial <-
 SF2017Locations %>%
-  ungroup() %>%
-  select(SFTYPE, NUMBER, STREET, OFFENSE, RACE, lat, lon) %>%
-  write_csv(. , path = "data/finaldata/SF2017.csv")
+  st_as_sf(
+    coords = c("lon", "lat"),
+ #   agr = "constant",
+    crs = 4326,
+#    stringAsFactors = FALSE,
+    remove = TRUE
+  )
 
+point_in_beat <- st_join(SF2017Spatial, beats, join = st_within)
+
+View(point_in_beat)
+
+## Print them out ##
+SF2017FINAL <-
+point_in_beat %>%
+  ungroup() %>%
+  select(SFTYPE, NUMBER, STREET, OFFENSE, RACE, geometry, BEAT_NO, POPULATION)
+  
+
+write_csv(SF2017FINAL. , path = "data/finaldata/SF2017.csv")
+
+####
+leaflet(data = beats) %>%
+  addProviderTiles("Stamen.Toner") %>%
+  addPolygons(
+    weight = 2,
+    fillOpacity = .1
+  ) %>%
+  addCircleMarkers(
+    data = SF2017FINAL,
+    color = "red",
+    weight = 0,
+    radius = 3,
+    fillOpacity = .5,
+    label = ~htmlEscape(paste0(NUMBER," ", STREET))
+    
+  )
 
 ######## 2016 ########
 ## Clean SF 2016 ##
