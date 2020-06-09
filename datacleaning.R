@@ -3,6 +3,8 @@
 ################
 library(tidyverse)
 library(openxlsx)
+library(ggmap)
+library(pdftools)
 
 
 setwd("/Volumes/GoogleDrive/My Drive/Equity Center/Github/cvilleequity_stopandfrisk")
@@ -59,7 +61,7 @@ SF2017Locations<-
   arrange(id, house_dist ) %>% 
   slice(1) 
 
-sum(table(SF2017Locations$house_dist))
+cumsum(round(table(SF2017Locations$house_dist)/sum(table(SF2017Locations$house_dist))*100, 2))
 
 
 # View(SF2017Locations)
@@ -68,6 +70,13 @@ SF2017Locations %>%
   filter(house_dist > 5) %>% 
   arrange(house_dist) %>%
   select(NUMBER, STREET, geo_MAT_ST_NUMBER, address, house_dist) %>% View()
+
+
+## Geocode with Google Maps ##
+
+google_geo_codes <- geocode(SF2017$ADDRESS)
+
+
 
 
 ## Clean SF 2016 ##
