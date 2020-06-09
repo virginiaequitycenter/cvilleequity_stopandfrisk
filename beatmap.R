@@ -3,11 +3,11 @@
 
 
 # 0. Setup ----
-library(geojsonio)
-library(sf)
-library(tigris)
-library(tidycensus)
-library(tidyverse)
+library(geojsonio) # read in map
+library(sf) # work with spatial data
+library(tigris) # get blocks/block group files
+library(tidycensus) # get census data
+library(tidyverse) # the usual
 
 
 # 1. Read in beat map ----
@@ -49,6 +49,8 @@ bl_cvl_sf2 <- st_transform(bl_cvl_sf, 4326)
 
 
 # 3. Pull in census data ----
+# requires having a census api key
+# census_api_key("", install = TRUE, overwrite = TRUE) # add key
 
 # acs_var <- load_variables(2018, "acs5", cache = TRUE)
 # dec_var <- load_variables(2010, "sf1", cache = TRUE)
