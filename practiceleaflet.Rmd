@@ -16,9 +16,7 @@ summary(cars)
 
 
 ```{r pressure, echo=FALSE}
-Test leaflet
-
-```{r}
+zs
 library(leaflet)
 library(shiny)
 sliderInput('n', 'Number of markers', min = 1, max = 100, value = 30, step = 1)
@@ -44,7 +42,6 @@ leaflet(data = beats) %>%
     radius = 2,
     fillOpacity = .5,
     label = ~htmlEscape(paste0(NUMBER," ", STREET))
-    
   )
 
 

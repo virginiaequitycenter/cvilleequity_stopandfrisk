@@ -1,0 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+            body {
+                font-family: 'Open Sans', sans-serif;
+                padding-top: 56px;
+            }
+                
+       #navbartop {
+           background-color: rgba(35, 45, 75, .95);
+           color: white;
+              }
