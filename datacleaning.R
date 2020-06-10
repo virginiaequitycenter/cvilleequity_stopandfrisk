@@ -23,7 +23,8 @@ SF1920 <-
 SF1920input %>%
   gather(Month, Number, - c(beat, beatnum, race)) %>%
   separate(Month, c("Month", "Year"), sep = "-") %>%
-  mutate(Year = as.numeric(paste0(20, Year)))
+  mutate(Year = as.numeric(paste0(20, Year))) %>%
+  filter(race %in% c("B", "W"))
 
 write_csv(SF1920, path = "data/finaldata/SF1920.csv")
 
@@ -43,7 +44,8 @@ SF2017_read %>%
                            )
                         ),
          ADDRESS = toupper(str_trim(ADDRESS))
-          ) 
+          ) %>%
+  filter(RACE %in% c("B", "W"))
 
 # View(SF2017)
 
@@ -113,7 +115,7 @@ point_in_beat %>%
   select(SFTYPE, NUMBER, STREET, OFFENSE, RACE, geometry, BEAT_NO, POPULATION)
   
 
-write_csv(SF2017FINAL. , path = "data/finaldata/SF2017.csv")
+write_csv(SF2017FINAL , path = "data/finaldata/SF2017.csv")
 
 ####
 leaflet(data = beats) %>%
@@ -143,7 +145,8 @@ SF2016WithoutSF <- read_csv("./data/2016withoutSF.csv") %>%
          Date = as.Date(Date, "%m/%d/%y"))  
 
 SF2016 <-
-  SF2016WithSF %>% bind_rows(SF2016WithoutSF) 
+  SF2016WithSF %>% bind_rows(SF2016WithoutSF)  %>%
+  filter(RACE %in% c("B", "W"))
 
 SF2016 %>%
   write_csv(. , path = "data/finaldata/SF2016.csv")
@@ -154,7 +157,7 @@ SF2016 %>%
 SF2014WithSF <- read_csv("data/2014withSF.csv") %>% 
   mutate(SFTYPE = "STOP WITH SEARCH OR FRISK",
          Date = as.Date(Date, "%m/%d/%y"))  
-
+View(SF2014WithSF)
 SF2014WithoutSF <- read_csv("data/2014withoutSF.csv") %>% 
   mutate(SFTYPE = "Search WITHOUT Stop-Frisk",
          Date = as.Date(Date, "%m/%d/%y"))  
@@ -163,7 +166,8 @@ SF2014 <-
 SF2014WithSF %>% bind_rows(SF2014WithoutSF) %>%
     mutate(Address = str_replace_all(Address, "  ", " ")) %>%
     mutate(Address = str_replace_all(Address, "  ", " ")) %>%
-    mutate(Address = str_replace_all(Address, "  ", " "))
+    mutate(Address = str_replace_all(Address, "  ", " ")) %>%
+  filter(RACE %in% c("B", "W"))
 
 SF2014 %>%
   write_csv(. , path = "data/finaldata/SF2014.csv")
