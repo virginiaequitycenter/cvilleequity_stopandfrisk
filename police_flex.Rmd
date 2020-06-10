@@ -28,7 +28,7 @@ beats <- readRDS("beat_pop_map.Rds")
 
 ```
 
-Overall {data-orientation=rows}
+Introduction {data-orientation=rows}
 =====================================
 
 Row
@@ -82,7 +82,7 @@ This analysis is based on records of temporary detentions made by the City of Ch
 * Period 1: mid-July 2012 to mid0June 2014
 * Period 2: January 2016 to mid-October 2016 combined with January 2017-December 2017
 
-Navigate to additional pages for more further analysis:
+Navigate to additional pages for further analysis:
 
 * **Composition** compares the percent of Black and White detentions to the overall population in the city.
 * **Mapping** visualizes where Black and White citizens are detained by the police.
@@ -119,13 +119,13 @@ Row
 ### Detentions per 1000 population for Black residents (2-year period)
 ```{r}
 bl_pc <- round(((nrow(filter(sf_race, race == "Black"))/2) / 8782)*1000,1)
-valueBox(bl_pc, icon = "fa-balance-scale-left")
+valueBox(bl_pc, icon = "fa-users")
 ```
 
 ### Detentions per 1000 population for White residents (2-year period)
 ```{r}
 wh_pc <- round(((nrow(filter(sf_race, race == "White"))/2) / 32565)*1000,1)
-valueBox(wh_pc, icon = "fa-balance-scale-right")
+valueBox(wh_pc, icon = "fa-user")
 ```
 
 
