@@ -1,0 +1,166 @@
+---
+title: "Charlottesville Police, Temporary Detentions"
+output: 
+  flexdashboard::flex_dashboard:
+    vertical_layout: scroll
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+
+library(tidyverse)
+sf <- readRDS("data/sf_combined.Rds")
+```
+
+Overall {data-orientation=rows}
+===================================== 
+
+Row
+-----------------------------------------------------------------------
+
+### Detentions per Month 
+
+```{r}
+avg <- round(nrow(sf)/44,1)
+valueBox(avg, icon = "fa-hand-paper")
+```
+
+### Ratio of Black to White Detentions 
+
+```{r}
+sf_race <- sf %>% 
+  filter(race %in% c("B", "W")) %>% 
+  mutate(race = factor(race),
+         race = fct_recode(race, 
+                           Black = "B",
+                           White = "W"))
+
+
+ratio <- round(nrow(filter(sf_race, race == "Black")) / nrow(filter(sf_race, race == "White")),1)
+valueBox(ratio, icon = "fa-user-friends")
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Detentions by Month
+
+```{r}
+sf_month <- sf %>% 
+  mutate(month = lubridate::month(date),
+         year_month = paste0(year, "-", month)) %>% 
+  group_by(year_month, year) %>% 
+  summarize(total_month = n()) %>% 
+  filter(year_month != "2017-NA") %>% 
+  ungroup() %>% 
+  mutate(period = ifelse(year < 2016, "2012-2014", "2016-2017")) 
+
+ggplot(sf_month, aes(x = year_month, y = total_month)) + 
+  geom_col(aes(fill = period)) +
+  theme(axis.text.x = element_text(angle = 90),
+        axis.title=element_blank())
+```
+
+
+### Detentions by Race
+
+```{r}
+byrace <- sf_race %>% 
+  group_by(year, race) %>% 
+  summarize(stops = n())
+
+ggplot(byrace, aes(x = year, y = stops, fill = race)) + 
+  geom_col(position = "dodge")
+```
+
+
+Composition {data-orientation=rows}
+===================================== 
+
+Row
+-----------------------------------------------------------------------
+
+### Detentions Relative to Population
+
+```{r}
+pop <- data.frame("race" = c("White", "Black", "Asian", "Multiracial", "Remaining"), 
+                  "value" = c(32565, 8782, 3370, 1443, 327))
+
+pop <- pop %>% 
+  mutate(race = factor(race, levels = c("Black", "White", "Multiracial", "Asian", "Remaining")),
+         group = "pop")
+
+pop3 <- pop %>% 
+  mutate(race = fct_collapse(race, 
+                             Remainig = c("Multiracial", "Asian", "Remaining"))) %>% 
+  group_by(race) %>% 
+  summarize(value = sum(value)) %>% 
+  ungroup() %>% mutate(group = "pop")
+
+pop2 <- pop3 %>% 
+  filter(race %in% c("Black", "White")) %>% 
+  droplevels()
+
+
+# total by race
+sf_race_all <- sf_race %>% 
+  group_by(race) %>% 
+  summarize(value = n()) %>% 
+  ungroup() %>% 
+  mutate(group = "total")
+
+sf_race_all <- rbind(sf_race_all, pop2) %>% 
+  mutate(group = factor(group, levels = c("pop", "total")))
+
+ggplot(sf_race_all, aes(x = group, y = value, fill = race)) + 
+  geom_bar(position="fill", stat="identity") + 
+  coord_polar("y")
+```
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### By Period
+
+```{r}
+# by period and race
+sf_race_period <- sf_race %>% 
+  group_by(period, race) %>% 
+  summarize(value = n()) %>% 
+  ungroup() %>% 
+  mutate(group = "period")
+
+pop2_p1 <- pop2 %>% 
+  mutate(period = "2012-2014")
+pop2_p2 <- pop2 %>% 
+  mutate(period = "2016-2017")
+sf_race_period <- rbind(sf_race_period, pop2_p1, pop2_p2) %>% 
+  mutate(group = factor(group, levels = c("pop", "period")))
+
+ggplot(sf_race_period, aes(x = group, y = value, fill = race)) + 
+  geom_bar(position="fill", stat = "identity") + 
+  coord_polar("y") + facet_wrap(~period)
+```
+
+
+### By Stop and Frisk
+
+```{r}
+# by stop and frisk by race
+sf_race_type <- sf_race %>% 
+  group_by(type, race) %>% 
+  summarize(value = n()) %>% 
+  ungroup() %>% 
+  mutate(group = "type")
+
+pop2_t1 <- pop2 %>% 
+  mutate(type = "Search WITHOUT Stop-Frisk")
+pop2_t2 <- pop2 %>% 
+  mutate(type = "STOP WITH SEARCH OR FRISK")
+sf_race_type <- rbind(sf_race_type, pop2_t1, pop2_t2) %>% 
+  mutate(group = factor(group, levels = c("pop", "type")))
+
+ggplot(sf_race_type, aes(x = group, y = value, fill = race)) + 
+  geom_bar(position="fill", stat = "identity") + 
+  coord_polar("y") + facet_wrap(~type)
+```
