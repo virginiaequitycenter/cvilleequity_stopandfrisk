@@ -1,0 +1,51 @@
+---
+title: "PracticeLeaflet"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r cars}
+summary(cars)
+```
+
+
+
+```{r pressure, echo=FALSE}
+Test leaflet
+
+```{r}
+library(leaflet)
+library(shiny)
+sliderInput('n', 'Number of markers', min = 1, max = 100, value = 30, step = 1)
+renderLeaflet({
+  n = input$n
+  df = data.frame(lat = rnorm(n, 42), lng = rnorm(n, -93))
+  leaflet(df) %>% addTiles() %>% addMarkers()
+})
+```
+
+``` {r}
+
+leaflet(data = beats) %>%
+  addProviderTiles("Stamen.Toner") %>%
+  addPolygons(
+    weight = 1,
+    fillOpacity = .1
+  ) %>%
+  addCircleMarkers(
+    data = SF2017FINAL,
+    color = "red",
+    weight = 0,
+    radius = 2,
+    fillOpacity = .5,
+    label = ~htmlEscape(paste0(NUMBER," ", STREET))
+    
+  )
+
+
+```

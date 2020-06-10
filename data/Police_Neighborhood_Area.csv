@@ -1,0 +1,34 @@
+﻿OBJECTID,BEAT_NO,NAME,POPULATION,DISTRICT
+1,10,Belmont,4327,2
+2,20,Woolen Mills,903,3
+3,09,Little High,654,3
+4,08,Martha Jefferson,1167,3
+5,07,North Downtown,1634,3
+6,28,Charlottesville High,998,5
+7,29,Greenbrier,1451,5
+8,30,29 North,488,5
+9,31,The Meadows,778,5
+10,12,Ridge St,1686,2
+11,11,Garrett,485,2
+12,21,Prospect\Orangedale Ave,1573,1
+13,22,Johnson Village,1333,1
+14,32,5th Street,775,1
+15,33,Longwood Dr,983,1
+16,13,Fifeville,2579,7
+17,23,Fry's Spring,3604,1
+18,03,West Main/Starr Hill,1333,8
+19,04,Westhaven,466,8
+20,05,10th Street N.W./Page St,1006,8
+21,15,The Corner,9,6
+22,16,Venable,5081,6
+23,06,Rosehill Dr/Birdwood,824,5
+24,17,Kellytown/Rugby Heights,670,5
+25,27,Blue Ridge/Rugby Ave,1398,5
+26,25,BRSC Area,700,5
+27,26,BRSC,0,5
+28,18,North East,1454,3
+29,19,Locust Grove,1068,3
+30,24,Lewis Mountain,1096,6
+31,02,Downtown,300,3
+32,01,Mall,29,4
+33,14,Jefferson Park Ave,3504,6
