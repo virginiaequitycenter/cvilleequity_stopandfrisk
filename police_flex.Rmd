@@ -33,14 +33,21 @@ Overall {data-orientation=rows}
 Row
 -----------------------------------------------------------------------
 
-### Detentions per Month 
+### Average Detentions per Month 
 
 ```{r}
 avg <- round(nrow(sf)/44,1)
 valueBox(avg, icon = "fa-hand-paper")
 ```
 
-### Ratio of Black to White Detentions 
+### Percent of Detentions with Search or Frisk
+```{r}
+frisk <- round(nrow(filter(sf, type == "STOP WITH SEARCH OR FRISK")) /
+                 nrow(sf)*100, 0)
+valueBox(frisk, icon = "fa-search")
+```
+
+### Ratio of Black to White Citizens Detained 
 
 ```{r}
 sf_race <- sf %>% 
@@ -58,39 +65,47 @@ valueBox(ratio, icon = "fa-user-friends")
 Row
 -----------------------------------------------------------------------
 
-### Detentions by Month
+### About the Data {data-width=333}
+
+This analysis is based on data received from FOIA requests (attribution for requesting?) over multiple time periods:
+
+* Period 1: July 2012-June 2014, with data for only part of the first and last month
+* Period 2: January 2016-October 2016 and January 2017-December 2017
+
+Considerably more of the detentions involved a stop and frisk search in the second period. The disproportionate interaction of Black residents remains consistently high in both periods.
+
+The following pages provide additional analysis,
+
+* Composition compares the percent of Black and White detentions to the overall population in the city.
+* Geography visualizes where Black and White citizens are detained by the police.
+* Offenses shows the nature of the offense reported as the reason for the detention across Black and White residents.
+
+### Detentions, with and without Search/Frisk, by Race
 
 ```{r}
-sf_month <- sf %>% 
-  mutate(month = lubridate::month(date),
-         year_month = paste0(year, "-", month)) %>% 
-  group_by(year_month, year) %>% 
-  summarize(total_month = n()) %>% 
-  filter(year_month != "2017-NA") %>% 
-  ungroup() %>% 
-  mutate(period = ifelse(year < 2016, "2012-2014", "2016-2017")) 
-
-ggplot(sf_month, aes(x = year_month, y = total_month)) + 
-  geom_col(aes(fill = period)) +
-  theme(axis.text.x = element_text(angle = 90),
-        axis.title=element_blank())
-```
-
-
-### Detentions by Race
-
-```{r}
-byrace <- sf_race %>% 
-  group_by(year, race) %>% 
-  summarize(stops = n())
-
-ggplot(byrace, aes(x = year, y = stops, fill = race)) + 
-  geom_col(position = "dodge")
+ggplot(sf_race, aes(x = type, fill = fct_rev(race))) + 
+  geom_bar() + facet_wrap(~period)
 ```
 
 
 Composition {data-orientation=rows}
 ===================================== 
+
+Row
+-----------------------------------------------------------------------
+
+### Detentions per 1000 population for Black residents (2-year period)
+```{r}
+bl_pc <- round(((nrow(filter(sf_race, race == "Black"))/2) / 8782)*1000,1)
+valueBox(bl_pc, icon = "fa-minus-square")
+```
+
+### Detentions per 1000 population for White residents (2-year period)
+```{r}
+wh_pc <- round(((nrow(filter(sf_race, race == "White"))/2) / 32565)*1000,1)
+valueBox(wh_pc, icon = "fa-plus-square")
+```
+
 
 Row
 -----------------------------------------------------------------------
@@ -130,54 +145,6 @@ sf_race_all <- rbind(sf_race_all, pop2) %>%
 ggplot(sf_race_all, aes(x = group, y = value, fill = race)) + 
   geom_bar(position="fill", stat="identity") + 
   coord_polar("y")
-```
-
-Row {.tabset}
------------------------------------------------------------------------
-
-### By Period
-
-```{r}
-# by period and race
-sf_race_period <- sf_race %>% 
-  group_by(period, race) %>% 
-  summarize(value = n()) %>% 
-  ungroup() %>% 
-  mutate(group = "period")
-
-pop2_p1 <- pop2 %>% 
-  mutate(period = "2012-2014")
-pop2_p2 <- pop2 %>% 
-  mutate(period = "2016-2017")
-sf_race_period <- rbind(sf_race_period, pop2_p1, pop2_p2) %>% 
-  mutate(group = factor(group, levels = c("pop", "period")))
-
-ggplot(sf_race_period, aes(x = group, y = value, fill = race)) + 
-  geom_bar(position="fill", stat = "identity") + 
-  coord_polar("y") + facet_wrap(~period)
-```
-
-
-### By Stop and Frisk
-
-```{r}
-# by stop and frisk by race
-sf_race_type <- sf_race %>% 
-  group_by(type, race) %>% 
-  summarize(value = n()) %>% 
-  ungroup() %>% 
-  mutate(group = "type")
-
-pop2_t1 <- pop2 %>% 
-  mutate(type = "Search WITHOUT Stop-Frisk")
-pop2_t2 <- pop2 %>% 
-  mutate(type = "STOP WITH SEARCH OR FRISK")
-sf_race_type <- rbind(sf_race_type, pop2_t1, pop2_t2) %>% 
-  mutate(group = factor(group, levels = c("pop", "type")))
-
-ggplot(sf_race_type, aes(x = group, y = value, fill = race)) + 
-  geom_bar(position="fill", stat = "identity") + 
-  coord_polar("y") + facet_wrap(~type)
 ```
 
 
@@ -249,4 +216,28 @@ l %>%
  #  )
 
 
+```
+
+
+Offense {data-orientation=rows}
+===================================== 
+
+```{r}
+sf_race <- sf_race %>% 
+  mutate(offense7 = case_when(
+    str_detect(offense, "Assault|Robbery|PURSE|Shots|Weapon") ~ "Person Crime",
+    str_detect(offense, "Burglary|Larceny|Trespass|VANDAL") ~ "Property Crime",
+    str_detect(offense, "Narcotic") ~ "Narcotics Related",
+    str_detect(offense, "Traffic") ~ "Traffic Related",
+    str_detect(offense, "Disorder|Drunk|Liquor|INDECENT|DIP") ~ "Public Disorder",
+    str_detect(offense, "Suspicious|Supsicious") ~ "Suspicious Circumstance",
+    TRUE ~ "Other"
+  ))
+
+sf_race <- sf_race %>% 
+  mutate(offense7 = factor(offense7),
+         offense7 = fct_infreq(offense7))
+
+ggplot(sf_race, aes(x = fct_rev(offense7), fill = fct_rev(race))) + 
+  geom_bar() + coord_flip() + facet_wrap(~period, ncol = 1)
 ```
