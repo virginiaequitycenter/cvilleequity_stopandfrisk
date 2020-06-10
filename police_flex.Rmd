@@ -7,9 +7,24 @@ output:
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
-
 library(tidyverse)
+library(leaflet)
+library(sf)
+library(htmltools)
+
 sf <- readRDS("data/sf_combined.Rds")
+
+
+sflocations <- read_csv("data/finaldata/sflocations.csv") %>% st_as_sf(
+    coords = c("lon", "lat"),
+    crs = 4326,
+    remove = TRUE
+  ) %>%
+  filter(!Year %in% c(2019, 2020))
+
+beats <- readRDS("beat_pop_map.Rds")
+
+
 ```
 
 Overall {data-orientation=rows}
@@ -163,4 +178,75 @@ sf_race_type <- rbind(sf_race_type, pop2_t1, pop2_t2) %>%
 ggplot(sf_race_type, aes(x = group, y = value, fill = race)) + 
   geom_bar(position="fill", stat = "identity") + 
   coord_polar("y") + facet_wrap(~type)
+```
+
+
+Mapping {data-orientation=row}
+===================================== 
+Will use the iframe tag here to add in the shiny map
+
+``` {r}
+l <-NULL
+
+beats_data <- 
+beats  %>% 
+  mutate(`Percent White` = round(whitepopE/totalpopE*100),2),
+         `Percent Black` = round(blackpopE/totalpopE*100),2)
+        ) 
+
+l <- leaflet() %>%
+  addProviderTiles("Stamen.Toner")  
+
+  addPolygons(
+    data = racebeats.df[[df]]
+    weight = 1,
+    fillOpacity = .1
+  )
+
+## Add Race Dot Colors ## 
+race.df <- split(sflocations, sflocations$RACE)
+race.colors <- data.frame()
+
+mycolors <- colorRampPalette(brewer.pal(3, "Spectral"))(2)
+racelevels <- names(race.df)
+racepal <- colorFactor(palette = mycolors,
+                   domain = racelevels)
+
+names(race.df) %>%
+   purrr::walk( function(df) {
+    l <<- l %>%
+          addCircleMarkers(
+                data = race.df[[df]],
+                color = ~racepal(df),
+                weight = 0,
+                radius = 2,
+               fillOpacity = .8,
+               group = df,
+               label = ~htmlEscape(paste0(RACE, "\n",SFTYPE,"\n", OFFENSE))
+       )
+    })
+  
+l %>%
+  addLayersControl(
+    overlayGroups = names(race.df),
+    options = layersControlOptions(collapsed = FALSE)
+  )
+
+
+ # l <- leaflet(data = beats) %>%
+ #  addProviderTiles("Stamen.Toner")  %>%
+ #  addPolygons(
+ #    weight = 1,
+ #    fillOpacity = .1
+ #  ) #%>%
+ #  addCircleMarkers(
+ #    data = df,
+ #    color = "red",
+ #    weight = 0,
+ #    radius = 2,
+ #    fillOpacity = .5,
+ #    label = ~htmlEscape(paste0(RACE, "\n",SFTYPE,"\n", OFFENSE))
+ #  )
+
+
 ```
