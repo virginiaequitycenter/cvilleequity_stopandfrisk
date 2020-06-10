@@ -11,6 +11,7 @@ library(tidyverse)
 library(leaflet)
 library(sf)
 library(htmltools)
+library(RColorBrewer)
 
 sf <- readRDS("data/sf_combined.Rds")
 
@@ -150,10 +151,9 @@ ggplot(sf_race_all, aes(x = group, y = value, fill = race)) +
 
 Mapping {data-orientation=row}
 ===================================== 
-Will use the iframe tag here to add in the shiny map
+### Chart 1 {data-height=600}
+``` {r }
 
-``` {r}
-``` {r}
 l <-NULL
 
 beats_data <- 
@@ -168,16 +168,34 @@ whitepal <- colorBin(palette = colorswhite, domain = c(0,100), bins = 5)
 colorsblack<- colorRampPalette(brewer.pal(9, "Purples"))(9)[2:6]
 blackpal <- colorBin(palette = colorsblack, domain = c(0,100), bins = 5)
 
-race.beats <- list(`Percent White` = beats_data %>% mutate(color = `Percent White`, df = "Percent White"),
+race.beats <- list(
+      `Data Off` = beats_data %>% mutate(color = 0, df = "Data Off"),
+     `Percent White` = beats_data %>% mutate(color = `Percent White`, df = "Percent White"),
      `Percent Black` = beats_data %>% mutate(color = `Percent Black`, df = "Percent Black")
      )
 
 beatscolorfunction <- function(listname, color){
-  ifelse( listname == names(race.beats)[1],  whitepal(color), blackpal(color)  )
+case_when(
+     listname == names(race.beats)[2] ~   whitepal(color),
+     listname == names(race.beats)[3] ~   blackpal(color),
+     TRUE ~ "DCF0EF"
+    )
 }
 
+beatsopacityfunction <- function(listname){
+case_when(
+     listname == names(race.beats)[2] ~   .5,
+     listname == names(race.beats)[3] ~  .5,
+     TRUE ~ 0
+    )
+}
+
+
 l <- leaflet() %>%
-  addProviderTiles("Stamen.Toner")  
+  addProviderTiles("Stamen.Toner",
+                   options = providerTileOptions(minZoom = 13))   %>%
+  addMapPane("polygons", zIndex = 410) %>%
+  addMapPane("circlemarkers", zIndex = 420) 
 
 names(race.beats) %>%
    purrr::walk( function(df) {
@@ -185,15 +203,21 @@ names(race.beats) %>%
            addPolygons(
               data = race.beats[[df]],
               weight = 3,
-              fillOpacity = .5,
+              fillOpacity = ~beatsopacityfunction(df),
               color = ~beatscolorfunction(df, color),
-              group = df
-            )
+              group = df   ,
+                            smoothFactor = 0.5,
+              )
     })
 
 
 ## Add Race Dot Colors ## 
-race.df <- split(sflocations, sflocations$RACE)
+
+sflocationsmap <- 
+  sflocations %>%
+  mutate(RACE = ifelse(RACE == "W", "White Individuals", "Black Individuals"))
+  
+race.df <- split(sflocationsmap, sflocationsmap$RACE)
 race.colors <- data.frame()
 
 mycolors <- c("#001855", "#002D00")
@@ -208,8 +232,8 @@ names(race.df) %>%
                 data = race.df[[df]],
                 color = ~racepal(df),
                   weight = 0,
-
-                radius = 3,
+              
+                radius = 2.5,
                fillOpacity = 1,
                group = df,
 #               label = ~htmlEscape(paste0(RACE, "<br>",SFTYPE,"<br>", OFFENSE))
@@ -217,34 +241,39 @@ names(race.df) %>%
        )
     })
   
+sf.df <- split(sflocationsmap, sflocationsmap$SFTYPE)
+
+
+
+ l <<- l %>%
+          addCircles(
+                data = sf.df[["STOP WITH SEARCH OR FRISK"]],
+                color =  "red",
+                weight = 2,
+                radius = 6,
+                fillColor = "transparent",
+               group = "Highlight Stop and Frisk"
+       )
+
 l %>%
   addLayersControl(
     baseGroups =  names(race.beats),
-    overlayGroups = names(race.df),
+    overlayGroups =  c(names(race.df), "Highlight Stop and Frisk"),
     options = layersControlOptions(collapsed = FALSE)
-  )
+  ) %>%
+  htmlwidgets::onRender("
+    function(el, x) {
+      this.on('baselayerchange', function(e) {
+        e.layer.bringToBack();
+      })
+    }
+  ")
 
-
- # l <- leaflet(data = beats) %>%
- #  addProviderTiles("Stamen.Toner")  %>%
- #  addPolygons(
- #    weight = 1,
- #    fillOpacity = .1
- #  ) #%>%
- #  addCircleMarkers(
- #    data = df,
- #    color = "red",
- #    weight = 0,
- #    radius = 2,
- #    fillOpacity = .5,
- #    label = ~htmlEscape(paste0(RACE, "\n",SFTYPE,"\n", OFFENSE))
- #  )
 
 
 ```
 
 
-```
 
 
 Offense {data-orientation=rows}
