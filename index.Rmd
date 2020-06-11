@@ -368,7 +368,9 @@ names(race.df) %>%
                 weight = 0,
                 radius = 2.5,
                fillOpacity = 1,
-               group = df
+               group = df,
+          label = ~htmlEscape(paste0("Offese: ", OFFENSE))
+
 )
        
     })
@@ -514,7 +516,9 @@ names(race.df) %>%
                 weight = 0,
                 radius = 2.5,
                fillOpacity = 1,
-               group = df
+               group = df,
+               label = ~htmlEscape(paste0("Offese: ", OFFENSE))
+
        )
     })
   
@@ -644,7 +648,9 @@ names(race.df) %>%
                 weight = 0,
                 radius = 2.5,
                fillOpacity = 1,
-               group = df
+               group = df,
+              label = ~htmlEscape(paste0("Offese: ", OFFENSE))
+
        )
     }) 
   
@@ -759,7 +765,9 @@ names(race.df) %>%
                 weight = 0,
                 radius = 4,
                fillOpacity = 1,
-               group = df)
+               group = df,
+              label = ~htmlEscape(paste0("Offese: ", OFFENSE))
+)
     })
   
 sf.df <- split(sflocationsmap, sflocationsmap$SFTYPE)
