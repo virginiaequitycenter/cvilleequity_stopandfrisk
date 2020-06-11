@@ -75,18 +75,18 @@ Row
 
 ### About the Data {data-width=333}
 
-A temporary detention involves a police officer holding and questioning an individual for a short amount of time. The police only need *reasonable suspicion* for a detention. Detentions may be accompanied by some form of search or frisk, though not all detentions will involve a search. Detentions can be initiated by an officer or dispatched in response to a call.
+A temporary detention involves a police officer holding and questioning an individual for a short amount of time. The police only need *reasonable suspicion* for a temporary detention. Detentions may be accompanied by some form of search or frisk, though not all detentions involve a search. Detentions can be dispatched in response to a call or initiated by an officer.
 
-This analysis is based on records of temporary detentions made by the City of Charlottesville Police. The data was received in response to Freedom of Information Act requests (by -- attribution for requesting?) made over multiple time periods. We have aggregated the data to two primary time periods:
+This analysis is based on records of temporary detentions made by the City of Charlottesville Police. The data was received in response to Freedom of Information Act requests by Jeff Fogel made over multiple time periods. We have aggregated the data to two primary time periods:
 
 * Period 1: mid-July 2012 to mid-June 2014
 * Period 2: January 2016 to mid-October 2016 combined with January 2017-December 2017
 
 Navigate to additional pages for further analysis:
 
-* **Composition** compares the percent of Black and White detentions to the overall population in the city.
-* **Mapping** visualizes where Black and White citizens are detained by the police.
-* **Offenses** shows the nature of the offense reported as the reason for the detention across Black and White residents.
+* **Who?** compares the percent of Black and White detentions to the overall population in the city.
+* **Where?** visualizes where Black and White citizens are detained by the police.
+* **Why?** shows the reason recorded by the police for the detention across Black and White residents.
 
 ### Detentions, with and without Search/Frisk, by Race
 
@@ -115,7 +115,7 @@ ggplot(sf_race, aes(x = type2, fill = race)) +
 
 
 
-Composition {data-orientation=rows}
+Who? {data-orientation=rows}
 =====================================
 
 Row
@@ -269,7 +269,7 @@ ggplot(sf_race_type, aes(x = group, y = value, fill = race)) +
 
 
 
-Mapping {data-orientation=rows}
+Where? {data-orientation=rows}
 ===================================== 
 
 ### Who do Police Detain and Where?
@@ -806,15 +806,12 @@ What these analyses cannot account for is frequency of utilization of the space.
 
 
 
-Offense {data-orientation=rows}
+Why? {data-orientation=rows}
 =====================================
 
-Row {data-height = 200}
------------------------------------------------------------------------
+### What Reasons do Police Give for Detentions?
 
-### Recorded Offense
-
-We recoded the offense generating the detention as recorded in the data into the following categories: (1) Narcotics Investigations, (2) Suspicious Circumstances, (3) Disorderly conduct (including drunkeness), (4) Crimes on persons (e.g., assult, robbery, weapons), (5) Crimes on property (e.g., burglary, vandalism, trespassing), (6) Traffic-related events (e.g., traffic stops, violations, accidents), and (7) everything else (e.g., assistance, unidentified).
+Police officers record a reason for detaining an individual. We recoded these reasons into the following categories: (1) Narcotics related, (2) Suspicious circumstances, (3) Disorderly conduct (including drunkeness), (4) Crimes on persons (e.g., assult, robbery, weapons), (5) Crimes on property (e.g., burglary, vandalism, trespassing), (6) Traffic-related (e.g., traffic stops, violations, accidents), and (7) everything else (e.g., assistance, unidentified). While several of the reasons represent categories of crimes, the recorded reason reflects the reasonable suspicion of an officer at the time of the stop, not a conclusion that the given crime has been committed. We do not have a record for whether the stop led to an arrest for all of the data provided.
 
 Row {.tabset}
 -----------------------------------------------------------------------
@@ -857,7 +854,7 @@ ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
 ```
 
 
-### By Time Period {data-height = 600}
+### By Time Period 
 
 ```{r}
 # for annotation
@@ -881,7 +878,7 @@ ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
 ```
 
 
-### By Stop and Frisk{data-height = 600}
+### By Stop and Frisk 
 
 ```{r}
 tots <- sf_race %>% group_by(offense7, type2) %>% summarize(tots = n())
