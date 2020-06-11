@@ -108,8 +108,8 @@ ggplot(sf_race, aes(x = type2, fill = race)) +
   scale_fill_manual(values = pal2) +
   labs(fill = "Race") +
   theme(axis.title = element_blank()) +
-  geom_text(data = arrange(racetots, race), aes(x = type2, y = lab_height, fill = race, label = percent_lab), position = position_dodge(width = 1)) +
- geom_text(data = arrange(racetots, race), aes(x = type2, y = racetot + 5, fill = race, label = racetot), position = position_dodge(width = 1))
+  geom_text(data = arrange(racetots, race), aes(x = type2, y = lab_height, fill = race, label = percent_lab), position = position_dodge(width = .85), size = 3, hjust = .5) +
+ geom_text(data = arrange(racetots, race), aes(x = type2, y = racetot + 5, fill = race, label = racetot), position = position_dodge(width = .85), size = 4, hjust = .5)
 
 ```
 
