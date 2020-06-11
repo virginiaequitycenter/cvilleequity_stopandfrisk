@@ -354,7 +354,7 @@ sflocationsmap <-
 race.df <- split(sflocationsmap, sflocationsmap$RACE)
 race.colors <- data.frame()
 
-mycolors <- c("#6969B3", "#2B572A")
+mycolors <- c("#6969B3", "#00AF98")
 racelevels <- names(race.df)
 racepal <- colorFactor(palette = mycolors,
                    domain = racelevels)
@@ -500,7 +500,7 @@ sflocationsmap <-
 race.df <- split(sflocationsmap, sflocationsmap$RACE)
 race.colors <- data.frame()
 
-mycolors <- c("#6969B3", "#2B572A")
+mycolors <- c("#6969B3", "#00AF98")
 racelevels <- names(race.df)
 racepal <- colorFactor(palette = mycolors,
                    domain = racelevels)
@@ -630,7 +630,7 @@ sflocationsmap <-
 race.df <- split(sflocationsmap, sflocationsmap$RACE)
 race.colors <- data.frame()
 
-mycolors <- c("#6969B3", "#2B572A")
+mycolors <- c("#6969B3", "#00AF98")
 racelevels <- names(race.df)
 racepal <- colorFactor(palette = mycolors,
                    domain = racelevels)
@@ -745,7 +745,7 @@ sflocationsmap <-
 race.df <- split(sflocationsmap, sflocationsmap$RACE)
 race.colors <- data.frame()
 
-mycolors <- c("#6969B3", "#2B572A")
+mycolors <- c("#6969B3", "#00AF98")
 racelevels <- names(race.df)
 racepal <- colorFactor(palette = mycolors,
                    domain = racelevels)
@@ -834,38 +834,63 @@ tots <- sf_race %>% group_by(offense7) %>% summarize(tots = n())
 racetots <- sf_race %>% group_by(offense7, race) %>% summarize(racetot = n())
 racetots <- racetots %>% left_join(tots)
 racetots <- racetots %>% mutate(percent = round((racetot/tots)*100,0),
-                                percent_lab = paste0(percent, "%"),
-                                race = fct_relevel(race, "Black"))
+                                percent_lab = ifelse(tots < 40 & racetot < 15 ,"",  paste0(percent, "%")),
+                                race = fct_relevel(race, "White"),
+                                racetot = ifelse(race == "White", racetot*-1, racetot),
+                                lab_pos = racetot/2)
 
-
-ggplot(sf_race, aes(x = offense7, fill = race)) +
-  geom_bar() + labs(fill = "Race") +
+ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
+  geom_bar(stat = "identity") + labs(fill = "Race") +
   scale_fill_manual(values = pal2) +
-  geom_text(data = filter(racetots, race == "Black"), aes(x = offense7, y = racetot, label = percent_lab), nudge_y = -5) +
-  theme(axis.title = element_blank(),
-        axis.text.x = element_text(angle = 45, hjust = 1))
+  geom_text(data = racetots, aes(x = offense7, y = lab_pos, label = percent_lab), size = 3) +
+  coord_flip() +
+  labs(y = "# Detentions", x = "Offense") +
+  scale_y_continuous(labels = function(x){abs(x)}, limits = c(-120, 120))
 ```
 
 
 ### By Time Period
 
 ```{r}
-ggplot(sf_race, aes(x = offense7, fill = race)) +
-  geom_bar() + labs(fill = "Race") +
+# for annotation
+tots <- sf_race %>% group_by(offense7, period) %>% summarize(tots = n())
+racetots <- sf_race %>% group_by(offense7, race, period) %>% summarize(racetot = n())
+racetots <- racetots %>% left_join(tots)
+racetots <- racetots %>% ungroup() %>% mutate(percent = round((racetot/tots)*100,0),
+                                percent_lab = ifelse(tots < 40 & racetot < 10 ,"",  paste0(percent, "%")),
+                                race = fct_relevel(race, "White"),
+                                racetot = ifelse(race == "White", racetot*-1, racetot),
+                                lab_pos = racetot/2)
+
+ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
+  geom_bar(stat = "identity") + labs(fill = "Race") +
   scale_fill_manual(values = pal2) +
-  facet_wrap(~period, ncol = 2) +  
-  theme(axis.title = element_blank(),
-        axis.text.x = element_text(angle = 45, hjust = 1))
+  geom_text(data = racetots, aes(x = offense7, y = lab_pos, label = percent_lab), size = 3) +
+  coord_flip() +
+  labs(y = "# Detentions", x = "Offense") +
+  scale_y_continuous(labels = function(x){abs(x)}, limits = c(-95, 95)) +
+  facet_wrap(~period, nrow = 2) 
 ```
 
 
 ### By Stop and Frisk
 
 ```{r}
-ggplot(sf_race, aes(x = offense7, fill = race)) +
-  geom_bar() + labs(fill = "Race") +
+tots <- sf_race %>% group_by(offense7, type2) %>% summarize(tots = n())
+racetots <- sf_race %>% group_by(offense7, race, type2) %>% summarize(racetot = n())
+racetots <- racetots %>% left_join(tots)
+racetots <- racetots %>% ungroup() %>% mutate(percent = round((racetot/tots)*100,0),
+                                percent_lab = ifelse(tots < 40 & racetot < 10 ,"",  paste0(percent, "%")),
+                                race = fct_relevel(race, "White"),
+                                racetot = ifelse(race == "White", racetot*-1, racetot),
+                                lab_pos = racetot/2)
+
+ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
+  geom_bar(stat = "identity") + labs(fill = "Race") +
   scale_fill_manual(values = pal2) +
-  facet_wrap(~type2, ncol = 2) +  
-  theme(axis.title = element_blank(),
-        axis.text.x = element_text(angle = 45, hjust = 1))
+  geom_text(data = racetots, aes(x = offense7, y = lab_pos, label = percent_lab), size = 3) +
+  coord_flip() +
+  labs(y = "# Detentions", x = "Offense") +
+  scale_y_continuous(labels = function(x){abs(x)}, limits = c(-120, 120), breaks = seq(-120,120,20)) +
+  facet_wrap(~type2, nrow = 2) 
 ```
