@@ -79,7 +79,7 @@ A temporary detention involves a police officer holding and questioning an indiv
 
 This analysis is based on records of temporary detentions made by the City of Charlottesville Police. The data was received in response to Freedom of Information Act requests (by -- attribution for requesting?) made over multiple time periods. We have aggregated the data to two primary time periods:
 
-* Period 1: mid-July 2012 to mid0June 2014
+* Period 1: mid-July 2012 to mid-June 2014
 * Period 2: January 2016 to mid-October 2016 combined with January 2017-December 2017
 
 Navigate to additional pages for further analysis:
@@ -97,15 +97,20 @@ racetots <- sf_race %>% group_by(period, type2, race) %>% summarize(racetot = n(
 racetots <- racetots %>% left_join(tots)
 racetots <- racetots %>% mutate(percent = round((racetot/tots)*100,0),
                                 percent_lab = paste0(percent, "%"),
-                                race = fct_relevel(race, "Black"))
+                                race = fct_relevel(race, "White")) %>%
+  group_by(period, type2) %>%
+  arrange(period, type2, race) %>%
+  mutate(lab_height =  racetot/2)
 
 
 ggplot(sf_race, aes(x = type2, fill = race)) +
-  geom_bar() + facet_wrap(~period) +
+  geom_bar(position = "dodge") + facet_wrap(~period) +
   scale_fill_manual(values = pal2) +
   labs(fill = "Race") +
   theme(axis.title = element_blank()) +
-  geom_text(data = filter(racetots, race == "Black"), aes(x = type2, y = racetot, label = percent_lab), nudge_y = -5)
+  geom_text(data = arrange(racetots, race), aes(x = type2, y = lab_height, fill = race, label = percent_lab), position = position_dodge(width = 1)) +
+ geom_text(data = arrange(racetots, race), aes(x = type2, y = racetot + 5, fill = race, label = racetot), position = position_dodge(width = 1))
+
 ```
 
 
@@ -163,7 +168,16 @@ sf_race_all <- sf_race %>%
   mutate(group = "total")
 
 sf_race_all <- rbind(sf_race_all, pop2) %>%
-  mutate(group = factor(group, levels = c("pop", "total")))
+  mutate(group = factor(group, levels = c("pop", "total")),
+         race = fct_relevel(race, "White")) %>%
+  arrange(group, desc(race)) %>%
+  group_by(group) %>%
+  mutate(label_pos = (cumsum(value) - value/2)/sum(value), 
+         percent = paste0(round(value/sum(value)*100,1),"%")
+         )
+
+labellingdata <- data.frame(label = c("Population", "Detentions"), group = c("pop", "total"), pos = c(.90,.90) )
+
 
 ggplot(sf_race_all, aes(x = group, y = value, fill = race)) +
   geom_bar(position="fill", stat="identity") +
@@ -171,9 +185,10 @@ ggplot(sf_race_all, aes(x = group, y = value, fill = race)) +
   coord_polar("y", direction = 1) +
   scale_x_discrete(limits = c(" ", "pop","total")) +
   theme_void() +
-  annotate("text", x = 0, y = 0, label = "Population", size = 3) +
-  annotate("text", x = 2, y = .1, label = "21%") +
-  annotate("text", x = 3, y = .1, label = "71%")
+  geom_text(  data = filter(sf_race_all, race == "Black"), aes(x = group, y = label_pos, label = percent), size = 3) +
+  geom_text( data = labellingdata,
+             aes(x = group, y = pos, label = label) ,inherit.aes = FALSE, size = 3) 
+
 ```
 
 ### By Time Period
@@ -189,8 +204,18 @@ pop2_p1 <- pop2 %>%
   mutate(period = "2012-2014")
 pop2_p2 <- pop2 %>%
   mutate(period = "2016-2017")
+
 sf_race_period <- rbind(sf_race_period, pop2_p1, pop2_p2) %>%
-  mutate(group = factor(group, levels = c("pop", "period")))
+  mutate(group = factor(group, levels = c("pop", "period")),
+         race = fct_relevel(race, "White")) %>%
+  arrange(group, period, desc(race)) %>%
+  group_by(group, period) %>%
+  mutate(label_pos = (cumsum(value) - value/2)/sum(value), 
+         percent = paste0(round(value/sum(value)*100,1),"%")
+         )
+
+labellingdata <- data.frame(label = rep(c("Population", "Detentions"),2), group = rep(c("pop", "period"),2), pos = rep(c(.90,.90),2), period = rep(c("2012-2014", "2016-2017"), each = 2 ))
+
 
 ggplot(sf_race_period, aes(x = group, y = value, fill = race)) +
   geom_bar(position="fill", stat = "identity") +
@@ -198,8 +223,10 @@ ggplot(sf_race_period, aes(x = group, y = value, fill = race)) +
   coord_polar("y", direction = 1) +
   scale_x_discrete(limits = c(" ", "pop","period")) +
   theme_void() +
-  facet_wrap(~period) +
-  annotate("text", x = 0, y = 0, label = "Population", size = 3)
+  geom_text(  data = filter(sf_race_period, race == "Black"), aes(x = group, y = label_pos, label = percent), size = 3) +
+    geom_text( data = labellingdata,
+             aes(x = group, y = pos, label = label) ,inherit.aes = FALSE, size = 3) +
+  facet_wrap(~period)
 ```
 
 ### By Stop and Frisk
@@ -216,17 +243,27 @@ pop2_t1 <- pop2 %>%
   mutate(type = "No Search/Frisk")
 pop2_t2 <- pop2 %>%
   mutate(type = "Search/Frisk")
+
 sf_race_type <- rbind(sf_race_type, pop2_t1, pop2_t2) %>%
-  mutate(group = factor(group, levels = c("pop", "type")))
+  mutate(group = factor(group, levels = c("pop", "type")),
+         race = fct_relevel(race, "White")) %>%
+  arrange(group, type, desc(race)) %>%
+  group_by(group, type) %>%
+  mutate(label_pos = (cumsum(value) - value/2)/sum(value), 
+         percent = paste0(round(value/sum(value)*100,1),"%")) 
+
+labellingdata <- data.frame(label = rep(c("Population", "Detentions"),2), group = rep(c("pop", "type"),2), pos = rep(c(.90,.90),2), type = rep(c("No Search/Frisk", "Search/Frisk"), each = 2 ))
 
 ggplot(sf_race_type, aes(x = group, y = value, fill = race)) +
   geom_bar(position="fill", stat = "identity") +
   scale_fill_manual(values = pal2) +
   coord_polar("y", direction = 1) +
   scale_x_discrete(limits = c(" ", "pop","type")) +
+  geom_text(  data = filter(sf_race_type, race == "Black"), aes(x = group, y = label_pos, label = percent), size = 3) +
+    geom_text( data = labellingdata,
+             aes(x = group, y = pos, label = label) ,inherit.aes = FALSE, size = 3) +
   theme_void() +
-  facet_wrap(~type) +
-  annotate("text", x = 0, y = 0, label = "Population", size = 3)
+  facet_wrap(~type) 
 ```
 
 
@@ -239,7 +276,7 @@ Mapping {data-orientation=rows}
 
 * These maps display all police detainments between 2012-2014 and 2016-2017. 
 * Points do not represent exact locations of each stop, rather the density of the dots represent the density of detainments in a geographic area. 
-* To help guide your eyes, Detainments that include Search and Frisk are circled in red 
+* To help guide your eyes, detainments that include Search and Frisk are circled in red 
 * Turn on and off underlying population characteristics through the box on the right to see how who primariliy occupies a specific district relates to who is detained in that space.
 
 
@@ -381,7 +418,7 @@ Segmenting by time period, we see a few trends
 
 * Firstly, there is greater dispersion of stop and frisk throughout the city during the 2017 time period
 * That said, there is a noticeable decrease of stop and frisk in some predominantly black neighborhoods such as the Rose Hill nieghborhood.
-* Despite those decreases, stop and frisk of black individuals in areas with predominantly student housing and increased, specifically in the Grady, Rugby Road, and Emmet Street Areas in addition to the areas south of west main by the train tracks and Jefferson Park Avenue.
+* Despite those decreases, stop and frisk of black individuals in areas with predominantly student housing increased, specifically in the Grady, Rugby Road, and Emmet Street Areas in addition to the areas south of west main by the train tracks and Jefferson Park Avenue.
 * Finally, Stop and Frisk increased significantly, particularly for black individuals, in the Prospect/Orangedale Ave area. 
 
 
