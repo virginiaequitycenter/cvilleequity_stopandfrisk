@@ -230,18 +230,304 @@ ggplot(sf_race_type, aes(x = group, y = value, fill = race)) +
 ```
 
 
-Mapping {data-orientation=row}
-=====================================
-### Chart 1 {data-height=600}
+
+
+Mapping {data-orientation=rows}
+===================================== 
+
+### Who do Police Detain and Where?
+
+* These maps display all police detainments between 2012-2014 and 2016-2017. 
+* Points do not represent exact locations of each stop, rather the density of the dots represent the density of detainments in a geographic area. 
+* To help guide your eyes, Detainments that include Search and Frisk are circled in red 
+* Turn on and off underlying population characteristics through the box on the right to see how who primariliy occupies a specific district relates to who is detained in that space.
+
+
+Row {data-height=800}
+----------------------------------------------
+
+### All Years of Data 
+
+``` {r fig.width = 7 }
+
+l <-NULL
+
+beats_data <- 
+beats  %>% 
+  mutate(`Percent White` = round(whitepopE/totalpopE*100,2),
+         `Percent Black` = round(blackpopE/totalpopE*100,2)
+        ) 
+
+colorswhite <- colorRampPalette(brewer.pal(9, "Greens"))(9)[2:6]
+whitepal <- colorBin(palette = colorswhite, domain = c(0,100), bins = 5)
+
+colorsblack<- colorRampPalette(brewer.pal(9, "Purples"))(9)[2:6]
+blackpal <- colorBin(palette = colorsblack, domain = c(0,100), bins = 5)
+
+race.beats <- list(
+      `Data Off` = beats_data %>% mutate(color = 0, df = "Data Off"),
+     `Percent White` = beats_data %>% mutate(color = `Percent White`, df = "Percent White"),
+     `Percent Black` = beats_data %>% mutate(color = `Percent Black`, df = "Percent Black")
+     )
+
+beatscolorfunction <- function(listname, color){
+case_when(
+     listname == names(race.beats)[2] ~   whitepal(color),
+     listname == names(race.beats)[3] ~   blackpal(color),
+     TRUE ~ "DCF0EF"
+    )
+}
+
+beatsopacityfunction <- function(listname){
+case_when(
+     listname == names(race.beats)[2] ~   .5,
+     listname == names(race.beats)[3] ~  .5,
+     TRUE ~ 0.01
+    )
+}
+
+l <- leaflet() %>%
+  addProviderTiles("Stamen.Toner",
+                   options = providerTileOptions(minZoom = 13))   %>%
+  addMapPane("polygons", zIndex = 410) %>%
+  addMapPane("circlemarkers", zIndex = 420) 
+
+
+names(race.beats) %>%
+   purrr::walk( function(df) {
+    l <<- l %>%
+           addPolygons(
+              data = race.beats[[df]],
+              weight = 3,
+              fillOpacity = ~beatsopacityfunction(df),
+              color = ~beatscolorfunction(df, color),
+              group = df   ,
+                            smoothFactor = 0.5,
+              label = ~htmlEscape(NAME)
+
+              )
+    })
+
+## Add Race Dot Colors ## 
+
+sflocationsmap <- 
+  sflocations %>%
+  mutate(RACE = ifelse(RACE == "W", "White", "Black"))
+  
+race.df <- split(sflocationsmap, sflocationsmap$RACE)
+race.colors <- data.frame()
+
+mycolors <- c("#6969B3", "#2B572A")
+racelevels <- names(race.df)
+racepal <- colorFactor(palette = mycolors,
+                   domain = racelevels)
+
+names(race.df) %>%
+   purrr::walk( function(df) {
+    l <<- l %>%
+          addCircleMarkers(
+                data = race.df[[df]],
+                color = ~racepal(df),
+                weight = 0,
+                radius = 2.5,
+               fillOpacity = 1,
+               group = df
+)
+       
+    })
+  
+sf.df <- split(sflocationsmap, sflocationsmap$SFTYPE)
+sf.race.df   <- split(sf.df[["STOP WITH SEARCH OR FRISK"]], sf.df[["STOP WITH SEARCH OR FRISK"]]$RACE)
+
+names(sf.race.df) %>%
+   purrr::walk( function(df) {
+    l <<- l %>%
+          addCircleMarkers(
+                data = sf.race.df[[df]],
+                color =  "red",
+                weight = 1,
+                radius = 6,
+                fill = FALSE,
+               group = df
+       )
+    })
+    
+               
+l %>%
+  addLayersControl(
+    baseGroups =  names(race.beats),
+    overlayGroups =  c(names(race.df)),
+    options = layersControlOptions(collapsed = FALSE)
+  ) %>%
+  htmlwidgets::onRender("
+    function(el, x) {
+      this.on('baselayerchange', function(e) {
+        e.layer.bringToBack();
+      })
+    }") %>%
+    addLegend("bottomleft", pal = racepal, values = names(race.df),
+    title = "Race",
+    opacity = 1
+  )
+
+
+```
+
+
+Row 
+----------------------------------------------
+### Changes Over Time 
+Segmenting by time period, we see a few trends
+
+* Firstly, there is greater dispersion of stop and frisk throughout the city during the 2017 time period
+* That said, there is a noticeable decrease of stop and frisk in some predominantly black neighborhoods such as the Rose Hill nieghborhood.
+* Despite those decreases, stop and frisk of black individuals in areas with predominantly student housing and increased, specifically in the Grady, Rugby Road, and Emmet Street Areas in addition to the areas south of west main by the train tracks and Jefferson Park Avenue.
+* Finally, Stop and Frisk increased significantly, particularly for black individuals, in the Prospect/Orangedale Ave area. 
+
+
+Row 
+----------------------------------------------
+
+### 2012-2014 
 ``` {r }
 
 l <-NULL
 
-beats_data <-
-beats  %>%
+beats_data <- 
+beats  %>% 
   mutate(`Percent White` = round(whitepopE/totalpopE*100,2),
          `Percent Black` = round(blackpopE/totalpopE*100,2)
-        )
+        ) 
+
+colorswhite <- colorRampPalette(brewer.pal(9, "Greens"))(9)[2:6]
+whitepal <- colorBin(palette = colorswhite, domain = c(0,100), bins = 5)
+
+colorsblack<- colorRampPalette(brewer.pal(9, "Purples"))(9)[2:6]
+blackpal <- colorBin(palette = colorsblack, domain = c(0,100), bins = 5)
+
+race.beats <- list(
+      `Data Off` = beats_data %>% mutate(color = 0, df = "Data Off"),
+     `Percent White` = beats_data %>% mutate(color = `Percent White`, df = "Percent White"),
+     `Percent Black` = beats_data %>% mutate(color = `Percent Black`, df = "Percent Black")
+     )
+
+beatscolorfunction <- function(listname, color){
+case_when(
+     listname == names(race.beats)[2] ~   whitepal(color),
+     listname == names(race.beats)[3] ~   blackpal(color),
+     TRUE ~ "DCF0EF"
+    )
+}
+
+beatsopacityfunction <- function(listname){
+case_when(
+     listname == names(race.beats)[2] ~   .5,
+     listname == names(race.beats)[3] ~  .5,
+     TRUE ~ .01
+    )
+}
+
+
+l <- leaflet() %>%
+  addProviderTiles("Stamen.Toner",
+                   options = providerTileOptions(minZoom = 13))   %>%
+  addMapPane("polygons", zIndex = 410) %>%
+  addMapPane("circlemarkers", zIndex = 420) 
+
+names(race.beats) %>%
+   purrr::walk( function(df) {
+    l <<- l %>%
+           addPolygons(
+              data = race.beats[[df]],
+              weight = 3,
+              fillOpacity = ~beatsopacityfunction(df),
+              color = ~beatscolorfunction(df, color),
+              group = df   ,
+              smoothFactor = 0.5,
+              label = ~htmlEscape(NAME)
+
+              )
+    })
+
+## Add Race Dot Colors ## 
+
+sflocationsmap <- 
+  sflocations %>%
+  mutate(RACE = ifelse(RACE == "W", "White", "Black")) %>%
+  filter(Year < 2015) %>%
+    mutate(labels =  paste0( '<p> Race:', RACE, '<p></p>', 
+         SFTYPE, '</p><p> Offense:', 
+          OFFENSE, '</p>' ) 
+)
+  
+race.df <- split(sflocationsmap, sflocationsmap$RACE)
+race.colors <- data.frame()
+
+mycolors <- c("#6969B3", "#2B572A")
+racelevels <- names(race.df)
+racepal <- colorFactor(palette = mycolors,
+                   domain = racelevels)
+
+names(race.df) %>%
+   purrr::walk( function(df) {
+    l <<- l %>%
+          addCircleMarkers(
+                data = race.df[[df]],
+                color = ~racepal(df),
+                weight = 0,
+                radius = 2.5,
+               fillOpacity = 1,
+               group = df
+       )
+    })
+  
+sf.df <- split(sflocationsmap, sflocationsmap$SFTYPE)
+sf.race.df   <- split(sf.df[["STOP WITH SEARCH OR FRISK"]], sf.df[["STOP WITH SEARCH OR FRISK"]]$RACE)
+
+names(sf.race.df) %>%
+   purrr::walk( function(df) {
+    l <<- l %>%
+          addCircleMarkers(
+                data = sf.race.df[[df]],
+                color =  "red",
+                weight = 1,
+                radius = 6,
+                fill = FALSE,
+               group = df
+       )
+    })
+    
+               
+l %>%
+  addLayersControl(
+    baseGroups =  names(race.beats),
+    overlayGroups =  c(names(race.df)),
+    options = layersControlOptions(collapsed = FALSE)
+  ) %>%
+  htmlwidgets::onRender("
+    function(el, x) {
+      this.on('baselayerchange', function(e) {
+        e.layer.bringToBack();
+      })
+    }") %>%
+    addLegend("bottomleft", pal = racepal, values = names(race.df),
+    title = "Race",
+    opacity = 1
+  )
+
+
+```
+
+### 2016-2017
+``` {r }
+
+l <-NULL
+
+beats_data <- 
+beats  %>% 
+  mutate(`Percent White` = round(whitepopE/totalpopE*100,2),
+         `Percent Black` = round(blackpopE/totalpopE*100,2)
+        ) 
 
 colorswhite <- colorRampPalette(brewer.pal(9, "Greens"))(9)[2:6]
 whitepal <- colorBin(palette = colorswhite, domain = c(0,100), bins = 5)
@@ -276,7 +562,7 @@ l <- leaflet() %>%
   addProviderTiles("Stamen.Toner",
                    options = providerTileOptions(minZoom = 13))   %>%
   addMapPane("polygons", zIndex = 410) %>%
-  addMapPane("circlemarkers", zIndex = 420)
+  addMapPane("circlemarkers", zIndex = 420) 
 
 names(race.beats) %>%
    purrr::walk( function(df) {
@@ -287,21 +573,27 @@ names(race.beats) %>%
               fillOpacity = ~beatsopacityfunction(df),
               color = ~beatscolorfunction(df, color),
               group = df   ,
-                            smoothFactor = 0.5,
+             smoothFactor = 0.5,
+             label = ~htmlEscape(NAME)
+
               )
     })
 
+## Add Race Dot Colors ## 
 
-## Add Race Dot Colors ##
-
-sflocationsmap <-
+sflocationsmap <- 
   sflocations %>%
-  mutate(RACE = ifelse(RACE == "W", "White Individuals", "Black Individuals"))
-
+  mutate(RACE = ifelse(RACE == "W", "White", "Black")) %>%
+  filter(Year > 2015) %>% ##################################################### YEAR 
+   mutate(labels =  paste0( '<p> Race:', RACE, '<p></p>', 
+         SFTYPE, '</p><p> Offense:', 
+          OFFENSE, '</p>' ) 
+)
+  
 race.df <- split(sflocationsmap, sflocationsmap$RACE)
 race.colors <- data.frame()
 
-mycolors <- c("#001855", "#002D00")
+mycolors <- c("#6969B3", "#2B572A")
 racelevels <- names(race.df)
 racepal <- colorFactor(palette = mycolors,
                    domain = racelevels)
@@ -311,35 +603,35 @@ names(race.df) %>%
     l <<- l %>%
           addCircleMarkers(
                 data = race.df[[df]],
-                color = ~racepal(df),
-                  weight = 0,
-
+                fillColor = ~racepal(df),
+                weight = 0,
                 radius = 2.5,
                fillOpacity = 1,
-               group = df,
-#               label = ~htmlEscape(paste0(RACE, "<br>",SFTYPE,"<br>", OFFENSE))
-     label = ~htmlEscape(paste0(RACE, "\n",SFTYPE,"\n", OFFENSE))
+               group = df
+       )
+    }) 
+  
+sf.df <- split(sflocationsmap, sflocationsmap$SFTYPE)
+sf.race.df   <- split(sf.df[["STOP WITH SEARCH OR FRISK"]], sf.df[["STOP WITH SEARCH OR FRISK"]]$RACE)
+
+names(sf.race.df) %>%
+   purrr::walk( function(df) {
+    l <<- l %>%
+          addCircleMarkers(
+                data = sf.race.df[[df]],
+                color =  "red",
+                weight = 1,
+                radius = 6,
+                fill = FALSE,
+               group = df
        )
     })
-
-sf.df <- split(sflocationsmap, sflocationsmap$SFTYPE)
-
-
-
- l <<- l %>%
-          addCircles(
-                data = sf.df[["STOP WITH SEARCH OR FRISK"]],
-                color =  "red",
-                weight = 2,
-                radius = 6,
-                fillColor = "transparent",
-               group = "Highlight Stop and Frisk"
-       )
-
+    
+               
 l %>%
   addLayersControl(
     baseGroups =  names(race.beats),
-    overlayGroups =  c(names(race.df), "Highlight Stop and Frisk"),
+    overlayGroups =  c(names(race.df)),
     options = layersControlOptions(collapsed = FALSE)
   ) %>%
   htmlwidgets::onRender("
@@ -347,12 +639,124 @@ l %>%
       this.on('baselayerchange', function(e) {
         e.layer.bringToBack();
       })
-    }
-  ")
-
+    }")  %>%
+    addLegend("bottomleft", pal = racepal, values = names(race.df),
+    title = "Race",
+    opacity = 1
+  )
 
 
 ```
+
+Row 
+----------------------------------------------
+### Exclusive Spaces
+
+This is where I think we could tie in some narrative that you are collecting, Jordy, to analyze some specific spaces that may have more fraught histories. I gave an example with the Mall. 
+
+
+Row {data-height=600}
+----------------------------------------------
+
+### Downtown {data-width=600}
+``` {r}
+l <- NULL
+
+beats_data <- 
+beats  %>% 
+  mutate(`Percent White` = round(whitepopE/totalpopE*100,2),
+         `Percent Black` = round(blackpopE/totalpopE*100,2)
+        ) 
+
+beatsopacityfunction <- function(BEAT_NO){
+case_when(
+     BEAT_NO == "01"  ~   0,
+     TRUE ~ .9
+    )
+}
+
+l <- leaflet(options = leafletOptions(zoomControl = FALSE)) %>%
+  addProviderTiles("Stamen.Toner",
+                   options = providerTileOptions(minZoom = 13, maxZoom = 17))   %>%
+         setView( lng = -78.4795, lat = 38.0305, zoom = 17) %>%
+
+  addMapPane("polygons", zIndex = 410) %>%
+  addMapPane("circlemarkers", zIndex = 420) %>%
+    # setMaxBounds( lng1 = -87.94011
+    #              , lat1 = 41.64454
+    #              , lng2 = -87.52414
+    #              , lat2 = 42.02304 ) %>%
+           addPolygons(
+              data = beats_data,
+              weight = 3,
+              fillOpacity = ~beatsopacityfunction(BEAT_NO),
+              color = "grey",
+               smoothFactor = 0.5,
+
+              )
+
+## Add Race Dot Colors ## 
+sflocationsmap <- 
+  sflocations %>%
+  mutate(RACE = ifelse(RACE == "W", "White", "Black")) %>%
+  filter(BEAT_NO == 1) %>%
+    mutate(labels =  paste0( '<p> Race:', RACE, '<p></p>', 
+         SFTYPE, '</p><p> Offense:', 
+          OFFENSE, '</p>' ) 
+)
+  
+race.df <- split(sflocationsmap, sflocationsmap$RACE)
+race.colors <- data.frame()
+
+mycolors <- c("#6969B3", "#2B572A")
+racelevels <- names(race.df)
+racepal <- colorFactor(palette = mycolors,
+                   domain = racelevels)
+
+names(race.df) %>%
+   purrr::walk(  function(df) {
+    l <<- l %>%
+          addCircleMarkers(
+                data = race.df[[df]],
+                color = ~racepal(df),
+                weight = 0,
+                radius = 4,
+               fillOpacity = 1,
+               group = df)
+    })
+  
+sf.df <- split(sflocationsmap, sflocationsmap$SFTYPE)
+sf.race.df   <- split(sf.df[["STOP WITH SEARCH OR FRISK"]], sf.df[["STOP WITH SEARCH OR FRISK"]]$RACE)
+
+names(sf.race.df) %>%
+   purrr::walk( function(df) {
+    l <<- l %>%
+          addCircleMarkers(
+                data = sf.race.df[[df]],
+                color =  "red",
+                weight = 1,
+                radius = 7,
+                fill = FALSE,
+               group = df
+       )
+    }) 
+               
+l 
+
+```
+
+
+### This needs to be prettier
+
+The Downtown Mall is a public space for free use by Charlottesville residents. 
+
+* In the periods of 2012 -2014 and 2016-2017, 26 Black individuals were detained by police 
+* 22 White individuals were detained in the same period. 
+* 73% of Black individuals stopped (19 individuals) were also searched and frisked 
+* 31% (7) of White individuals were also searched and frisked. 
+
+
+What these analyses cannot account for is frequency of utilization of the space. Not many individuals live in this area, although 83% of those who do are white. Speaking with Charlottesville residents of color....
 
 
 

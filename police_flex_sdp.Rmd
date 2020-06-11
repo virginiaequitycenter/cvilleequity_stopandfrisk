@@ -39,7 +39,7 @@ Mapping {data-orientation=rows}
 * These maps display all police detainments between 2012-2014 and 2016-2017. 
 * Points do not represent exact locations of each stop, rather the density of the dots represent the density of detainments in a geographic area. 
 * To help guide your eyes, Detainments that include Search and Frisk are circled in red 
-* Turn on and off underlying population characteristics through the underlying data to see how who primariliy occupies a specific district relates to who is detained in that space.
+* Turn on and off underlying population characteristics through the box on the right to see how who primariliy occupies a specific district relates to who is detained in that space.
 
 
 Row {data-height=800}
@@ -81,7 +81,7 @@ beatsopacityfunction <- function(listname){
 case_when(
      listname == names(race.beats)[2] ~   .5,
      listname == names(race.beats)[3] ~  .5,
-     TRUE ~ 0
+     TRUE ~ 0.01
     )
 }
 
@@ -102,6 +102,8 @@ names(race.beats) %>%
               color = ~beatscolorfunction(df, color),
               group = df   ,
                             smoothFactor = 0.5,
+              label = ~htmlEscape(NAME)
+
               )
     })
 
@@ -128,10 +130,9 @@ names(race.df) %>%
                 weight = 0,
                 radius = 2.5,
                fillOpacity = 1,
-               group = df,
-#               label = ~htmlEscape(paste0(RACE, "<br>",SFTYPE,"<br>", OFFENSE))
-     label = ~htmlEscape(paste0(RACE, "\n",SFTYPE,"\n", OFFENSE))
-       )
+               group = df
+)
+       
     })
   
 sf.df <- split(sflocationsmap, sflocationsmap$SFTYPE)
@@ -162,7 +163,11 @@ l %>%
       this.on('baselayerchange', function(e) {
         e.layer.bringToBack();
       })
-    }") 
+    }") %>%
+    addLegend("bottomleft", pal = racepal, values = names(race.df),
+    title = "Race",
+    opacity = 1
+  )
 
 
 ```
@@ -217,7 +222,7 @@ beatsopacityfunction <- function(listname){
 case_when(
      listname == names(race.beats)[2] ~   .5,
      listname == names(race.beats)[3] ~  .5,
-     TRUE ~ 0
+     TRUE ~ .01
     )
 }
 
@@ -237,7 +242,9 @@ names(race.beats) %>%
               fillOpacity = ~beatsopacityfunction(df),
               color = ~beatscolorfunction(df, color),
               group = df   ,
-                            smoothFactor = 0.5,
+              smoothFactor = 0.5,
+              label = ~htmlEscape(NAME)
+
               )
     })
 
@@ -246,7 +253,11 @@ names(race.beats) %>%
 sflocationsmap <- 
   sflocations %>%
   mutate(RACE = ifelse(RACE == "W", "White", "Black")) %>%
-  filter(Year < 2015)
+  filter(Year < 2015) %>%
+    mutate(labels =  paste0( '<p> Race:', RACE, '<p></p>', 
+         SFTYPE, '</p><p> Offense:', 
+          OFFENSE, '</p>' ) 
+)
   
 race.df <- split(sflocationsmap, sflocationsmap$RACE)
 race.colors <- data.frame()
@@ -265,9 +276,7 @@ names(race.df) %>%
                 weight = 0,
                 radius = 2.5,
                fillOpacity = 1,
-               group = df,
-#               label = ~htmlEscape(paste0(RACE, "<br>",SFTYPE,"<br>", OFFENSE))
-     label = ~htmlEscape(paste0(RACE, "\n",SFTYPE,"\n", OFFENSE))
+               group = df
        )
     })
   
@@ -299,7 +308,11 @@ l %>%
       this.on('baselayerchange', function(e) {
         e.layer.bringToBack();
       })
-    }") 
+    }") %>%
+    addLegend("bottomleft", pal = racepal, values = names(race.df),
+    title = "Race",
+    opacity = 1
+  )
 
 
 ```
@@ -359,7 +372,9 @@ names(race.beats) %>%
               fillOpacity = ~beatsopacityfunction(df),
               color = ~beatscolorfunction(df, color),
               group = df   ,
-                            smoothFactor = 0.5,
+             smoothFactor = 0.5,
+             label = ~htmlEscape(NAME)
+
               )
     })
 
@@ -368,7 +383,11 @@ names(race.beats) %>%
 sflocationsmap <- 
   sflocations %>%
   mutate(RACE = ifelse(RACE == "W", "White", "Black")) %>%
-  filter(Year > 2015) ##################################################### YEAR 
+  filter(Year > 2015) %>% ##################################################### YEAR 
+   mutate(labels =  paste0( '<p> Race:', RACE, '<p></p>', 
+         SFTYPE, '</p><p> Offense:', 
+          OFFENSE, '</p>' ) 
+)
   
 race.df <- split(sflocationsmap, sflocationsmap$RACE)
 race.colors <- data.frame()
@@ -387,11 +406,9 @@ names(race.df) %>%
                 weight = 0,
                 radius = 2.5,
                fillOpacity = 1,
-               group = df,
-#               label = ~htmlEscape(paste0(RACE, "<br>",SFTYPE,"<br>", OFFENSE))
-     label = ~htmlEscape(paste0(RACE, "\n",SFTYPE,"\n", OFFENSE))
+               group = df
        )
-    })
+    }) 
   
 sf.df <- split(sflocationsmap, sflocationsmap$SFTYPE)
 sf.race.df   <- split(sf.df[["STOP WITH SEARCH OR FRISK"]], sf.df[["STOP WITH SEARCH OR FRISK"]]$RACE)
@@ -421,7 +438,11 @@ l %>%
       this.on('baselayerchange', function(e) {
         e.layer.bringToBack();
       })
-    }") 
+    }")  %>%
+    addLegend("bottomleft", pal = racepal, values = names(race.df),
+    title = "Race",
+    opacity = 1
+  )
 
 
 ```
@@ -436,9 +457,9 @@ This is where I think we could tie in some narrative that you are collecting, Jo
 Row {data-height=600}
 ----------------------------------------------
 
-### Downtown
+### Downtown {data-width=600}
 ``` {r}
-l <-NULL
+l <- NULL
 
 beats_data <- 
 beats  %>% 
@@ -470,13 +491,18 @@ l <- leaflet(options = leafletOptions(zoomControl = FALSE)) %>%
               fillOpacity = ~beatsopacityfunction(BEAT_NO),
               color = "grey",
                smoothFactor = 0.5,
+
               )
 
 ## Add Race Dot Colors ## 
 sflocationsmap <- 
   sflocations %>%
   mutate(RACE = ifelse(RACE == "W", "White", "Black")) %>%
-  filter(BEAT_NO == 1)
+  filter(BEAT_NO == 1) %>%
+    mutate(labels =  paste0( '<p> Race:', RACE, '<p></p>', 
+         SFTYPE, '</p><p> Offense:', 
+          OFFENSE, '</p>' ) 
+)
   
 race.df <- split(sflocationsmap, sflocationsmap$RACE)
 race.colors <- data.frame()
@@ -487,7 +513,7 @@ racepal <- colorFactor(palette = mycolors,
                    domain = racelevels)
 
 names(race.df) %>%
-   purrr::walk( function(df) {
+   purrr::walk(  function(df) {
     l <<- l %>%
           addCircleMarkers(
                 data = race.df[[df]],
@@ -495,10 +521,7 @@ names(race.df) %>%
                 weight = 0,
                 radius = 4,
                fillOpacity = 1,
-               group = df,
-#               label = ~htmlEscape(paste0(RACE, "<br>",SFTYPE,"<br>", OFFENSE))
-     label = ~htmlEscape(paste0(RACE, "\n",SFTYPE,"\n", OFFENSE))
-       )
+               group = df)
     })
   
 sf.df <- split(sflocationsmap, sflocationsmap$SFTYPE)
@@ -515,17 +538,23 @@ names(sf.race.df) %>%
                 fill = FALSE,
                group = df
        )
-    })
+    }) 
                
 l 
 
 ```
 
-```{r}
-```
 
 ### This needs to be prettier
 
-The Downtown Mall is a public space for free use by Charlottesville residents. In the periods of 2012 -2014 and 2016-2017, 26 Black individuals were detained by police as were 22 White individuals. 73% of Black individuals stopped (19 individuals) were also searched and frisked as opposed to 31% (7) of White individuals. What these analyses cannot account for is frequency of utilization of the space. Not many individuals live in this area, although 83% of those who do are white.
+The Downtown Mall is a public space for free use by Charlottesville residents. 
+
+* In the periods of 2012 -2014 and 2016-2017, 26 Black individuals were detained by police 
+* 22 White individuals were detained in the same period. 
+* 73% of Black individuals stopped (19 individuals) were also searched and frisked 
+* 31% (7) of White individuals were also searched and frisked. 
+
+
+What these analyses cannot account for is frequency of utilization of the space. Not many individuals live in this area, although 83% of those who do are white. Speaking with Charlottesville residents of color, 
 
 
