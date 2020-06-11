@@ -857,7 +857,7 @@ ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
 ```
 
 
-### By Time Period
+### By Time Period {data-height = 600}
 
 ```{r}
 # for annotation
@@ -881,7 +881,7 @@ ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
 ```
 
 
-### By Stop and Frisk
+### By Stop and Frisk{data-height = 600}
 
 ```{r}
 tots <- sf_race %>% group_by(offense7, type2) %>% summarize(tots = n())
