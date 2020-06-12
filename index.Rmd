@@ -1173,7 +1173,7 @@ ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
 About {data-orientation=rows}
 =====================================
 
-The Charlottesville policing data was acquired by attorney Jeff Fogel through Freedom of Information Act requests. The site was created by [Michele Claibourn](https://mclaibourn.github.io/) and Sam Powers in a partnership between the [Equity Center](http://virginiaequitycenter.org/) at UVA and Jordy Yager's *[Determined](https://www.vinegarhillmagazine.com/determined)* series with Vinegar Hill Magazine and Charlottesville Tomorrow. 
+The Charlottesville policing data was acquired by attorney Jeff Fogel through Freedom of Information Act requests. The site was created by [Michele Claibourn](https://mclaibourn.github.io/) and Sam Powers in a partnership between the [Equity Center](http://virginiaequitycenter.org/) at UVA and Jordy Yager's *[Determined](https://www.cvilletomorrow.org/articles/determined-stories-of-resilience-in-a-broken-ecosystem/)* series with Vinegar Hill Magazine and Charlottesville Tomorrow. 
 
 This is a work in progress and we plan to keep building and improving it. We appreciate all feedback --  questions, corrections, concerns, ideas to make it better. You can reach us at [CvilleEquityAtlas@virginia.edu](mailto:CvilleEquityAtlas@virginia.edu). The source code to generate the analysis and this site are available on [GitHub](https://github.com/virginiaequitycenter/cvilleequity_stopandfrisk).
 
