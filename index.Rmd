@@ -286,7 +286,7 @@ Where? {data-orientation=rows}
 * Turn on and off underlying population characteristics through the box on the right
 * Note that the underlying population percentages are based on a comparison of White and Black populations only to align with the races identifiable in the police data files.  
 
-Row {data-height=800}
+Row {data-height=700}
 ----------------------------------------------
 
 ### Detentions 2012 - 2014 & 2016 - 2017 
@@ -422,7 +422,7 @@ l %>%
 
 ### Detentions by Beat
  
-``` {r fig.height = 7}
+``` {r fig.height = 5, fig.width = 7}
  
 sfs <- 
   sflocations %>%
@@ -439,12 +439,12 @@ sfs <-
   summarize(Counts = n()) %>%
     group_by(NAME) %>%
   mutate(total = sum(Counts)) %>%
-  mutate(Counts = ifelse(RACE ==  "White", Counts *-1, Counts)) %>%
+  mutate(Counts = ifelse(RACE ==  "Black", Counts *-1, Counts)) %>%
   ungroup() %>%
   mutate(RACE = fct_relevel(RACE, "White")) %>%
   group_by(NAME, RACE) %>%
   mutate(RaceTot = sum(Counts)) %>%
-  mutate(lab_pos = ifelse(RACE ==  "White", RaceTot -1, RaceTot + 1))
+  mutate(lab_pos = ifelse(RACE ==  "Black", RaceTot -2, RaceTot + 2))
 
 pal2 <- c("#8dd3c7" ,"#bebada")
 
@@ -453,18 +453,26 @@ ggplot(sfs, aes(x = reorder(NAME, -total), fill = RACE, y = Counts, alpha = SFTY
   scale_fill_manual(values = pal2) +
   geom_text(data = sfs %>% select(NAME, lab_pos, RaceTot) %>% unique(), aes(x = NAME, y = lab_pos, label = abs(RaceTot)), size = 3, inherit.aes = FALSE) +
   coord_flip() +
-  labs(y = "# Detentions", x = "") +
-  scale_y_continuous(labels = function(x){abs(x)}, limits = c(-52, 52), breaks = seq(-50, 50, 20)) +
+  scale_y_continuous(labels = function(x){abs(x)}, limits = c(-53, 53), breaks = c(seq(-40, 40, 20), 0)) +
   scale_alpha_discrete(range = c(.6, 1)) +
-  annotate("text", x = 29, y = -15, label = "White" ) +
-    annotate("text", x = 29, y = 15, label = "Black" ) +
-   annotate("rect", xmin = 25, xmax = 26, ymin = 10, ymax = 14, alpha = 1, fill = "#bebada") +
+  annotate("text", x = 29, y = -15, label = "Black" ) +
+    annotate("text", x = 29, y = 15, label = "White" ) +
+   annotate("rect", xmin = 25, xmax = 26, ymin = 10, ymax = 14, alpha = 1, fill = "#8dd3c7") +
    annotate("text", x = 25.5, y = 15, label = "= With Stop and Frisk", size = 3, hjust = 0)+
-    annotate("rect", xmin = 23.5, xmax = 24.5, ymin = 10, ymax = 14, alpha = .6, fill = "#bebada") +
+    annotate("rect", xmin = 23.5, xmax = 24.5, ymin = 10, ymax = 14, alpha = .6, fill = "#8dd3c7") +
    annotate("text", x = 24, y = 15, label = "= Without Stop and Frisk", size = 3, hjust = 0)+
-  theme_bw() +
+  geom_hline(yintercept  = 0) +
+  theme_minimal() +
   theme(
-    legend.position = "none"
+    legend.position = "none",
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    axis.title = element_blank(),
+    panel.grid.major.y = element_line(linetype = "dashed"),
+ #   axis.text.x = element_blank(),
+ axis.line.x = element_line(),
+ axis.ticks.x = element_line()
+
   ) 
 
 
@@ -1051,12 +1059,10 @@ sfs %>% filter(BEAT_NO %in% c("8", "19", "21", "12"))
 
 Historically, racial covenants prohibited Black individuals from living in the Martha Jefferson and Locust Grove. That legacy continues today
 
-* An estimated 1401 White individuals live in the Martha Jefferson and Locust Grove
-* 3 White individuals were detained in the Martha Jefferson and Locust Grove Neighborhoods
-* 2.14 White individuals for every 1000 White individuals in those neighborhoods were detained
-* An estimated 1731	Black individuals live in in Prospect Orangedale Ave Neighborhood
-* 68 Black individuals were detained in the Prospect Orangedale Ave Neighborhood
-* 39 Black individuals for every 1000 Black individuals in those neighborhoods were detained
+* An estimated 1401 White individuals live in the Martha Jefferson and Locust Grove Neighborhoods
+* 3 (2.14 for every 1000) White individuals were detained in the Martha Jefferson and Locust Grove Neighborhoods
+* An estimated 1731	Black individuals live in in Prospect Orangedale Ave and Ridge St Neighborhoods
+* 68 (39 for every 1000) Black individuals were detained in the Prospect Orangedale Ave and Ridge St Neighborhoods
 
 The Downtown Mall is a public space for free use by Charlottesville residents. 
 
