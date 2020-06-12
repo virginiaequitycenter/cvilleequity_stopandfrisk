@@ -25,7 +25,7 @@ sflocations <- read_csv("data/sflocations.csv") %>% st_as_sf(
   ) %>%
   filter(!Year %in% c(2019, 2020))
 
-beats <- readRDS("beat_pop_map.Rds")
+beats <- readRDS("data/beat_pop_map.Rds")
 
 
 ```
