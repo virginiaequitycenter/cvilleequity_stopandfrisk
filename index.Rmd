@@ -270,21 +270,28 @@ ggplot(sf_race_type, aes(x = group, y = value, fill = race)) +
 
 
 
+
 Where? {data-orientation=rows}
 ===================================== 
 
-### Who do Police Detain and Where?
 
-* These maps display all police detainments between 2012-2014 and 2016-2017. 
-* Points do not represent exact locations of each stop, rather the density of the dots represent the density of detainments in a geographic area. 
+### Where Do Police Detain People?
+
+Row 
+---------------------------
+### Map Details
+* These maps display all police detainments between *2012-2014* and *2016-2017* 
+* Each point represents one stop
+* Points *do not* represent exact locations of each stop
+* Density of the dots represent the density of detainments in a geographic area
 * To help guide your eyes, detainments that include Search and Frisk are circled in red 
-* Turn on and off underlying population characteristics through the box on the right to see how who primariliy occupies a specific district relates to who is detained in that space.
+* Turn on and off underlying population characteristics through the box on the right
+* Note that our percentages used are based solely on a comparison of White and Black populations given that they were the only races identifiable in the police data files.  
 
-
-Row {data-height=800}
+Row {data-height=700}
 ----------------------------------------------
 
-### All Years of Data 
+### Detainments 2012 - 2014 & 2016 - 2017 
 
 ``` {r fig.width = 7 }
 
@@ -341,8 +348,7 @@ names(race.beats) %>%
               color = ~beatscolorfunction(df, color),
               group = df   ,
                             smoothFactor = 0.5,
-              label = ~htmlEscape(NAME)
-
+              label = ~htmlEscape(paste0(NAME,  ifelse(color == 0, "", ifelse(df  == "Percent White", paste0(": ", color, "% White"), paste0(": ", color, "% Black") )  )))
               )
     })
 
@@ -370,7 +376,7 @@ names(race.df) %>%
                 radius = 2.5,
                fillOpacity = 1,
                group = df,
-          label = ~htmlEscape(paste0("Offese: ", OFFENSE))
+          label = ~htmlEscape(paste0("Offense: ", OFFENSE))
 
 )
        
@@ -392,6 +398,7 @@ names(sf.race.df) %>%
        )
     })
     
+html_legend <- "<svg width = '10' height = '10'> <circle cx='5' cy='5' r='5' stroke='red' fill = 'white' stroke-width = '1' /></svg> = Stop & Frisk"
                
 l %>%
   addLayersControl(
@@ -408,21 +415,72 @@ l %>%
     addLegend("bottomleft", pal = racepal, values = names(race.df),
     title = "Race",
     opacity = 1
-  )
+  ) %>%
+    addControl(html = html_legend, position = "bottomright")
+
 
 
 ```
 
+### Detainments by Beat
+ 
+``` {r fig.height = 7}
+ 
+sfs <- 
+  sflocations %>%
+  mutate(RACE = ifelse(RACE == "W", "White", "Black")) %>%
+  as_tibble() %>% 
+  select(BEAT_NO, RACE, OFFENSE, SFTYPE) %>%
+  left_join(
+  beats %>%
+    as_tibble() %>%
+    select(BEAT_NO, NAME) %>%
+    mutate(BEAT_NO = as.numeric(BEAT_NO))
+) %>%
+  group_by(NAME, BEAT_NO, RACE, SFTYPE) %>%
+  summarize(Counts = n()) %>%
+    group_by(NAME) %>%
+  mutate(total = sum(Counts)) %>%
+  mutate(Counts = ifelse(RACE ==  "White", Counts *-1, Counts)) %>%
+  ungroup() %>%
+  mutate(RACE = fct_relevel(RACE, "White")) %>%
+  group_by(NAME, RACE) %>%
+  mutate(RaceTot = sum(Counts)) %>%
+  mutate(lab_pos = ifelse(RACE ==  "White", RaceTot -1, RaceTot + 1))
+
+pal2 <- c("#8dd3c7" ,"#bebada")
+
+ggplot(sfs, aes(x = reorder(NAME, -total), fill = RACE, y = Counts, alpha = SFTYPE), color = "black") +
+  geom_bar(stat = "identity") + labs(fill = "Race") +
+  scale_fill_manual(values = pal2) +
+  geom_text(data = sfs %>% select(NAME, lab_pos, RaceTot) %>% unique(), aes(x = NAME, y = lab_pos, label = abs(RaceTot)), size = 3, inherit.aes = FALSE) +
+  coord_flip() +
+  labs(y = "# Detentions", x = "") +
+  scale_y_continuous(labels = function(x){abs(x)}, limits = c(-52, 52), breaks = seq(-50, 50, 20)) +
+  scale_alpha_discrete(range = c(.6, 1)) +
+  annotate("text", x = 29, y = -15, label = "White" ) +
+    annotate("text", x = 29, y = 15, label = "Black" ) +
+   annotate("rect", xmin = 25, xmax = 26, ymin = 10, ymax = 14, alpha = 1, fill = "#bebada") +
+   annotate("text", x = 25.5, y = 15, label = "= With Stop and Frisk", size = 3, hjust = 0)+
+    annotate("rect", xmin = 23.5, xmax = 24.5, ymin = 10, ymax = 14, alpha = .6, fill = "#bebada") +
+   annotate("text", x = 24, y = 15, label = "= Without Stop and Frisk", size = 3, hjust = 0)+
+  theme_bw() +
+  theme(
+    legend.position = "none"
+  ) 
+
+
+```
 
 Row 
 ----------------------------------------------
 ### Changes Over Time 
-Segmenting by time period, we see a few trends
+Trends:
 
-* Firstly, there is greater dispersion of stop and frisk throughout the city during the 2017 time period
-* That said, there is a noticeable decrease of stop and frisk in some predominantly black neighborhoods such as the Rose Hill nieghborhood.
-* Despite those decreases, stop and frisk of black individuals in areas with predominantly student housing increased, specifically in the Grady, Rugby Road, and Emmet Street Areas in addition to the areas south of west main by the train tracks and Jefferson Park Avenue.
-* Finally, Stop and Frisk increased significantly, particularly for black individuals, in the Prospect/Orangedale Ave area. 
+* Greater dispersion of stop and frisk throughout the city during the 2017
+* Noticeable *decrease* of stop and frisk in the Rose Hill nieghborhood.
+* Stop and frisk of black individuals in areas with predominantly student housing *increased*, specifically in the Grady, Rugby Road, and Emmet Street Areas in addition to the areas south of west main by the train tracks and Jefferson Park Avenue.
+* Stop and Frisk *increased significantly*, particularly for black individuals, in the Prospect/Orangedale Ave area. 
 
 
 Row 
@@ -484,7 +542,7 @@ names(race.beats) %>%
               color = ~beatscolorfunction(df, color),
               group = df   ,
               smoothFactor = 0.5,
-              label = ~htmlEscape(NAME)
+              label = ~htmlEscape(paste0(NAME,  ifelse(color == 0, "", ifelse(df  == "Percent White", paste0(": ", color, "% White"), paste0(": ", color, "% Black") )  )))
 
               )
     })
@@ -518,7 +576,7 @@ names(race.df) %>%
                 radius = 2.5,
                fillOpacity = 1,
                group = df,
-               label = ~htmlEscape(paste0("Offese: ", OFFENSE))
+               label = ~htmlEscape(paste0("Offense: ", OFFENSE))
 
        )
     })
@@ -555,7 +613,8 @@ l %>%
     addLegend("bottomleft", pal = racepal, values = names(race.df),
     title = "Race",
     opacity = 1
-  )
+  ) %>%
+    addControl(html = html_legend, position = "bottomright")
 
 
 ```
@@ -616,8 +675,7 @@ names(race.beats) %>%
               color = ~beatscolorfunction(df, color),
               group = df   ,
              smoothFactor = 0.5,
-             label = ~htmlEscape(NAME)
-
+              label = ~htmlEscape(paste0(NAME,  ifelse(color == 0, "", ifelse(df  == "Percent White", paste0(": ", color, "% White"), paste0(": ", color, "% Black") )  )))
               )
     })
 
@@ -650,7 +708,7 @@ names(race.df) %>%
                 radius = 2.5,
                fillOpacity = 1,
                group = df,
-              label = ~htmlEscape(paste0("Offese: ", OFFENSE))
+              label = ~htmlEscape(paste0("Offense: ", OFFENSE))
 
        )
     }) 
@@ -687,17 +745,209 @@ l %>%
     addLegend("bottomleft", pal = racepal, values = names(race.df),
     title = "Race",
     opacity = 1
-  )
+  ) %>%
+    addControl(html = html_legend, position = "bottomright")
 
 
 ```
 
 Row 
 ----------------------------------------------
-### Exclusive Spaces
+### Over Policing & Exclusive Spaces
 
-This is where I think we could tie in some narrative that you are collecting, Jordy, to analyze some specific spaces that may have more fraught histories. I gave an example with the Mall. 
+The data does not record why police enter certain spaces, whether it is an officer-initiated discretionary stop or a response to a call.  We also do not have data on whether or not a detainment led to an arrest. The offense listed is the reason the police officer recorded to justify the stop based on reasonable suspicion, not a determination that the offense occured. Beacuse of this, it is difficult to say that police detainments are an indicator of crime. Fewer detainments does not immediatley signify less crime in an area, just less police activity. 
 
+Below, we highlight three areas, a predominantly black residential space, a predominantly white residential space, and a public walking mall to investigate who police detain and where.
+
+Row {data-height=600}
+----------------------------------------------
+### Ridge Street & Prospect-Orangedale Neighborhoods {data-height=600}
+
+
+``` {r}
+l <- NULL
+
+beats_data <- 
+beats  %>% 
+  mutate(`Percent White` = round(whitepopE/totalpopE*100,2),
+         `Percent Black` = round(blackpopE/totalpopE*100,2)
+        ) 
+
+beatsopacityfunction <- function(BEAT_NO){
+case_when(
+     BEAT_NO %in% c("12", "21" )  ~ 0,
+     TRUE ~ .9
+    )
+}
+
+
+l <- leaflet(options = leafletOptions(zoomControl = FALSE)) %>%
+  addProviderTiles("Stamen.Toner",
+                   options = providerTileOptions(minZoom = 15, maxZoom = 16))   %>%
+         setView( lng =  -78.48875, lat = 38.02272 , zoom = 15) %>%
+
+  addMapPane("polygons", zIndex = 410) %>%
+  addMapPane("circlemarkers", zIndex = 420) %>%
+    # setMaxBounds( lng1 = -87.94011
+    #              , lat1 = 41.64454
+    #              , lng2 = -87.52414
+    #              , lat2 = 42.02304 ) %>%
+           addPolygons(
+              data = beats_data,
+              weight = 10,
+              fillOpacity = ~beatsopacityfunction(BEAT_NO),
+              color = "grey",
+               smoothFactor = 0.5,
+
+              )
+
+## Add Race Dot Colors ## 
+sflocationsmap <- 
+  sflocations %>%
+  mutate(RACE = ifelse(RACE == "W", "White", "Black")) %>%
+  filter(BEAT_NO  %in%  c(12, 21 )) 
+  
+race.df <- split(sflocationsmap, sflocationsmap$RACE)
+race.colors <- data.frame()
+
+mycolors <- c("#6969B3", "#00AF98")
+racelevels <- names(race.df)
+racepal <- colorFactor(palette = mycolors,
+                   domain = racelevels)
+
+names(race.df) %>%
+   purrr::walk(  function(df) {
+    l <<- l %>%
+          addCircleMarkers(
+                data = race.df[[df]],
+                color = ~racepal(df),
+                weight = 0,
+                radius = 4,
+               fillOpacity = 1,
+               group = df,
+              label = ~htmlEscape(paste0("Offense: ", OFFENSE))
+)
+    })
+  
+sf.df <- split(sflocationsmap, sflocationsmap$SFTYPE)
+sf.race.df   <- split(sf.df[["STOP WITH SEARCH OR FRISK"]], sf.df[["STOP WITH SEARCH OR FRISK"]]$RACE)
+
+names(sf.race.df) %>%
+   purrr::walk( function(df) {
+    l <<- l %>%
+          addCircleMarkers(
+                data = sf.race.df[[df]],
+                color =  "red",
+                weight = 1,
+                radius = 7,
+                fill = FALSE,
+               group = df
+       )
+    }) 
+               
+l %>%
+    addLegend("bottomleft", pal = racepal, values = names(race.df),
+    title = "Race",
+    opacity = 1
+  ) %>%
+    addControl(html = html_legend, position = "bottomright")
+
+
+```
+
+
+### Martha Jefferson & Locust Grove Neighborhoods {data-height=600}
+
+``` {r}
+l <- NULL
+
+beats_data <- 
+beats  %>% 
+  mutate(`Percent White` = round(whitepopE/totalpopE*100,2),
+         `Percent Black` = round(blackpopE/totalpopE*100,2)
+        ) 
+
+beatsopacityfunction <- function(BEAT_NO){
+case_when(
+     BEAT_NO %in% c("08", "19" )  ~ 0,
+     TRUE ~ .9
+    )
+}
+
+
+l <- leaflet(options = leafletOptions(zoomControl = FALSE)) %>%
+  addProviderTiles("Stamen.Toner",
+                   options = providerTileOptions(minZoom = 15, maxZoom = 16))   %>%
+         setView( lng = -78.46738, lat = 38.03754 , zoom = 15) %>%
+
+  addMapPane("polygons", zIndex = 410) %>%
+  addMapPane("circlemarkers", zIndex = 420) %>%
+    # setMaxBounds( lng1 = -87.94011
+    #              , lat1 = 41.64454
+    #              , lng2 = -87.52414
+    #              , lat2 = 42.02304 ) %>%
+           addPolygons(
+              data = beats_data,
+              weight = 10,
+              fillOpacity = ~beatsopacityfunction(BEAT_NO),
+              color = "grey",
+               smoothFactor = 0.5,
+
+              )
+
+## Add Race Dot Colors ## 
+sflocationsmap <- 
+  sflocations %>%
+  mutate(RACE = ifelse(RACE == "W", "White", "Black")) %>%
+  filter(BEAT_NO  %in%  c(8, 19)) 
+  
+race.df <- split(sflocationsmap, sflocationsmap$RACE)
+race.colors <- data.frame()
+
+mycolors <- c("#6969B3", "#00AF98")
+racelevels <- names(race.df)
+racepal <- colorFactor(palette = mycolors,
+                   domain = racelevels)
+
+names(race.df) %>%
+   purrr::walk(  function(df) {
+    l <<- l %>%
+          addCircleMarkers(
+                data = race.df[[df]],
+                color = ~racepal(df),
+                weight = 0,
+                radius = 4,
+               fillOpacity = 1,
+               group = df,
+              label = ~htmlEscape(paste0("Offense: ", OFFENSE))
+)
+    })
+  
+sf.df <- split(sflocationsmap, sflocationsmap$SFTYPE)
+sf.race.df   <- split(sf.df[["STOP WITH SEARCH OR FRISK"]], sf.df[["STOP WITH SEARCH OR FRISK"]]$RACE)
+
+names(sf.race.df) %>%
+   purrr::walk( function(df) {
+    l <<- l %>%
+          addCircleMarkers(
+                data = sf.race.df[[df]],
+                color =  "red",
+                weight = 1,
+                radius = 7,
+                fill = FALSE,
+               group = df
+       )
+    }) 
+               
+l %>%
+    addLegend("bottomleft", pal = racepal, values = names(race.df),
+    title = "Race",
+    opacity = 1
+  ) %>%
+    addControl(html = html_legend, position = "bottomright")
+
+
+```
 
 Row {data-height=600}
 ----------------------------------------------
@@ -721,7 +971,7 @@ case_when(
 
 l <- leaflet(options = leafletOptions(zoomControl = FALSE)) %>%
   addProviderTiles("Stamen.Toner",
-                   options = providerTileOptions(minZoom = 15, maxZoom = 17))   %>%
+                   options = providerTileOptions(minZoom = 16, maxZoom = 17))   %>%
          setView( lng = -78.4795, lat = 38.0305, zoom = 16) %>%
 
   addMapPane("polygons", zIndex = 410) %>%
@@ -767,7 +1017,7 @@ names(race.df) %>%
                 radius = 4,
                fillOpacity = 1,
                group = df,
-              label = ~htmlEscape(paste0("Offese: ", OFFENSE))
+              label = ~htmlEscape(paste0("Offense: ", OFFENSE))
 )
     })
   
@@ -787,12 +1037,28 @@ names(sf.race.df) %>%
        )
     }) 
                
-l 
+l %>%
+    addLegend("bottomleft", pal = racepal, values = names(race.df),
+    title = "Race",
+    opacity = 1
+  ) %>%
+    addControl(html = html_legend, position = "bottomright")
+
+sfs %>% filter(BEAT_NO %in% c("8", "19", "21", "12"))
 
 ```
 
 
-### This needs to be prettier
+### Analysis
+
+Historically, racial covenants prohibited Black individuals from living in the Martha Jefferson and Locust Grove. That legacy continues today
+
+* An estimated 1401 White individuals live in the Martha Jefferson and Locust Grove
+* 3 White individuals were detained in the Martha Jefferson and Locust Grove Neighborhoods
+* 2.14 White individuals for every 1000 White individuals in those neighborhoods were detained
+* An estimated 1731	Black individuals live in in Prospect Orangedale Ave Neighborhood
+* 68 Black individuals were detained in the Prospect Orangedale Ave Neighborhood
+* 39 Black individuals for every 1000 Black individuals in those neighborhoods were detained
 
 The Downtown Mall is a public space for free use by Charlottesville residents. 
 
@@ -800,10 +1066,6 @@ The Downtown Mall is a public space for free use by Charlottesville residents.
 * 22 White individuals were detained in the same period. 
 * 73% of Black individuals stopped (19 individuals) were also searched and frisked 
 * 31% (7) of White individuals were also searched and frisked. 
-
-
-What these analyses cannot account for is frequency of utilization of the space. Not many individuals live in this area, although 83% of those who do are white. Speaking with Charlottesville residents of color....
-
 
 
 
