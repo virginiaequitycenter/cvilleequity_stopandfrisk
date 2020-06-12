@@ -278,22 +278,18 @@ Where? {data-orientation=rows}
 
 ### Where Do Police Detain People?
 
-Row {data-height = 100}
------------------------------
-
-### Map Details
-* These maps display all police detainments between *2012-2014* and *2016-2017* 
-* Each point represents one stop
-* Points *do not* represent exact locations of each stop
-* Density of the dots represent the density of detainments in a geographic area
-* To help guide your eyes, detainments that include Search and Frisk are circled in red 
+#### Map Details
+* These maps display police detentions from both time periods, *2012-2014* and *2016-2017*. 
+* Each point represents one individual stopped.
+* Points *do not* represent the exact locations of each stop, but the density of the dots represents the density of detainments in a [geographic area](https://opendata.charlottesville.org/datasets/police-neighborhood-area).
+* To help guide your eyes, detentions that include Search and Frisk are circled in red.
 * Turn on and off underlying population characteristics through the box on the right
-* Note that our percentages used are based solely on a comparison of White and Black populations given that they were the only races identifiable in the police data files.  
+* Note that the underlying population percentages are based on a comparison of White and Black populations only to align with the races identifiable in the police data files.  
 
-Row {data-height=700}
+Row {data-height=800}
 ----------------------------------------------
 
-### Detainments 2012 - 2014 & 2016 - 2017 
+### Detentions 2012 - 2014 & 2016 - 2017 
 
 ``` {r fig.width = 7 }
 
@@ -424,7 +420,7 @@ l %>%
 
 ```
 
-### Detainments by Beat
+### Detentions by Beat
  
 ``` {r fig.height = 7}
  
@@ -1082,7 +1078,7 @@ Police officers record a reason for detaining an individual. We recoded these re
 Row {.tabset}
 -----------------------------------------------------------------------
 
-### Detention by Recorded Offense
+### Detention by Recorded Reason
 
 ```{r}
 sf_race <- sf_race %>%
@@ -1113,9 +1109,9 @@ racetots <- racetots %>% mutate(percent = round((racetot/tots)*100,0),
 ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
   geom_bar(stat = "identity") + labs(fill = "Race") +
   scale_fill_manual(values = pal2) +
-  geom_text(data = racetots, aes(x = offense7, y = lab_pos, label = percent_lab), size = 3) +
+  geom_text(data = racetots, aes(x = offense7, y = lab_pos, label = percent_lab), size = 2) +
   coord_flip() +
-  labs(y = "# Detentions", x = "Offense") +
+  labs(y = "# Detentions", x = "Reason") +
   scale_y_continuous(labels = function(x){abs(x)}, limits = c(-120, 120))
 ```
 
@@ -1138,7 +1134,7 @@ ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
   scale_fill_manual(values = pal2) +
   geom_text(data = racetots, aes(x = offense7, y = lab_pos, label = percent_lab), size = 3) +
   coord_flip() +
-  labs(y = "# Detentions", x = "Offense") +
+  labs(y = "# Detentions", x = "Reason") +
   scale_y_continuous(labels = function(x){abs(x)}, limits = c(-95, 95)) +
   facet_wrap(~period, nrow = 2) 
 ```
@@ -1161,7 +1157,7 @@ ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
   scale_fill_manual(values = pal2) +
   geom_text(data = racetots, aes(x = offense7, y = lab_pos, label = percent_lab), size = 3) +
   coord_flip() +
-  labs(y = "# Detentions", x = "Offense") +
+  labs(y = "# Detentions", x = "Reason") +
   scale_y_continuous(labels = function(x){abs(x)}, limits = c(-120, 120), breaks = seq(-120,120,20)) +
   facet_wrap(~type2, nrow = 2) 
 ```
