@@ -3,6 +3,7 @@ title: "Charlottesville Police, Temporary Detentions"
 output:
   flexdashboard::flex_dashboard:
     vertical_layout: scroll
+    theme: bootstrap
 ---
 
 ```{r setup, include=FALSE}
@@ -1175,3 +1176,20 @@ The Charlottesville policing data was acquired by attorney Jeff Fogel through Fr
 
 This is a work in progress and we plan to keep building and improving it. We appreciate all feedback --  questions, corrections, concerns, ideas to make it better. You can reach us at [CvilleEquityAtlas@virginia.edu](mailto:CvilleEquityAtlas@virginia.edu). The source code to generate the analysis and this site are available on [GitHub](https://github.com/virginiaequitycenter/cvilleequity_stopandfrisk).
 
+### Resources on policing in the Charlottesville community
+
+* 2020 Disproportionate Minority Contact Report (coming soon, we hope)
+    + [Charlottesville and Albemarle release report on disproportionate minority contact](https://www.nbc29.com/2020/01/28/charlottesville-albemarle-release-report-disproportionate-minority-contact/), January 28, 2020, NBC29
+    + [Report finds racial disparity at almost every level of local criminal justice system](https://www.dailyprogress.com/dailyprogress/report-finds-racial-disparity-at-almost-every-level-of-local-criminal-justice-system/article_8c1dad70-7e3a-565b-a98c-f9bc4a189862.html), January 29, 2020, The Daily Progress
+    + [Race-based bias: Consultants demonstrate racist policing, council says study didn’t go far enough](https://www.c-ville.com/race-based-bias-consultants-demonstrate-racist-policing/), February 4, 2020, C-VILLE Weekly
+    + [Questions remain in the wake of the disproportionate minority contact report’s release](https://www.cvilletomorrow.org/articles/questions-remain-in-the-wake-of-the-disproportionate-minority-contact-reports-release/), February 7, 2020, Charlottesville Tomorrow
+    + [Now that the disproportionate minority contact report has been released, what’s next?](https://www.cvilletomorrow.org/articles/now-that-the-disproportionate-minority-contact-report-has-been-released-whats-next/), February 24, 2020, Charlottesville Tomorrow
+* [Charlottesville Police Statistics](https://www.charlottesville.gov/327/Crime-Statistics)
+* News on Charlottesville's Civilian Review Board
+    + [Initial and current Civilian Review Board members speak about next steps](https://www.nbc29.com/2020/06/05/initial-current-civilian-review-board-members-speak-about-next-steps/), June 5, 2020, NBC29
+    + [Council appoints seven to Police CRB](https://www.dailyprogress.com/news/local/council-appoints-seven-to-police-crb/article_75ff0476-743a-577d-a68e-66a8feac8250.html), February 18, 2020, Daily Progress
+* [Disproportionate Minority Contact Task Force](https://www.charlottesville.gov/254/Disproportionate-Minority-Contact-Task-F)
+    + [Assessment of Disproportionate Minority Contact in Charlottesville](https://www.charlottesville.gov/DocumentCenter/View/348/DMC-Report-PDF), 2016
+    + [Charlottesville Task Force Report on Disproportionate Minority Contactin the Juvenile Justice System](https://www.charlottesville.gov/DocumentCenter/View/347/Final-Full-DMC-Report-PDF), 2014
+    + [Race Disparity and Disproportionality in Youth Services](https://www.charlottesville.gov/DocumentCenter/View/350/Disproportionality-Study-PDF), 2011
+* Legal Aid Justice Center [Civil Rights & Racial Justice Program](https://www.justice4all.org/civil-rights-racial-justice/)
