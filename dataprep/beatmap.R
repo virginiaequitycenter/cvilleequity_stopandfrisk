@@ -140,8 +140,8 @@ pm_pop_sf <- cbind(pm_sf, cvl_acs_beat_block)
 
 cor(pm_pop_sf$POPULATION, pm_pop_sf$totalpopE) # .97
 
-save.image("beatmap_work.RData")
-saveRDS(pm_pop_sf, "beat_pop_map.Rds")
+save.image("../initial/beatmap_work.RData")
+saveRDS(pm_pop_sf, "../data/beat_pop_map.Rds")
 
 # # to use
 # library(sf)
