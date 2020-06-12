@@ -276,11 +276,11 @@ ggplot(sf_race_type, aes(x = group, y = value, fill = race)) +
 Where? {data-orientation=rows}
 ===================================== 
 
-
 ### Where Do Police Detain People?
 
-Row 
----------------------------
+Row {data-height = 100}
+-----------------------------
+
 ### Map Details
 * These maps display all police detainments between *2012-2014* and *2016-2017* 
 * Each point represents one stop
@@ -1122,7 +1122,7 @@ ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
 
 ### By Time Period 
 
-```{r fig.height = 7, fig.width = 8}
+```{r fig.height = 8, fig.width = 8}
 # for annotation
 tots <- sf_race %>% group_by(offense7, period) %>% summarize(tots = n())
 racetots <- sf_race %>% group_by(offense7, race, period) %>% summarize(racetot = n())
