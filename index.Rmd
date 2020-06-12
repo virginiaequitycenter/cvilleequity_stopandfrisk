@@ -1186,6 +1186,7 @@ This is a work in progress and we plan to keep building and improving it. We app
     + [Questions remain in the wake of the disproportionate minority contact report’s release](https://www.cvilletomorrow.org/articles/questions-remain-in-the-wake-of-the-disproportionate-minority-contact-reports-release/), February 7, 2020, Charlottesville Tomorrow
     + [Now that the disproportionate minority contact report has been released, what’s next?](https://www.cvilletomorrow.org/articles/now-that-the-disproportionate-minority-contact-report-has-been-released-whats-next/), February 24, 2020, Charlottesville Tomorrow
 * [Charlottesville Police Statistics](https://www.charlottesville.gov/327/Crime-Statistics)
+    + We initially hoped to use the information reported in the reports that began Feburary 2019, but the number of monthly cases reported in these reports was four times the number in the earlier FOIA'd data; we chose to pause until we could understand more clearly how data generation process for these new reports differs from the process for the 2012-2017 data.
 * News on Charlottesville's Civilian Review Board
     + [Initial and current Civilian Review Board members speak about next steps](https://www.nbc29.com/2020/06/05/initial-current-civilian-review-board-members-speak-about-next-steps/), June 5, 2020, NBC29
     + [Council appoints seven to Police CRB](https://www.dailyprogress.com/news/local/council-appoints-seven-to-police-crb/article_75ff0476-743a-577d-a68e-66a8feac8250.html), February 18, 2020, Daily Progress
