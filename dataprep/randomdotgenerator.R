@@ -20,7 +20,7 @@ num1920 <- SF1920 %>%
            mutate(BEAT_NO = str_replace_all(BEAT_NO, "C", ""))
 
 dots1920 <-     
-  map_df( unique(num1920$BEAT_NO),  # Okay, so for every occupation
+  map_df( unique(num1920$BEAT_NO),  # Okay, so for every beat
           
           ~ st_sample(beats$geometry[beats$BEAT_NO == .x],                             # Interpolate this surface 
                       size = num1920$NumDots[num1920$BEAT_NO == .x], # with this occupation's dots
@@ -47,9 +47,6 @@ SF1920 %>%
   ungroup() %>%
   select(-Abbrev)
   
-  
-
-
 
 ### 2017 Location Imputations ###
 num17 <-
@@ -61,7 +58,7 @@ beats
 
 # Time to interpolate the dots
 dots2017 <-     
-  map_df( unique(num17$BEAT_NO),  # Okay, so for every occupation
+  map_df( unique(num17$BEAT_NO),  # Okay, so for every beat
           
           ~ st_sample(beats$geometry[beats$BEAT_NO == .x],                             # Interpolate this surface 
                       size = num17$NumDots[num17$BEAT_NO == .x], # with this occupation's dots
@@ -92,7 +89,7 @@ num16 <-
 
 # Time to interpolate the dots
 dots2016 <-     
-  map_df( unique(num16$BEAT_NO),  # Okay, so for every occupation
+  map_df( unique(num16$BEAT_NO),  # Okay, so for every beat
           
           ~ st_sample(beats$geometry[beats$BEAT_NO == .x],                             # Interpolate this surface 
                       size = num16$NumDots[num16$BEAT_NO == .x], # with this occupation's dots
@@ -126,7 +123,7 @@ num1214 <-
 
 # Time to interpolate the dots
 dots1214 <-     
-  map_df( unique(num1214$BEAT_NO),  # Okay, so for every occupation
+  map_df( unique(num1214$BEAT_NO),  # Okay, so for every Beat
           
           ~ st_sample(beats$geometry[beats$BEAT_NO == .x],                             # Interpolate this surface 
                       size = num1214$NumDots[num1214$BEAT_NO == .x], # with this occupation's dots
