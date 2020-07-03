@@ -17,14 +17,14 @@ addresses_table <- read_csv("data/Master_Address_Table.csv")
 
 
 ####### 2019-2020 #######
-SF1920input <- read_csv("data/SF20192020Input.csv")
+SF1920input <- read_csv("data/SF20192020Input.csv") # Reads in Data
 
 SF1920 <-
 SF1920input %>%
   gather(Month, Number, - c(beat, beatnum, race)) %>%
   separate(Month, c("Month", "Year"), sep = "-") %>%
   mutate(Year = as.numeric(paste0(20, Year))) %>%
-  filter(race %in% c("B", "W"))
+  filter(race %in% c("B", "W"))                        
 
 write_csv(SF1920, path = "data/finaldata/SF1920.csv")
 
