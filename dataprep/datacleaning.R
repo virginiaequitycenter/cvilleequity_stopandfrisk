@@ -62,12 +62,13 @@ address_points_cleaned <-
   unite(STREET, geo_MAT_PREDIR, geo_MAT_ST_NAME, geo_MAT_SUFFIX, geo_MAT_POSTDIR, sep = " ", remove = FALSE)  %>%
   mutate(STREET = str_trim(STREET))
 
-
 setdiff(sf_for_join$STREET, address_points_cleaned$STREET)
 
-address <- "5TH"
-sf_for_join$STREET[grepl(address, sf_for_join$STREET)]
+
+address <- "5TH"            # Sam seeing things that he finds useful
+sf_for_join$STREET[grepl(address, sf_for_join$STREET)] 
 address_points_cleaned$STREET[grepl(address, address_points_cleaned$STREET)]
+
 
 SF2017Locations<-
   sf_for_join %>%
@@ -75,8 +76,11 @@ SF2017Locations<-
   left_join(address_points_cleaned) %>% 
   mutate(house_dist = abs(geo_MAT_ST_NUMBER - NUMBER)) %>%
   group_by(id) %>%
-  arrange(id, house_dist ) %>% 
-  slice(1) 
+  arrange(id, house_dist ) %>%
+  slice(1)  %>%
+  ungroup()
+
+View(SF2017Locations)
 
 cumsum(round(table(SF2017Locations$house_dist)/sum(table(SF2017Locations$house_dist))*100, 2))
 
@@ -92,10 +96,11 @@ SF2017Locations %>%
 
 ## Try to get at the beats ##
 beats <- st_read("data/Police_Neighborhood_Area-shp/Police_Neighborhood_Area.shp")
-beats
+View(beats)
 
 SF2017Spatial <-
 SF2017Locations %>%
+  ungroup() %>%
   st_as_sf(
     coords = c("lon", "lat"),
  #   agr = "constant",
@@ -104,9 +109,10 @@ SF2017Locations %>%
     remove = TRUE
   )
 
+## View(SF2017Spatial)
 point_in_beat <- st_join(SF2017Spatial, beats, join = st_within)
 
-View(point_in_beat)
+# View(point_in_beat)
 
 ## Print them out ##
 SF2017FINAL <-
@@ -114,7 +120,6 @@ point_in_beat %>%
   ungroup() %>%
   select(SFTYPE, NUMBER, STREET, OFFENSE, RACE, geometry, BEAT_NO, POPULATION)
   
-
 write_csv(SF2017FINAL , path = "data/finaldata/SF2017.csv")
 
 ####

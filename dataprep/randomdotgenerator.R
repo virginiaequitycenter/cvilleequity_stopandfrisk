@@ -1,13 +1,14 @@
 ########################
 # Random Dot Generator #
 ########################
+setwd("/Volumes/GoogleDrive/My Drive/Equity Center/Github/cvilleequity_stopandfrisk")
 
-beats <- readRDS("beat_pop_map.Rds")
+beats <- readRDS("data/beat_pop_map.Rds")
 
-SF1920 <- read_csv("data/finaldata/SF1920.csv")
-SF17 <- read_csv("data/finaldata/SF2017.csv")
-SF16 <- read_csv("data/finaldata/SF2016.csv")
-SF1214 <- read_csv("data/finaldata/SF2014.csv")
+SF1920 <- read_csv("data/SF1920.csv")
+SF17 <- read_csv("data/SF2017.csv")
+SF16 <- read_csv("data/SF2016.csv")
+SF1214 <- read_csv("data/SF2014.csv")
 monthlabels <- data.frame(Abbrev = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"),
            Month = c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"))
 
@@ -68,7 +69,7 @@ dots2017 <-
             st_coordinates() %>%                                                      # pull out coordinates into
             as_tibble() %>%                                                           # convert to tibble
             setNames(c("lon","lat")) %>%                                              # set column names
-            mutate(BEAT_NO = .x)  # add categorical party var  
+            mutate(BEAT_NO = .x)  # add categorical beat var  
   ) %>% arrange(BEAT_NO)
 
 SF2017Locations <-
@@ -92,14 +93,14 @@ dots2016 <-
   map_df( unique(num16$BEAT_NO),  # Okay, so for every beat
           
           ~ st_sample(beats$geometry[beats$BEAT_NO == .x],                             # Interpolate this surface 
-                      size = num16$NumDots[num16$BEAT_NO == .x], # with this occupation's dots
+                      size = num16$NumDots[num16$BEAT_NO == .x], # with this beat's dots
                       type = "random",
                       exact = TRUE) %>%                                              # generate the points in ea
             st_cast("POINT") %>%                                                      # cast the geom set as 'POI
             st_coordinates() %>%                                                      # pull out coordinates into
             as_tibble() %>%                                                           # convert to tibble
             setNames(c("lon","lat")) %>%                                              # set column names
-            mutate(BEAT_NO = .x)  # add categorical party var  
+            mutate(BEAT_NO = .x)  # add categorical beat var  
   ) %>% arrange(BEAT_NO)
 
 SF2016Locations <-
