@@ -1,0 +1,991 @@
+beat,beatnum,race,Month,Year,Number
+Mall,C01,B,Feb,2019,0
+Mall,C01,W,Feb,2019,1
+Downtown,C02,B,Feb,2019,0
+Downtown,C02,W,Feb,2019,0
+Star Hill,C03,B,Feb,2019,1
+Star Hill,C03,W,Feb,2019,4
+Westhaven,C04,B,Feb,2019,0
+Westhaven,C04,W,Feb,2019,0
+10th & Page,C05,B,Feb,2019,0
+10th & Page,C05,W,Feb,2019,0
+Rosehill Dr,C06,B,Feb,2019,0
+Rosehill Dr,C06,W,Feb,2019,0
+North Downtown,C07,B,Feb,2019,0
+North Downtown,C07,W,Feb,2019,0
+MJH,C08,B,Feb,2019,0
+MJH,C08,W,Feb,2019,0
+Little High,C09,B,Feb,2019,0
+Little High,C09,W,Feb,2019,0
+Belmont,C10,B,Feb,2019,5
+Belmont,C10,W,Feb,2019,1
+Garrett,C11,B,Feb,2019,3
+Garrett,C11,W,Feb,2019,0
+Ridge St,C12,B,Feb,2019,4
+Ridge St,C12,W,Feb,2019,1
+Fifeville,C13,B,Feb,2019,1
+Fifeville,C13,W,Feb,2019,1
+JPA,C14,B,Feb,2019,0
+JPA,C14,W,Feb,2019,0
+The Corner,C15,B,Feb,2019,2
+The Corner,C15,W,Feb,2019,3
+Venable,C16,B,Feb,2019,0
+Venable,C16,W,Feb,2019,1
+Kellytown,C17,B,Feb,2019,0
+Kellytown,C17,W,Feb,2019,0
+North East,C18,B,Feb,2019,0
+North East,C18,W,Feb,2019,0
+Locust Grove,C19,B,Feb,2019,0
+Locust Grove,C19,W,Feb,2019,0
+Woolen Mills,C20,B,Feb,2019,1
+Woolen Mills,C20,W,Feb,2019,1
+Prospect,C21,B,Feb,2019,0
+Prospect,C21,W,Feb,2019,0
+Johnson Village,C22,B,Feb,2019,0
+Johnson Village,C22,W,Feb,2019,0
+Fry's Spring,C23,B,Feb,2019,0
+Fry's Spring,C23,W,Feb,2019,1
+Lewis Mountain,C24,B,Feb,2019,0
+Lewis Mountain,C24,W,Feb,2019,0
+BRSC Area,C25,B,Feb,2019,0
+BRSC Area,C25,W,Feb,2019,1
+BRSC,C26,B,Feb,2019,1
+BRSC,C26,W,Feb,2019,0
+Blue Ridge,C27,B,Feb,2019,0
+Blue Ridge,C27,W,Feb,2019,1
+CHS,C28,B,Feb,2019,2
+CHS,C28,W,Feb,2019,0
+Greenbrier,C29,B,Feb,2019,0
+Greenbrier,C29,W,Feb,2019,0
+29 North,C30,B,Feb,2019,3
+29 North,C30,W,Feb,2019,5
+The Meadows,C31,B,Feb,2019,0
+The Meadows,C31,W,Feb,2019,0
+5th Street,C32,B,Feb,2019,0
+5th Street,C32,W,Feb,2019,1
+Longwood,C33,B,Feb,2019,0
+Longwood,C33,W,Feb,2019,0
+Mall,C01,B,Mar,2019,4
+Mall,C01,W,Mar,2019,1
+Downtown,C02,B,Mar,2019,0
+Downtown,C02,W,Mar,2019,1
+Star Hill,C03,B,Mar,2019,1
+Star Hill,C03,W,Mar,2019,1
+Westhaven,C04,B,Mar,2019,0
+Westhaven,C04,W,Mar,2019,0
+10th & Page,C05,B,Mar,2019,3
+10th & Page,C05,W,Mar,2019,0
+Rosehill Dr,C06,B,Mar,2019,1
+Rosehill Dr,C06,W,Mar,2019,0
+North Downtown,C07,B,Mar,2019,0
+North Downtown,C07,W,Mar,2019,0
+MJH,C08,B,Mar,2019,1
+MJH,C08,W,Mar,2019,1
+Little High,C09,B,Mar,2019,2
+Little High,C09,W,Mar,2019,0
+Belmont,C10,B,Mar,2019,0
+Belmont,C10,W,Mar,2019,0
+Garrett,C11,B,Mar,2019,1
+Garrett,C11,W,Mar,2019,1
+Ridge St,C12,B,Mar,2019,2
+Ridge St,C12,W,Mar,2019,0
+Fifeville,C13,B,Mar,2019,0
+Fifeville,C13,W,Mar,2019,0
+JPA,C14,B,Mar,2019,0
+JPA,C14,W,Mar,2019,0
+The Corner,C15,B,Mar,2019,6
+The Corner,C15,W,Mar,2019,3
+Venable,C16,B,Mar,2019,0
+Venable,C16,W,Mar,2019,0
+Kellytown,C17,B,Mar,2019,0
+Kellytown,C17,W,Mar,2019,0
+North East,C18,B,Mar,2019,0
+North East,C18,W,Mar,2019,0
+Locust Grove,C19,B,Mar,2019,0
+Locust Grove,C19,W,Mar,2019,1
+Woolen Mills,C20,B,Mar,2019,0
+Woolen Mills,C20,W,Mar,2019,2
+Prospect,C21,B,Mar,2019,4
+Prospect,C21,W,Mar,2019,0
+Johnson Village,C22,B,Mar,2019,0
+Johnson Village,C22,W,Mar,2019,2
+Fry's Spring,C23,B,Mar,2019,0
+Fry's Spring,C23,W,Mar,2019,1
+Lewis Mountain,C24,B,Mar,2019,0
+Lewis Mountain,C24,W,Mar,2019,0
+BRSC Area,C25,B,Mar,2019,1
+BRSC Area,C25,W,Mar,2019,1
+BRSC,C26,B,Mar,2019,1
+BRSC,C26,W,Mar,2019,0
+Blue Ridge,C27,B,Mar,2019,1
+Blue Ridge,C27,W,Mar,2019,0
+CHS,C28,B,Mar,2019,1
+CHS,C28,W,Mar,2019,0
+Greenbrier,C29,B,Mar,2019,0
+Greenbrier,C29,W,Mar,2019,0
+29 North,C30,B,Mar,2019,0
+29 North,C30,W,Mar,2019,0
+The Meadows,C31,B,Mar,2019,1
+The Meadows,C31,W,Mar,2019,1
+5th Street,C32,B,Mar,2019,0
+5th Street,C32,W,Mar,2019,1
+Longwood,C33,B,Mar,2019,0
+Longwood,C33,W,Mar,2019,0
+Mall,C01,B,Apr,2019,5
+Mall,C01,W,Apr,2019,1
+Downtown,C02,B,Apr,2019,0
+Downtown,C02,W,Apr,2019,2
+Star Hill,C03,B,Apr,2019,1
+Star Hill,C03,W,Apr,2019,0
+Westhaven,C04,B,Apr,2019,0
+Westhaven,C04,W,Apr,2019,0
+10th & Page,C05,B,Apr,2019,2
+10th & Page,C05,W,Apr,2019,1
+Rosehill Dr,C06,B,Apr,2019,0
+Rosehill Dr,C06,W,Apr,2019,0
+North Downtown,C07,B,Apr,2019,0
+North Downtown,C07,W,Apr,2019,0
+MJH,C08,B,Apr,2019,0
+MJH,C08,W,Apr,2019,0
+Little High,C09,B,Apr,2019,0
+Little High,C09,W,Apr,2019,0
+Belmont,C10,B,Apr,2019,0
+Belmont,C10,W,Apr,2019,0
+Garrett,C11,B,Apr,2019,0
+Garrett,C11,W,Apr,2019,0
+Ridge St,C12,B,Apr,2019,3
+Ridge St,C12,W,Apr,2019,0
+Fifeville,C13,B,Apr,2019,3
+Fifeville,C13,W,Apr,2019,2
+JPA,C14,B,Apr,2019,0
+JPA,C14,W,Apr,2019,0
+The Corner,C15,B,Apr,2019,1
+The Corner,C15,W,Apr,2019,1
+Venable,C16,B,Apr,2019,2
+Venable,C16,W,Apr,2019,0
+Kellytown,C17,B,Apr,2019,1
+Kellytown,C17,W,Apr,2019,0
+North East,C18,B,Apr,2019,0
+North East,C18,W,Apr,2019,1
+Locust Grove,C19,B,Apr,2019,0
+Locust Grove,C19,W,Apr,2019,0
+Woolen Mills,C20,B,Apr,2019,0
+Woolen Mills,C20,W,Apr,2019,0
+Prospect,C21,B,Apr,2019,0
+Prospect,C21,W,Apr,2019,0
+Johnson Village,C22,B,Apr,2019,1
+Johnson Village,C22,W,Apr,2019,0
+Fry's Spring,C23,B,Apr,2019,1
+Fry's Spring,C23,W,Apr,2019,1
+Lewis Mountain,C24,B,Apr,2019,0
+Lewis Mountain,C24,W,Apr,2019,0
+BRSC Area,C25,B,Apr,2019,0
+BRSC Area,C25,W,Apr,2019,1
+BRSC,C26,B,Apr,2019,0
+BRSC,C26,W,Apr,2019,2
+Blue Ridge,C27,B,Apr,2019,1
+Blue Ridge,C27,W,Apr,2019,0
+CHS,C28,B,Apr,2019,0
+CHS,C28,W,Apr,2019,0
+Greenbrier,C29,B,Apr,2019,0
+Greenbrier,C29,W,Apr,2019,0
+29 North,C30,B,Apr,2019,0
+29 North,C30,W,Apr,2019,2
+The Meadows,C31,B,Apr,2019,0
+The Meadows,C31,W,Apr,2019,0
+5th Street,C32,B,Apr,2019,0
+5th Street,C32,W,Apr,2019,0
+Longwood,C33,B,Apr,2019,0
+Longwood,C33,W,Apr,2019,0
+Mall,C01,B,May,2019,3
+Mall,C01,W,May,2019,2
+Downtown,C02,B,May,2019,7
+Downtown,C02,W,May,2019,0
+Star Hill,C03,B,May,2019,1
+Star Hill,C03,W,May,2019,1
+Westhaven,C04,B,May,2019,1
+Westhaven,C04,W,May,2019,0
+10th & Page,C05,B,May,2019,1
+10th & Page,C05,W,May,2019,1
+Rosehill Dr,C06,B,May,2019,0
+Rosehill Dr,C06,W,May,2019,1
+North Downtown,C07,B,May,2019,0
+North Downtown,C07,W,May,2019,0
+MJH,C08,B,May,2019,0
+MJH,C08,W,May,2019,0
+Little High,C09,B,May,2019,0
+Little High,C09,W,May,2019,0
+Belmont,C10,B,May,2019,1
+Belmont,C10,W,May,2019,2
+Garrett,C11,B,May,2019,2
+Garrett,C11,W,May,2019,1
+Ridge St,C12,B,May,2019,3
+Ridge St,C12,W,May,2019,0
+Fifeville,C13,B,May,2019,0
+Fifeville,C13,W,May,2019,0
+JPA,C14,B,May,2019,0
+JPA,C14,W,May,2019,2
+The Corner,C15,B,May,2019,1
+The Corner,C15,W,May,2019,0
+Venable,C16,B,May,2019,1
+Venable,C16,W,May,2019,0
+Kellytown,C17,B,May,2019,2
+Kellytown,C17,W,May,2019,0
+North East,C18,B,May,2019,0
+North East,C18,W,May,2019,3
+Locust Grove,C19,B,May,2019,0
+Locust Grove,C19,W,May,2019,0
+Woolen Mills,C20,B,May,2019,0
+Woolen Mills,C20,W,May,2019,0
+Prospect,C21,B,May,2019,2
+Prospect,C21,W,May,2019,0
+Johnson Village,C22,B,May,2019,0
+Johnson Village,C22,W,May,2019,0
+Fry's Spring,C23,B,May,2019,0
+Fry's Spring,C23,W,May,2019,0
+Lewis Mountain,C24,B,May,2019,0
+Lewis Mountain,C24,W,May,2019,0
+BRSC Area,C25,B,May,2019,0
+BRSC Area,C25,W,May,2019,0
+BRSC,C26,B,May,2019,0
+BRSC,C26,W,May,2019,0
+Blue Ridge,C27,B,May,2019,0
+Blue Ridge,C27,W,May,2019,1
+CHS,C28,B,May,2019,2
+CHS,C28,W,May,2019,0
+Greenbrier,C29,B,May,2019,4
+Greenbrier,C29,W,May,2019,0
+29 North,C30,B,May,2019,0
+29 North,C30,W,May,2019,0
+The Meadows,C31,B,May,2019,0
+The Meadows,C31,W,May,2019,3
+5th Street,C32,B,May,2019,1
+5th Street,C32,W,May,2019,2
+Longwood,C33,B,May,2019,0
+Longwood,C33,W,May,2019,0
+Mall,C01,B,Jun,2019,2
+Mall,C01,W,Jun,2019,5
+Downtown,C02,B,Jun,2019,2
+Downtown,C02,W,Jun,2019,3
+Star Hill,C03,B,Jun,2019,1
+Star Hill,C03,W,Jun,2019,1
+Westhaven,C04,B,Jun,2019,0
+Westhaven,C04,W,Jun,2019,0
+10th & Page,C05,B,Jun,2019,1
+10th & Page,C05,W,Jun,2019,0
+Rosehill Dr,C06,B,Jun,2019,0
+Rosehill Dr,C06,W,Jun,2019,0
+North Downtown,C07,B,Jun,2019,0
+North Downtown,C07,W,Jun,2019,0
+MJH,C08,B,Jun,2019,0
+MJH,C08,W,Jun,2019,0
+Little High,C09,B,Jun,2019,0
+Little High,C09,W,Jun,2019,0
+Belmont,C10,B,Jun,2019,4
+Belmont,C10,W,Jun,2019,10
+Garrett,C11,B,Jun,2019,2
+Garrett,C11,W,Jun,2019,0
+Ridge St,C12,B,Jun,2019,3
+Ridge St,C12,W,Jun,2019,0
+Fifeville,C13,B,Jun,2019,0
+Fifeville,C13,W,Jun,2019,1
+JPA,C14,B,Jun,2019,0
+JPA,C14,W,Jun,2019,0
+The Corner,C15,B,Jun,2019,0
+The Corner,C15,W,Jun,2019,5
+Venable,C16,B,Jun,2019,0
+Venable,C16,W,Jun,2019,0
+Kellytown,C17,B,Jun,2019,0
+Kellytown,C17,W,Jun,2019,0
+North East,C18,B,Jun,2019,0
+North East,C18,W,Jun,2019,0
+Locust Grove,C19,B,Jun,2019,0
+Locust Grove,C19,W,Jun,2019,0
+Woolen Mills,C20,B,Jun,2019,0
+Woolen Mills,C20,W,Jun,2019,0
+Prospect,C21,B,Jun,2019,0
+Prospect,C21,W,Jun,2019,0
+Johnson Village,C22,B,Jun,2019,0
+Johnson Village,C22,W,Jun,2019,0
+Fry's Spring,C23,B,Jun,2019,2
+Fry's Spring,C23,W,Jun,2019,0
+Lewis Mountain,C24,B,Jun,2019,1
+Lewis Mountain,C24,W,Jun,2019,0
+BRSC Area,C25,B,Jun,2019,1
+BRSC Area,C25,W,Jun,2019,1
+BRSC,C26,B,Jun,2019,1
+BRSC,C26,W,Jun,2019,1
+Blue Ridge,C27,B,Jun,2019,0
+Blue Ridge,C27,W,Jun,2019,0
+CHS,C28,B,Jun,2019,0
+CHS,C28,W,Jun,2019,0
+Greenbrier,C29,B,Jun,2019,0
+Greenbrier,C29,W,Jun,2019,0
+29 North,C30,B,Jun,2019,0
+29 North,C30,W,Jun,2019,1
+The Meadows,C31,B,Jun,2019,0
+The Meadows,C31,W,Jun,2019,0
+5th Street,C32,B,Jun,2019,0
+5th Street,C32,W,Jun,2019,0
+Longwood,C33,B,Jun,2019,0
+Longwood,C33,W,Jun,2019,1
+Mall,C01,B,Jul,2019,2
+Mall,C01,W,Jul,2019,1
+Downtown,C02,B,Jul,2019,2
+Downtown,C02,W,Jul,2019,3
+Star Hill,C03,B,Jul,2019,2
+Star Hill,C03,W,Jul,2019,1
+Westhaven,C04,B,Jul,2019,3
+Westhaven,C04,W,Jul,2019,0
+10th & Page,C05,B,Jul,2019,1
+10th & Page,C05,W,Jul,2019,1
+Rosehill Dr,C06,B,Jul,2019,2
+Rosehill Dr,C06,W,Jul,2019,0
+North Downtown,C07,B,Jul,2019,0
+North Downtown,C07,W,Jul,2019,0
+MJH,C08,B,Jul,2019,0
+MJH,C08,W,Jul,2019,1
+Little High,C09,B,Jul,2019,0
+Little High,C09,W,Jul,2019,2
+Belmont,C10,B,Jul,2019,2
+Belmont,C10,W,Jul,2019,1
+Garrett,C11,B,Jul,2019,2
+Garrett,C11,W,Jul,2019,2
+Ridge St,C12,B,Jul,2019,1
+Ridge St,C12,W,Jul,2019,0
+Fifeville,C13,B,Jul,2019,2
+Fifeville,C13,W,Jul,2019,0
+JPA,C14,B,Jul,2019,0
+JPA,C14,W,Jul,2019,0
+The Corner,C15,B,Jul,2019,3
+The Corner,C15,W,Jul,2019,4
+Venable,C16,B,Jul,2019,2
+Venable,C16,W,Jul,2019,0
+Kellytown,C17,B,Jul,2019,0
+Kellytown,C17,W,Jul,2019,0
+North East,C18,B,Jul,2019,0
+North East,C18,W,Jul,2019,0
+Locust Grove,C19,B,Jul,2019,0
+Locust Grove,C19,W,Jul,2019,0
+Woolen Mills,C20,B,Jul,2019,0
+Woolen Mills,C20,W,Jul,2019,1
+Prospect,C21,B,Jul,2019,0
+Prospect,C21,W,Jul,2019,1
+Johnson Village,C22,B,Jul,2019,0
+Johnson Village,C22,W,Jul,2019,0
+Fry's Spring,C23,B,Jul,2019,0
+Fry's Spring,C23,W,Jul,2019,3
+Lewis Mountain,C24,B,Jul,2019,0
+Lewis Mountain,C24,W,Jul,2019,0
+BRSC Area,C25,B,Jul,2019,0
+BRSC Area,C25,W,Jul,2019,0
+BRSC,C26,B,Jul,2019,0
+BRSC,C26,W,Jul,2019,2
+Blue Ridge,C27,B,Jul,2019,0
+Blue Ridge,C27,W,Jul,2019,0
+CHS,C28,B,Jul,2019,0
+CHS,C28,W,Jul,2019,0
+Greenbrier,C29,B,Jul,2019,0
+Greenbrier,C29,W,Jul,2019,0
+29 North,C30,B,Jul,2019,2
+29 North,C30,W,Jul,2019,1
+The Meadows,C31,B,Jul,2019,0
+The Meadows,C31,W,Jul,2019,0
+5th Street,C32,B,Jul,2019,0
+5th Street,C32,W,Jul,2019,1
+Longwood,C33,B,Jul,2019,0
+Longwood,C33,W,Jul,2019,1
+Mall,C01,B,Aug,2019,1
+Mall,C01,W,Aug,2019,1
+Downtown,C02,B,Aug,2019,1
+Downtown,C02,W,Aug,2019,4
+Star Hill,C03,B,Aug,2019,2
+Star Hill,C03,W,Aug,2019,1
+Westhaven,C04,B,Aug,2019,0
+Westhaven,C04,W,Aug,2019,0
+10th & Page,C05,B,Aug,2019,0
+10th & Page,C05,W,Aug,2019,0
+Rosehill Dr,C06,B,Aug,2019,1
+Rosehill Dr,C06,W,Aug,2019,0
+North Downtown,C07,B,Aug,2019,0
+North Downtown,C07,W,Aug,2019,0
+MJH,C08,B,Aug,2019,0
+MJH,C08,W,Aug,2019,0
+Little High,C09,B,Aug,2019,0
+Little High,C09,W,Aug,2019,1
+Belmont,C10,B,Aug,2019,1
+Belmont,C10,W,Aug,2019,3
+Garrett,C11,B,Aug,2019,0
+Garrett,C11,W,Aug,2019,0
+Ridge St,C12,B,Aug,2019,2
+Ridge St,C12,W,Aug,2019,2
+Fifeville,C13,B,Aug,2019,3
+Fifeville,C13,W,Aug,2019,0
+JPA,C14,B,Aug,2019,0
+JPA,C14,W,Aug,2019,0
+The Corner,C15,B,Aug,2019,2
+The Corner,C15,W,Aug,2019,3
+Venable,C16,B,Aug,2019,0
+Venable,C16,W,Aug,2019,0
+Kellytown,C17,B,Aug,2019,0
+Kellytown,C17,W,Aug,2019,0
+North East,C18,B,Aug,2019,0
+North East,C18,W,Aug,2019,0
+Locust Grove,C19,B,Aug,2019,0
+Locust Grove,C19,W,Aug,2019,0
+Woolen Mills,C20,B,Aug,2019,1
+Woolen Mills,C20,W,Aug,2019,1
+Prospect,C21,B,Aug,2019,3
+Prospect,C21,W,Aug,2019,0
+Johnson Village,C22,B,Aug,2019,0
+Johnson Village,C22,W,Aug,2019,0
+Fry's Spring,C23,B,Aug,2019,0
+Fry's Spring,C23,W,Aug,2019,1
+Lewis Mountain,C24,B,Aug,2019,0
+Lewis Mountain,C24,W,Aug,2019,1
+BRSC Area,C25,B,Aug,2019,0
+BRSC Area,C25,W,Aug,2019,0
+BRSC,C26,B,Aug,2019,0
+BRSC,C26,W,Aug,2019,1
+Blue Ridge,C27,B,Aug,2019,1
+Blue Ridge,C27,W,Aug,2019,0
+CHS,C28,B,Aug,2019,3
+CHS,C28,W,Aug,2019,0
+Greenbrier,C29,B,Aug,2019,0
+Greenbrier,C29,W,Aug,2019,0
+29 North,C30,B,Aug,2019,0
+29 North,C30,W,Aug,2019,0
+The Meadows,C31,B,Aug,2019,0
+The Meadows,C31,W,Aug,2019,0
+5th Street,C32,B,Aug,2019,0
+5th Street,C32,W,Aug,2019,0
+Longwood,C33,B,Aug,2019,0
+Longwood,C33,W,Aug,2019,1
+Mall,C01,B,Sep,2019,3
+Mall,C01,W,Sep,2019,0
+Downtown,C02,B,Sep,2019,0
+Downtown,C02,W,Sep,2019,1
+Star Hill,C03,B,Sep,2019,5
+Star Hill,C03,W,Sep,2019,1
+Westhaven,C04,B,Sep,2019,0
+Westhaven,C04,W,Sep,2019,0
+10th & Page,C05,B,Sep,2019,0
+10th & Page,C05,W,Sep,2019,0
+Rosehill Dr,C06,B,Sep,2019,0
+Rosehill Dr,C06,W,Sep,2019,0
+North Downtown,C07,B,Sep,2019,0
+North Downtown,C07,W,Sep,2019,2
+MJH,C08,B,Sep,2019,1
+MJH,C08,W,Sep,2019,1
+Little High,C09,B,Sep,2019,0
+Little High,C09,W,Sep,2019,0
+Belmont,C10,B,Sep,2019,4
+Belmont,C10,W,Sep,2019,3
+Garrett,C11,B,Sep,2019,0
+Garrett,C11,W,Sep,2019,0
+Ridge St,C12,B,Sep,2019,1
+Ridge St,C12,W,Sep,2019,0
+Fifeville,C13,B,Sep,2019,1
+Fifeville,C13,W,Sep,2019,1
+JPA,C14,B,Sep,2019,1
+JPA,C14,W,Sep,2019,3
+The Corner,C15,B,Sep,2019,3
+The Corner,C15,W,Sep,2019,2
+Venable,C16,B,Sep,2019,1
+Venable,C16,W,Sep,2019,0
+Kellytown,C17,B,Sep,2019,0
+Kellytown,C17,W,Sep,2019,0
+North East,C18,B,Sep,2019,0
+North East,C18,W,Sep,2019,0
+Locust Grove,C19,B,Sep,2019,0
+Locust Grove,C19,W,Sep,2019,0
+Woolen Mills,C20,B,Sep,2019,0
+Woolen Mills,C20,W,Sep,2019,0
+Prospect,C21,B,Sep,2019,0
+Prospect,C21,W,Sep,2019,0
+Johnson Village,C22,B,Sep,2019,1
+Johnson Village,C22,W,Sep,2019,0
+Fry's Spring,C23,B,Sep,2019,0
+Fry's Spring,C23,W,Sep,2019,0
+Lewis Mountain,C24,B,Sep,2019,0
+Lewis Mountain,C24,W,Sep,2019,0
+BRSC Area,C25,B,Sep,2019,1
+BRSC Area,C25,W,Sep,2019,0
+BRSC,C26,B,Sep,2019,0
+BRSC,C26,W,Sep,2019,2
+Blue Ridge,C27,B,Sep,2019,1
+Blue Ridge,C27,W,Sep,2019,0
+CHS,C28,B,Sep,2019,0
+CHS,C28,W,Sep,2019,0
+Greenbrier,C29,B,Sep,2019,0
+Greenbrier,C29,W,Sep,2019,1
+29 North,C30,B,Sep,2019,2
+29 North,C30,W,Sep,2019,1
+The Meadows,C31,B,Sep,2019,0
+The Meadows,C31,W,Sep,2019,1
+5th Street,C32,B,Sep,2019,0
+5th Street,C32,W,Sep,2019,1
+Longwood,C33,B,Sep,2019,0
+Longwood,C33,W,Sep,2019,0
+Mall,C01,B,Oct,2019,2
+Mall,C01,W,Oct,2019,2
+Downtown,C02,B,Oct,2019,7
+Downtown,C02,W,Oct,2019,2
+Star Hill,C03,B,Oct,2019,0
+Star Hill,C03,W,Oct,2019,0
+Westhaven,C04,B,Oct,2019,4
+Westhaven,C04,W,Oct,2019,0
+10th & Page,C05,B,Oct,2019,0
+10th & Page,C05,W,Oct,2019,0
+Rosehill Dr,C06,B,Oct,2019,0
+Rosehill Dr,C06,W,Oct,2019,0
+North Downtown,C07,B,Oct,2019,0
+North Downtown,C07,W,Oct,2019,0
+MJH,C08,B,Oct,2019,1
+MJH,C08,W,Oct,2019,0
+Little High,C09,B,Oct,2019,0
+Little High,C09,W,Oct,2019,0
+Belmont,C10,B,Oct,2019,2
+Belmont,C10,W,Oct,2019,3
+Garrett,C11,B,Oct,2019,1
+Garrett,C11,W,Oct,2019,0
+Ridge St,C12,B,Oct,2019,0
+Ridge St,C12,W,Oct,2019,2
+Fifeville,C13,B,Oct,2019,0
+Fifeville,C13,W,Oct,2019,0
+JPA,C14,B,Oct,2019,0
+JPA,C14,W,Oct,2019,0
+The Corner,C15,B,Oct,2019,2
+The Corner,C15,W,Oct,2019,5
+Venable,C16,B,Oct,2019,4
+Venable,C16,W,Oct,2019,2
+Kellytown,C17,B,Oct,2019,0
+Kellytown,C17,W,Oct,2019,0
+North East,C18,B,Oct,2019,1
+North East,C18,W,Oct,2019,0
+Locust Grove,C19,B,Oct,2019,0
+Locust Grove,C19,W,Oct,2019,3
+Woolen Mills,C20,B,Oct,2019,0
+Woolen Mills,C20,W,Oct,2019,0
+Prospect,C21,B,Oct,2019,1
+Prospect,C21,W,Oct,2019,0
+Johnson Village,C22,B,Oct,2019,0
+Johnson Village,C22,W,Oct,2019,0
+Fry's Spring,C23,B,Oct,2019,0
+Fry's Spring,C23,W,Oct,2019,0
+Lewis Mountain,C24,B,Oct,2019,0
+Lewis Mountain,C24,W,Oct,2019,0
+BRSC Area,C25,B,Oct,2019,0
+BRSC Area,C25,W,Oct,2019,0
+BRSC,C26,B,Oct,2019,0
+BRSC,C26,W,Oct,2019,0
+Blue Ridge,C27,B,Oct,2019,0
+Blue Ridge,C27,W,Oct,2019,0
+CHS,C28,B,Oct,2019,1
+CHS,C28,W,Oct,2019,0
+Greenbrier,C29,B,Oct,2019,0
+Greenbrier,C29,W,Oct,2019,0
+29 North,C30,B,Oct,2019,0
+29 North,C30,W,Oct,2019,1
+The Meadows,C31,B,Oct,2019,0
+The Meadows,C31,W,Oct,2019,0
+5th Street,C32,B,Oct,2019,1
+5th Street,C32,W,Oct,2019,1
+Longwood,C33,B,Oct,2019,0
+Longwood,C33,W,Oct,2019,0
+Mall,C01,B,Nov,2019,0
+Mall,C01,W,Nov,2019,2
+Downtown,C02,B,Nov,2019,0
+Downtown,C02,W,Nov,2019,0
+Star Hill,C03,B,Nov,2019,0
+Star Hill,C03,W,Nov,2019,1
+Westhaven,C04,B,Nov,2019,1
+Westhaven,C04,W,Nov,2019,1
+10th & Page,C05,B,Nov,2019,1
+10th & Page,C05,W,Nov,2019,0
+Rosehill Dr,C06,B,Nov,2019,2
+Rosehill Dr,C06,W,Nov,2019,1
+North Downtown,C07,B,Nov,2019,0
+North Downtown,C07,W,Nov,2019,0
+MJH,C08,B,Nov,2019,0
+MJH,C08,W,Nov,2019,0
+Little High,C09,B,Nov,2019,0
+Little High,C09,W,Nov,2019,0
+Belmont,C10,B,Nov,2019,1
+Belmont,C10,W,Nov,2019,3
+Garrett,C11,B,Nov,2019,0
+Garrett,C11,W,Nov,2019,0
+Ridge St,C12,B,Nov,2019,2
+Ridge St,C12,W,Nov,2019,1
+Fifeville,C13,B,Nov,2019,0
+Fifeville,C13,W,Nov,2019,0
+JPA,C14,B,Nov,2019,0
+JPA,C14,W,Nov,2019,0
+The Corner,C15,B,Nov,2019,1
+The Corner,C15,W,Nov,2019,2
+Venable,C16,B,Nov,2019,0
+Venable,C16,W,Nov,2019,2
+Kellytown,C17,B,Nov,2019,0
+Kellytown,C17,W,Nov,2019,0
+North East,C18,B,Nov,2019,0
+North East,C18,W,Nov,2019,0
+Locust Grove,C19,B,Nov,2019,0
+Locust Grove,C19,W,Nov,2019,1
+Woolen Mills,C20,B,Nov,2019,0
+Woolen Mills,C20,W,Nov,2019,0
+Prospect,C21,B,Nov,2019,0
+Prospect,C21,W,Nov,2019,1
+Johnson Village,C22,B,Nov,2019,0
+Johnson Village,C22,W,Nov,2019,0
+Fry's Spring,C23,B,Nov,2019,0
+Fry's Spring,C23,W,Nov,2019,0
+Lewis Mountain,C24,B,Nov,2019,0
+Lewis Mountain,C24,W,Nov,2019,0
+BRSC Area,C25,B,Nov,2019,3
+BRSC Area,C25,W,Nov,2019,0
+BRSC,C26,B,Nov,2019,0
+BRSC,C26,W,Nov,2019,0
+Blue Ridge,C27,B,Nov,2019,0
+Blue Ridge,C27,W,Nov,2019,0
+CHS,C28,B,Nov,2019,1
+CHS,C28,W,Nov,2019,0
+Greenbrier,C29,B,Nov,2019,0
+Greenbrier,C29,W,Nov,2019,0
+29 North,C30,B,Nov,2019,0
+29 North,C30,W,Nov,2019,2
+The Meadows,C31,B,Nov,2019,0
+The Meadows,C31,W,Nov,2019,0
+5th Street,C32,B,Nov,2019,0
+5th Street,C32,W,Nov,2019,1
+Longwood,C33,B,Nov,2019,0
+Longwood,C33,W,Nov,2019,0
+Mall,C01,B,Dec,2019,0
+Mall,C01,W,Dec,2019,2
+Downtown,C02,B,Dec,2019,1
+Downtown,C02,W,Dec,2019,5
+Star Hill,C03,B,Dec,2019,1
+Star Hill,C03,W,Dec,2019,3
+Westhaven,C04,B,Dec,2019,0
+Westhaven,C04,W,Dec,2019,0
+10th & Page,C05,B,Dec,2019,7
+10th & Page,C05,W,Dec,2019,1
+Rosehill Dr,C06,B,Dec,2019,2
+Rosehill Dr,C06,W,Dec,2019,0
+North Downtown,C07,B,Dec,2019,0
+North Downtown,C07,W,Dec,2019,0
+MJH,C08,B,Dec,2019,0
+MJH,C08,W,Dec,2019,0
+Little High,C09,B,Dec,2019,0
+Little High,C09,W,Dec,2019,1
+Belmont,C10,B,Dec,2019,13
+Belmont,C10,W,Dec,2019,1
+Garrett,C11,B,Dec,2019,0
+Garrett,C11,W,Dec,2019,0
+Ridge St,C12,B,Dec,2019,2
+Ridge St,C12,W,Dec,2019,1
+Fifeville,C13,B,Dec,2019,2
+Fifeville,C13,W,Dec,2019,0
+JPA,C14,B,Dec,2019,0
+JPA,C14,W,Dec,2019,0
+The Corner,C15,B,Dec,2019,1
+The Corner,C15,W,Dec,2019,1
+Venable,C16,B,Dec,2019,1
+Venable,C16,W,Dec,2019,0
+Kellytown,C17,B,Dec,2019,0
+Kellytown,C17,W,Dec,2019,0
+North East,C18,B,Dec,2019,0
+North East,C18,W,Dec,2019,3
+Locust Grove,C19,B,Dec,2019,0
+Locust Grove,C19,W,Dec,2019,0
+Woolen Mills,C20,B,Dec,2019,0
+Woolen Mills,C20,W,Dec,2019,1
+Prospect,C21,B,Dec,2019,0
+Prospect,C21,W,Dec,2019,0
+Johnson Village,C22,B,Dec,2019,0
+Johnson Village,C22,W,Dec,2019,0
+Fry's Spring,C23,B,Dec,2019,0
+Fry's Spring,C23,W,Dec,2019,0
+Lewis Mountain,C24,B,Dec,2019,0
+Lewis Mountain,C24,W,Dec,2019,0
+BRSC Area,C25,B,Dec,2019,0
+BRSC Area,C25,W,Dec,2019,0
+BRSC,C26,B,Dec,2019,0
+BRSC,C26,W,Dec,2019,2
+Blue Ridge,C27,B,Dec,2019,0
+Blue Ridge,C27,W,Dec,2019,0
+CHS,C28,B,Dec,2019,1
+CHS,C28,W,Dec,2019,0
+Greenbrier,C29,B,Dec,2019,0
+Greenbrier,C29,W,Dec,2019,0
+29 North,C30,B,Dec,2019,1
+29 North,C30,W,Dec,2019,2
+The Meadows,C31,B,Dec,2019,0
+The Meadows,C31,W,Dec,2019,0
+5th Street,C32,B,Dec,2019,1
+5th Street,C32,W,Dec,2019,0
+Longwood,C33,B,Dec,2019,0
+Longwood,C33,W,Dec,2019,0
+Mall,C01,B,Jan,2020,3
+Mall,C01,W,Jan,2020,2
+Downtown,C02,B,Jan,2020,1
+Downtown,C02,W,Jan,2020,4
+Star Hill,C03,B,Jan,2020,0
+Star Hill,C03,W,Jan,2020,0
+Westhaven,C04,B,Jan,2020,0
+Westhaven,C04,W,Jan,2020,0
+10th & Page,C05,B,Jan,2020,1
+10th & Page,C05,W,Jan,2020,1
+Rosehill Dr,C06,B,Jan,2020,0
+Rosehill Dr,C06,W,Jan,2020,0
+North Downtown,C07,B,Jan,2020,0
+North Downtown,C07,W,Jan,2020,1
+MJH,C08,B,Jan,2020,0
+MJH,C08,W,Jan,2020,0
+Little High,C09,B,Jan,2020,0
+Little High,C09,W,Jan,2020,0
+Belmont,C10,B,Jan,2020,2
+Belmont,C10,W,Jan,2020,2
+Garrett,C11,B,Jan,2020,1
+Garrett,C11,W,Jan,2020,0
+Ridge St,C12,B,Jan,2020,2
+Ridge St,C12,W,Jan,2020,1
+Fifeville,C13,B,Jan,2020,2
+Fifeville,C13,W,Jan,2020,0
+JPA,C14,B,Jan,2020,0
+JPA,C14,W,Jan,2020,0
+The Corner,C15,B,Jan,2020,1
+The Corner,C15,W,Jan,2020,1
+Venable,C16,B,Jan,2020,3
+Venable,C16,W,Jan,2020,1
+Kellytown,C17,B,Jan,2020,0
+Kellytown,C17,W,Jan,2020,0
+North East,C18,B,Jan,2020,2
+North East,C18,W,Jan,2020,2
+Locust Grove,C19,B,Jan,2020,0
+Locust Grove,C19,W,Jan,2020,0
+Woolen Mills,C20,B,Jan,2020,0
+Woolen Mills,C20,W,Jan,2020,1
+Prospect,C21,B,Jan,2020,2
+Prospect,C21,W,Jan,2020,0
+Johnson Village,C22,B,Jan,2020,0
+Johnson Village,C22,W,Jan,2020,1
+Fry's Spring,C23,B,Jan,2020,0
+Fry's Spring,C23,W,Jan,2020,1
+Lewis Mountain,C24,B,Jan,2020,0
+Lewis Mountain,C24,W,Jan,2020,0
+BRSC Area,C25,B,Jan,2020,0
+BRSC Area,C25,W,Jan,2020,0
+BRSC,C26,B,Jan,2020,0
+BRSC,C26,W,Jan,2020,0
+Blue Ridge,C27,B,Jan,2020,0
+Blue Ridge,C27,W,Jan,2020,0
+CHS,C28,B,Jan,2020,0
+CHS,C28,W,Jan,2020,0
+Greenbrier,C29,B,Jan,2020,0
+Greenbrier,C29,W,Jan,2020,0
+29 North,C30,B,Jan,2020,0
+29 North,C30,W,Jan,2020,0
+The Meadows,C31,B,Jan,2020,0
+The Meadows,C31,W,Jan,2020,0
+5th Street,C32,B,Jan,2020,3
+5th Street,C32,W,Jan,2020,0
+Longwood,C33,B,Jan,2020,0
+Longwood,C33,W,Jan,2020,0
+Mall,C01,B,Feb,2020,1
+Mall,C01,W,Feb,2020,2
+Downtown,C02,B,Feb,2020,1
+Downtown,C02,W,Feb,2020,2
+Star Hill,C03,B,Feb,2020,0
+Star Hill,C03,W,Feb,2020,0
+Westhaven,C04,B,Feb,2020,0
+Westhaven,C04,W,Feb,2020,1
+10th & Page,C05,B,Feb,2020,4
+10th & Page,C05,W,Feb,2020,1
+Rosehill Dr,C06,B,Feb,2020,0
+Rosehill Dr,C06,W,Feb,2020,0
+North Downtown,C07,B,Feb,2020,0
+North Downtown,C07,W,Feb,2020,0
+MJH,C08,B,Feb,2020,0
+MJH,C08,W,Feb,2020,0
+Little High,C09,B,Feb,2020,0
+Little High,C09,W,Feb,2020,0
+Belmont,C10,B,Feb,2020,1
+Belmont,C10,W,Feb,2020,3
+Garrett,C11,B,Feb,2020,0
+Garrett,C11,W,Feb,2020,1
+Ridge St,C12,B,Feb,2020,1
+Ridge St,C12,W,Feb,2020,0
+Fifeville,C13,B,Feb,2020,2
+Fifeville,C13,W,Feb,2020,1
+JPA,C14,B,Feb,2020,0
+JPA,C14,W,Feb,2020,1
+The Corner,C15,B,Feb,2020,0
+The Corner,C15,W,Feb,2020,2
+Venable,C16,B,Feb,2020,0
+Venable,C16,W,Feb,2020,1
+Kellytown,C17,B,Feb,2020,2
+Kellytown,C17,W,Feb,2020,0
+North East,C18,B,Feb,2020,0
+North East,C18,W,Feb,2020,1
+Locust Grove,C19,B,Feb,2020,0
+Locust Grove,C19,W,Feb,2020,1
+Woolen Mills,C20,B,Feb,2020,1
+Woolen Mills,C20,W,Feb,2020,0
+Prospect,C21,B,Feb,2020,1
+Prospect,C21,W,Feb,2020,0
+Johnson Village,C22,B,Feb,2020,0
+Johnson Village,C22,W,Feb,2020,1
+Fry's Spring,C23,B,Feb,2020,0
+Fry's Spring,C23,W,Feb,2020,1
+Lewis Mountain,C24,B,Feb,2020,0
+Lewis Mountain,C24,W,Feb,2020,1
+BRSC Area,C25,B,Feb,2020,0
+BRSC Area,C25,W,Feb,2020,0
+BRSC,C26,B,Feb,2020,0
+BRSC,C26,W,Feb,2020,0
+Blue Ridge,C27,B,Feb,2020,1
+Blue Ridge,C27,W,Feb,2020,0
+CHS,C28,B,Feb,2020,1
+CHS,C28,W,Feb,2020,0
+Greenbrier,C29,B,Feb,2020,0
+Greenbrier,C29,W,Feb,2020,0
+29 North,C30,B,Feb,2020,0
+29 North,C30,W,Feb,2020,0
+The Meadows,C31,B,Feb,2020,0
+The Meadows,C31,W,Feb,2020,0
+5th Street,C32,B,Feb,2020,0
+5th Street,C32,W,Feb,2020,1
+Longwood,C33,B,Feb,2020,0
+Longwood,C33,W,Feb,2020,0
+Mall,C01,B,Mar,2020,2
+Mall,C01,W,Mar,2020,1
+Downtown,C02,B,Mar,2020,0
+Downtown,C02,W,Mar,2020,0
+Star Hill,C03,B,Mar,2020,2
+Star Hill,C03,W,Mar,2020,1
+Westhaven,C04,B,Mar,2020,3
+Westhaven,C04,W,Mar,2020,0
+10th & Page,C05,B,Mar,2020,0
+10th & Page,C05,W,Mar,2020,0
+Rosehill Dr,C06,B,Mar,2020,0
+Rosehill Dr,C06,W,Mar,2020,0
+North Downtown,C07,B,Mar,2020,0
+North Downtown,C07,W,Mar,2020,0
+MJH,C08,B,Mar,2020,1
+MJH,C08,W,Mar,2020,0
+Little High,C09,B,Mar,2020,0
+Little High,C09,W,Mar,2020,0
+Belmont,C10,B,Mar,2020,8
+Belmont,C10,W,Mar,2020,1
+Garrett,C11,B,Mar,2020,7
+Garrett,C11,W,Mar,2020,0
+Ridge St,C12,B,Mar,2020,0
+Ridge St,C12,W,Mar,2020,0
+Fifeville,C13,B,Mar,2020,0
+Fifeville,C13,W,Mar,2020,0
+JPA,C14,B,Mar,2020,1
+JPA,C14,W,Mar,2020,0
+The Corner,C15,B,Mar,2020,1
+The Corner,C15,W,Mar,2020,1
+Venable,C16,B,Mar,2020,1
+Venable,C16,W,Mar,2020,0
+Kellytown,C17,B,Mar,2020,0
+Kellytown,C17,W,Mar,2020,0
+North East,C18,B,Mar,2020,0
+North East,C18,W,Mar,2020,1
+Locust Grove,C19,B,Mar,2020,0
+Locust Grove,C19,W,Mar,2020,1
+Woolen Mills,C20,B,Mar,2020,0
+Woolen Mills,C20,W,Mar,2020,0
+Prospect,C21,B,Mar,2020,1
+Prospect,C21,W,Mar,2020,0
+Johnson Village,C22,B,Mar,2020,0
+Johnson Village,C22,W,Mar,2020,0
+Fry's Spring,C23,B,Mar,2020,0
+Fry's Spring,C23,W,Mar,2020,1
+Lewis Mountain,C24,B,Mar,2020,0
+Lewis Mountain,C24,W,Mar,2020,0
+BRSC Area,C25,B,Mar,2020,0
+BRSC Area,C25,W,Mar,2020,1
+BRSC,C26,B,Mar,2020,0
+BRSC,C26,W,Mar,2020,3
+Blue Ridge,C27,B,Mar,2020,0
+Blue Ridge,C27,W,Mar,2020,0
+CHS,C28,B,Mar,2020,0
+CHS,C28,W,Mar,2020,0
+Greenbrier,C29,B,Mar,2020,0
+Greenbrier,C29,W,Mar,2020,0
+29 North,C30,B,Mar,2020,0
+29 North,C30,W,Mar,2020,0
+The Meadows,C31,B,Mar,2020,0
+The Meadows,C31,W,Mar,2020,1
+5th Street,C32,B,Mar,2020,0
+5th Street,C32,W,Mar,2020,1
+Longwood,C33,B,Mar,2020,0
+Longwood,C33,W,Mar,2020,0
+Mall,C01,B,Apr,2020,0
+Mall,C01,W,Apr,2020,0
+Downtown,C02,B,Apr,2020,1
+Downtown,C02,W,Apr,2020,2
+Star Hill,C03,B,Apr,2020,0
+Star Hill,C03,W,Apr,2020,0
+Westhaven,C04,B,Apr,2020,6
+Westhaven,C04,W,Apr,2020,0
+10th & Page,C05,B,Apr,2020,1
+10th & Page,C05,W,Apr,2020,0
+Rosehill Dr,C06,B,Apr,2020,3
+Rosehill Dr,C06,W,Apr,2020,1
+North Downtown,C07,B,Apr,2020,0
+North Downtown,C07,W,Apr,2020,0
+MJH,C08,B,Apr,2020,1
+MJH,C08,W,Apr,2020,1
+Little High,C09,B,Apr,2020,0
+Little High,C09,W,Apr,2020,0
+Belmont,C10,B,Apr,2020,3
+Belmont,C10,W,Apr,2020,0
+Garrett,C11,B,Apr,2020,1
+Garrett,C11,W,Apr,2020,0
+Ridge St,C12,B,Apr,2020,1
+Ridge St,C12,W,Apr,2020,2
+Fifeville,C13,B,Apr,2020,2
+Fifeville,C13,W,Apr,2020,0
+JPA,C14,B,Apr,2020,0
+JPA,C14,W,Apr,2020,0
+The Corner,C15,B,Apr,2020,0
+The Corner,C15,W,Apr,2020,0
+Venable,C16,B,Apr,2020,1
+Venable,C16,W,Apr,2020,1
+Kellytown,C17,B,Apr,2020,0
+Kellytown,C17,W,Apr,2020,0
+North East,C18,B,Apr,2020,1
+North East,C18,W,Apr,2020,0
+Locust Grove,C19,B,Apr,2020,0
+Locust Grove,C19,W,Apr,2020,1
+Woolen Mills,C20,B,Apr,2020,2
+Woolen Mills,C20,W,Apr,2020,0
+Prospect,C21,B,Apr,2020,0
+Prospect,C21,W,Apr,2020,0
+Johnson Village,C22,B,Apr,2020,0
+Johnson Village,C22,W,Apr,2020,0
+Fry's Spring,C23,B,Apr,2020,2
+Fry's Spring,C23,W,Apr,2020,0
+Lewis Mountain,C24,B,Apr,2020,0
+Lewis Mountain,C24,W,Apr,2020,0
+BRSC Area,C25,B,Apr,2020,0
+BRSC Area,C25,W,Apr,2020,0
+BRSC,C26,B,Apr,2020,0
+BRSC,C26,W,Apr,2020,0
+Blue Ridge,C27,B,Apr,2020,0
+Blue Ridge,C27,W,Apr,2020,0
+CHS,C28,B,Apr,2020,0
+CHS,C28,W,Apr,2020,0
+Greenbrier,C29,B,Apr,2020,0
+Greenbrier,C29,W,Apr,2020,3
+29 North,C30,B,Apr,2020,2
+29 North,C30,W,Apr,2020,0
+The Meadows,C31,B,Apr,2020,0
+The Meadows,C31,W,Apr,2020,0
+5th Street,C32,B,Apr,2020,0
+5th Street,C32,W,Apr,2020,0
+Longwood,C33,B,Apr,2020,1
+Longwood,C33,W,Apr,2020,0
