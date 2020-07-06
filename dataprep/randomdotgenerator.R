@@ -119,9 +119,13 @@ SF2016Locations <-
 num1214 <-
   SF1214 %>%
   group_by(BEAT) %>%
+# mutate(Create a Year Variable) %>%
+# group_by(BEAT, Year) %>%  
   summarize(NumDots = n()) %>%
   mutate(BEAT_NO = str_replace_all(BEAT, "C", ""))
 
+# split(num1214, Year)
+# Run the following code for each year chunk
 # Time to interpolate the dots
 dots1214 <-     
   map_df( unique(num1214$BEAT_NO),  # Okay, so for every Beat
@@ -134,7 +138,9 @@ dots1214 <-
             st_coordinates() %>%                                                      # pull out coordinates into
             as_tibble() %>%                                                           # convert to tibble
             setNames(c("lon","lat")) %>%                                              # set column names
-            mutate(BEAT_NO = .x)  # add categorical party var  
+            mutate(BEAT_NO = .x #,
+               #    Year = 
+                   )  # add categorical party var  
   ) %>% arrange(BEAT_NO)
 
 SF1214Locations <-
