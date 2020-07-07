@@ -10,7 +10,8 @@ library(leaflet)
 library(htmltools)
 
 
-setwd("/Volumes/GoogleDrive/My Drive/Equity Center/Github/cvilleequity_stopandfrisk")
+#setwd("/Volumes/GoogleDrive/My Drive/Equity Center/Github/cvilleequity_stopandfrisk")
+setwd("/Users/enriqueunruh/Documents/Equity Center/GitHub/cvilleequity_stopandfrisk") 
 
 addresses <- read_csv("data/Master_Address_Points.csv")
 addresses_table <- read_csv("data/Master_Address_Table.csv")
@@ -26,7 +27,9 @@ SF1920input %>%
   mutate(Year = as.numeric(paste0(20, Year))) %>%
   filter(race %in% c("B", "W"))                        
 
-write_csv(SF1920, path = "data/finaldata/SF1920.csv")
+#write_csv(SF1920, path = "data/finaldata/SF1920.csv")
+
+write_csv(SF1920, path = "data/SF1920.csv")
 
 ##### 2017 ########
 ## Clean SF 2017 ##
@@ -120,7 +123,8 @@ point_in_beat %>%
   ungroup() %>%
   select(SFTYPE, NUMBER, STREET, OFFENSE, RACE, geometry, BEAT_NO, POPULATION)
   
-write_csv(SF2017FINAL , path = "data/finaldata/SF2017.csv")
+##write_csv(SF2017FINAL , path = "data/finaldata/SF2017.csv")
+write_csv(SF2017FINAL , path = "data/SF2017.csv")
 
 ####
 leaflet(data = beats) %>%
@@ -154,7 +158,8 @@ SF2016 <-
   filter(RACE %in% c("B", "W"))
 
 SF2016 %>%
-  write_csv(. , path = "data/finaldata/SF2016.csv")
+  ##write_csv(. , path = "data/finaldata/SF2016.csv")
+  write_csv(. , path="data/SF2016.csv")
 
 
 ###### 2014 #######

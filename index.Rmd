@@ -41,13 +41,13 @@ Row
 
 ### Average Detentions per Month
 
-```{r}
-avg <- round(nrow(sf)/44,1)
+```{r Detentions per Month}
+avg <- round(nrow(sf)/56,1) #Enrique added 12 months to denominator
 valueBox(avg, icon = "fa-hand-paper")
 ```
 
 ### Percent of Detentions with Search or Frisk
-```{r}
+```{r Detentions with Search or Frisk}
 frisk <- round(nrow(filter(sf, type == "STOP WITH SEARCH OR FRISK")) /
                  nrow(sf)*100, 0)
 valueBox(frisk, icon = "fa-search")
@@ -55,7 +55,7 @@ valueBox(frisk, icon = "fa-search")
 
 ### Ratio of Black to White Citizens Detained
 
-```{r}
+```{r Black to White Citizens}
 sf_race <- sf %>%
   filter(race %in% c("B", "W")) %>%
   mutate(race = factor(race),
@@ -96,26 +96,26 @@ Navigate to additional pages for further analysis:
 
 ### Detentions, with and without Search/Frisk, by Race
 
-```{r}
+```{r Detentions by Race}
 # for annotation
-tots <- sf_race %>% group_by(period, type2) %>% summarize(tots = n())
-racetots <- sf_race %>% group_by(period, type2, race) %>% summarize(racetot = n())
+tots <- sf_race %>% group_by(year, type2) %>% summarize(tots = n())
+racetots <- sf_race %>% group_by(year, type2, race) %>% summarize(racetot = n())
 racetots <- racetots %>% left_join(tots)
 racetots <- racetots %>% mutate(percent = round((racetot/tots)*100,0),
                                 percent_lab = paste0(percent, "%"),
                                 race = fct_relevel(race, "White")) %>%
-  group_by(period, type2) %>%
-  arrange(period, type2, race) %>%
+  group_by(year, type2) %>%
+  arrange(year, type2, race) %>%
   mutate(lab_height =  racetot/2)
 
 
 ggplot(sf_race, aes(x = type2, fill = race)) +
-  geom_bar(position = "dodge") + facet_wrap(~period) +
+  geom_bar(position = "dodge") + facet_wrap(~year) +
   scale_fill_manual(values = pal2) +
   labs(fill = "Race") +
   theme(axis.title = element_blank()) +
   geom_text(data = arrange(racetots, race), aes(x = type2, y = lab_height, fill = race, label = percent_lab), position = position_dodge(width = .85), size = 3, hjust = .5) +
- geom_text(data = arrange(racetots, race), aes(x = type2, y = racetot + 5, fill = race, label = racetot), position = position_dodge(width = .85), size = 4, hjust = .5)
+  geom_text(data = arrange(racetots, race), aes(x = type2, y = racetot + 8, fill = race, label = racetot), position = position_dodge(width = .85), size = 4, hjust = .5)
 
 ```
 
@@ -128,7 +128,7 @@ Row
 -----------------------------------------------------------------------
 
 ### Detentions per 1000 population for Black residents (2-year period)
-```{r}
+```{r per 1000}
 bl_pc <- round(((nrow(filter(sf_race, race == "Black"))/2) / 8782)*1000,1)
 valueBox(bl_pc, icon = "fa-users")
 ```

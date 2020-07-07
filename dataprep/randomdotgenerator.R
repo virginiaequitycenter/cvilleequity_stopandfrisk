@@ -1,7 +1,8 @@
 ########################
 # Random Dot Generator #
 ########################
-setwd("/Volumes/GoogleDrive/My Drive/Equity Center/Github/cvilleequity_stopandfrisk")
+#setwd("/Volumes/GoogleDrive/My Drive/Equity Center/Github/cvilleequity_stopandfrisk")
+setwd("/Users/enriqueunruh/Documents/Equity Center/GitHub/cvilleequity_stopandfrisk")
 
 beats <- readRDS("data/beat_pop_map.Rds")
 
@@ -9,6 +10,7 @@ SF1920 <- read_csv("data/SF1920.csv")
 SF17 <- read_csv("data/SF2017.csv")
 SF16 <- read_csv("data/SF2016.csv")
 SF1214 <- read_csv("data/SF2014.csv")
+SF2015 <- read_csv("data/Stop_Frisk_2015_Final") #Enrique added 2015 csv
 monthlabels <- data.frame(Abbrev = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"),
            Month = c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"))
 
@@ -32,8 +34,9 @@ dots1920 <-
             as_tibble() %>%                                                           # convert to tibble
             setNames(c("lon","lat")) %>%                                              # set column names
             mutate(BEAT_NO = .x)  # add categorical party var  
-  ) %>% arrange(BEAT_NO)          
-   
+  ) %>% arrange(BEAT_NO)      
+
+
 SF1920Locations <-            
 SF1920 %>%
   mutate(BEAT_NO = str_replace_all(beatnum, "C", "")) %>%
@@ -148,15 +151,68 @@ SF1214Locations <-
   slice(sample(1:n())) # once map_df binds rows randomise order to avoid bias in plotting order
 
 ####################
+
+#Enrique added 2015 --------
+
+num2015 <-
+  SF2015 %>%
+  group_by(BEAT_NO) %>%
+  summarize(NumDots = n())
+
+# Time to interpolate the dots
+dots2015 <-     
+  map_df( unique(num2015$BEAT_NO),  # Okay, so for every Beat
+          
+          ~ st_sample(beats$geometry[beats$BEAT_NO == .x],                             # Interpolate this surface 
+                      size = num2015$NumDots[num2015$BEAT_NO == .x], # with this occupation's dots
+                      type = "random",
+                      exact = TRUE) %>%                                              # generate the points in ea
+            st_cast("POINT") %>%                                                      # cast the geom set as 'POI
+            st_coordinates() %>%                                                      # pull out coordinates into
+            as_tibble() %>%                                                           # convert to tibble
+            setNames(c("lon","lat")) %>%                                              # set column names
+            mutate(BEAT_NO = .x)  # add categorical party var  
+  ) %>% arrange(BEAT_NO)
+
+SF2015Locations <-
+  SF2015 %>%
+  mutate(SFType = str_replace_all(SFType, "YES", "STOP WITH SEARCH OR FRISK"))%>%
+  mutate(SFType = str_replace_all(SFType, "NO", "Search WITHOUT Stop-Frisk"))%>%
+  select(SFTYPE = SFType, OFFENSE = Arrest, RACE = Race, BEAT_NO) %>%
+  arrange(BEAT_NO) %>%
+  add_column(lat = dots2015$lat, lon = dots2015$lon, beatnumdot = dots2015$BEAT_NO, Year = 2015) %>%
+  slice(sample(1:n()))
+
+
+
+# Final Binding ------
 SFALLLOCATIONS <-
   bind_rows(
     SF1920Locations,
     SF2017Locations,
     SF2016Locations,
-    SF1214Locations
+    SF1214Locations,
+    SF2015Locations  #Enrique added 2015 locations
   )
 
-View(SFALLLOCATIONS)
+SFALLLOCATIONS$OFFENSE[SFALLLOCATIONS$OFFENSE == "No"]  <- NA
+SFALLLOCATIONS_BEATNOs <- as.double(SFALLLOCATIONS$BEAT_NO)
 
-write_csv(SFALLLOCATIONS, path = "data/finaldata/sflocations.csv")
+
+#Made BEAT_NO numeric
+SFALLLOCATIONSFINAL <-
+  SFALLLOCATIONS %>%
+  add_column(BeatNum = SFALLLOCATIONS_BEATNOs) %>%
+  select(-BEAT_NO) %>%
+  rename(BEAT_NO = BeatNum)
+
+
+
+#write_csv(SFALLLOCATIONS, path = "data/finaldata/sflocations.csv")
+
+write_csv(SFALLLOCATIONSFINAL, path = "data/sflocations.csv")
+
+
+
+
 

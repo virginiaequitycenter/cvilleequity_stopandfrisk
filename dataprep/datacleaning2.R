@@ -6,7 +6,7 @@ library(openxlsx)
 library(ggmap)
 library(pdftools)
 
-
+#Sam original -------
 # setwd("/Volumes/GoogleDrive/My Drive/Equity Center/Github/cvilleequity_stopandfrisk")
 
 addresses <- read_csv("data/Master_Address_Points.csv")
@@ -107,7 +107,7 @@ View(SF2014)
 # mpc added -----------------
 # add beats to 2017 records
 library(sf)
-beatmap <- readRDS("beat_pop_map.Rds")
+beatmap <- readRDS("data/beat_pop_map.Rds")
 
 SF2017_sf <- as.data.frame(SF2017Locations) %>% 
   st_as_sf(coords=c("lon", "lat"), crs=4326, remove=FALSE) # convert to sf object
@@ -154,6 +154,8 @@ SF2017brief <- SF2017_wbeat %>%
 # combine
 SF <- rbind(SF2014brief, SF2016brief, SF2017brief)
 
+view(SF)
+
 saveRDS(SF, "sf_combined.Rds")
 
 
@@ -166,3 +168,103 @@ sf1920_data <- googlesheets4::read_sheet(url_sheet,
 sf1920_data <- sf1920_data %>% # remove summed row at bottom
   filter(!is.na(beat))
 # whoa
+
+#Enrique added ----------
+
+Stop_Frisk_2015_read <- read_csv("data/2015_Stop_and_Frisk.csv") %>%
+  rename(Address = "Individuals Stopped by Location", Arrest = "Arrest/Summons",
+         SFType = "Search/Frisk") %>%
+  select(c(Address, Race, Arrest, SFType)) %>%
+  filter(Race %in% c("B", "W"))
+
+Stop_Frisk_2015 <-
+  Stop_Frisk_2015_read %>% 
+  separate(Address, c("NUMBER", "STREET"), sep = " ", extra = "merge") %>%
+  mutate(NUMBER = as.numeric(NUMBER)) %>%
+  as_tibble()
+
+
+Stop_Frisk_2015_Locations<-
+  Stop_Frisk_2015 %>%
+  mutate(id = 1:n()) %>%
+  left_join(address_points_cleaned) %>% 
+  mutate(house_dist = abs(geo_MAT_ST_NUMBER - NUMBER)) %>%
+  group_by(id) %>%
+  arrange(id, house_dist ) %>%
+  slice(1)  %>%
+  ungroup()
+
+cumsum(round(table(Stop_Frisk_2015_Locations$house_dist)/sum(table(Stop_Frisk_2015_Locations$house_dist))*100, 2))
+
+#Checking for csv typos
+#Stop_Frisk_2015_Locations %>%
+ # filter(is.na(house_dist)) %>% 
+  #arrange(house_dist) %>%
+  #select(NUMBER, STREET, geo_MAT_ST_NUMBER, address, house_dist) %>% View()
+
+Stop_Frisk_2015_Spatial <-
+  Stop_Frisk_2015_Locations %>%
+  ungroup() %>%
+  st_as_sf(
+    coords = c("lon", "lat"),
+    #   agr = "constant",
+    crs = 4326,
+    #    stringAsFactors = FALSE,
+    remove = TRUE
+  )
+
+#Borrowed from datacleaning1
+beats <- st_read("data/Police_Neighborhood_Area-shp/Police_Neighborhood_Area.shp")
+View(beats)
+
+point_in_beat_2015 <- st_join(Stop_Frisk_2015_Spatial, beats, join = st_within)
+
+#View(point_in_beat_2015)
+
+## Print them out ##
+Stop_Frisk_2015_Final <-
+  point_in_beat_2015 %>%
+  ungroup() %>%
+  select(SFType, NUMBER, STREET, Arrest, Race, geometry, BEAT_NO, POPULATION)
+
+write_csv(Stop_Frisk_2015_Final, path = "data/Stop_Frisk_2015_Final")
+
+
+Stop_Frisk_2015_sf <- as.data.frame(Stop_Frisk_2015_Locations) %>% 
+  st_as_sf(coords=c("lon", "lat"), crs=4326, remove=FALSE)
+
+#plot(Stop_Frisk_2015_sf$geometry)
+#plot(beatmap$geometry)
+
+
+## 2016 SF Data ## 
+Stop_Frisk_2016 <- read_csv("data/2016 Stop and Frisk.csv")
+
+
+
+###Adding 2015 data into sf compiled dataset
+sf <- read_rds("data/sf_combined.Rds")
+
+
+SF2015brief <- Stop_Frisk_2015_Final %>% 
+  rename(type = SFType, beat = BEAT_NO, 
+         offense = Arrest, race = Race) %>% 
+  mutate(year = 2015, period = "2015", date = NA) %>% 
+  mutate(beat_letter = "C") %>%
+  unite(beat,beat_letter, beat, sep = "") %>%
+  select(date, year, period, type, beat, offense, race) %>%
+  st_drop_geometry()
+
+#Matching variable names to larger dataset  
+SF2015brief$type[SF2015brief$type == "YES"]  <- "STOP WITH SEARCH OR FRISK"
+SF2015brief$type[SF2015brief$type == "NO"]  <- "Search WITHOUT Stop-Frisk"
+
+  
+Stop_Frisk_Together <- rbind(sf, SF2015brief)%>%
+  as_tibble() %>%
+  arrange(year)
+  
+
+saveRDS(Stop_Frisk_Together, "data/sf_combined.Rds")
+
+
