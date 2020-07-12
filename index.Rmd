@@ -154,7 +154,7 @@ pop <- pop %>%
 
 pop3 <- pop %>%
   mutate(race = fct_collapse(race,
-                             Remainig = c("Multiracial", "Asian", "Remaining"))) %>%
+                             Remaining = c("Multiracial", "Asian", "Remaining"))) %>%
   group_by(race) %>%
   summarize(value = sum(value)) %>%
   ungroup() %>% mutate(group = "pop")
@@ -200,19 +200,31 @@ ggplot(sf_race_all, aes(x = group, y = value, fill = race)) +
 
 > Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data.
 
-### By Time Period
+### By Year 
 
-```{r}
-sf_race_period <- sf_race %>%
-  group_by(period, race) %>%
+```{r By Year}
+sf_race_year <- sf_race %>%
+  group_by(year, race) %>%
   summarize(value = n()) %>%
   ungroup() %>%
-  mutate(group = "period")
+  mutate(group = "")
 
 pop2_p1 <- pop2 %>%
   mutate(period = "2012-2014")
 pop2_p2 <- pop2 %>%
   mutate(period = "2016-2017")
+
+pop2_year <- pop2 %>%
+  mutate(year = "Total")
+
+sf_race_year <- rbind(sf_race_year, pop2_year) %>%
+  mutate(group = c(c(rep("year",12), rep("pop",2))),
+         race = fct_relevel(race, "White"))%>%
+  arrange(group, year, desc(race)) %>%
+  group_by(group, year) %>%
+  mutate(label_pos = (cumsum(value) - value/2)/sum(value), 
+         percent = paste0(round(value/sum(value)*100,1),"%")
+         )
 
 sf_race_period <- rbind(sf_race_period, pop2_p1, pop2_p2) %>%
   mutate(group = factor(group, levels = c("pop", "period")),
@@ -223,19 +235,27 @@ sf_race_period <- rbind(sf_race_period, pop2_p1, pop2_p2) %>%
          percent = paste0(round(value/sum(value)*100,1),"%")
          )
 
-labellingdata <- data.frame(label = rep(c("Population", "Detentions"),2), group = rep(c("pop", "period"),2), pos = rep(c(.90,.90),2), period = rep(c("2012-2014", "2016-2017"), each = 2 ))
+labellingdata <- data.frame (label = c(rep("Population",6), rep("Detentions",6)), 
+  group = c(rep("pop",6), rep("year",6)), pos = rep(.90, 12), year = rep(seq(2012,2017),2))
 
 
-ggplot(sf_race_period, aes(x = group, y = value, fill = race)) +
+
+ggplot(sf_race_year, aes(x = year, y = value, fill = race)) +
   geom_bar(position="fill", stat = "identity") +
   scale_fill_manual(values = pal2, name = "Race") +
-  coord_polar("y", direction = 1) +
-  scale_x_discrete(limits = c(" ", "pop","period")) +
+  coord_polar("y", direction = 1)  +
+  scale_x_discrete(limits = c(" ", "Total",seq(2012,2017))) +
   theme_void() +
-  geom_text(  data = filter(sf_race_period, race == "Black"), aes(x = group, y = label_pos, label = percent), size = 3) +
-    geom_text( data = labellingdata,
-             aes(x = group, y = pos, label = label) ,inherit.aes = FALSE, size = 3) +
-  facet_wrap(~period)
+  geom_text(data = filter(sf_race_year, race == "Black"), 
+            aes(x = year, y = label_pos, label = percent), 
+            size = 3) +
+  facet_wrap(~ year)
+
++
+  geom_text(data = labellingdata,
+            aes(x = year, y = pos, label = label),
+            inherit.aes = FALSE, size = 3)
+ 
 ```
 
 ### By Stop and Frisk
