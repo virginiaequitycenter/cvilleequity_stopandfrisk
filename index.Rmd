@@ -478,7 +478,7 @@ ggplot(sfs, aes(x = reorder(NAME, -total), fill = RACE, y = Counts, alpha = SFTY
   scale_fill_manual(values = pal2) +
   geom_text(data = sfs %>% select(NAME, lab_pos, RaceTot) %>% unique(), aes(x = NAME, y = lab_pos, label = abs(RaceTot)), size = 3, inherit.aes = FALSE) +
   coord_flip() +
-  scale_y_continuous(labels = function(x){abs(x)}, limits = c(-53, 53), breaks = c(seq(-40, 40, 20), 0)) +
+  scale_y_continuous(labels = function(x){abs(x)}, limits = c(-60, 60), breaks = c(seq(-40, 40, 20), 0)) +
   scale_alpha_discrete(range = c(.6, 1)) +
   annotate("text", x = 29, y = -15, label = "Black" ) +
     annotate("text", x = 29, y = 15, label = "White" ) +
