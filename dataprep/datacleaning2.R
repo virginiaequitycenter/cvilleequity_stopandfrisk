@@ -5,9 +5,11 @@ library(tidyverse)
 library(openxlsx)
 library(ggmap)
 library(pdftools)
+library(sf)
 
 #Sam original -------
 # setwd("/Volumes/GoogleDrive/My Drive/Equity Center/Github/cvilleequity_stopandfrisk")
+setwd("/Users/enriqueunruh/Documents/Equity Center/GitHub/cvilleequity_stopandfrisk")
 
 addresses <- read_csv("data/Master_Address_Points.csv")
 addresses_table <- read_csv("data/Master_Address_Table.csv")
@@ -237,9 +239,19 @@ Stop_Frisk_2015_sf <- as.data.frame(Stop_Frisk_2015_Locations) %>%
 #plot(beatmap$geometry)
 
 
-## 2016 SF Data ## 
-Stop_Frisk_2016 <- read_csv("data/2016 Stop and Frisk.csv")
+## 2016 November and December SF Data ## 
+Stop_Frisk_2016_read <- read_csv("data/2016 Stop and Frisk.csv") %>%
+  select(date = "REPORT DATE", type = "Stop& Frisk", beat = "BEAT", offense = "OFFENSE", race = "RACE") %>%
+  filter(race %in% c("B", "W"))
 
+Stop_Frisk_2016_read$date <- as.Date(Stop_Frisk_2016_read$date, "%m/%d/%y")
+
+Stop_Frisk_2016_added <-
+  Stop_Frisk_2016_read %>% 
+  filter(date > "2016-10-15") %>%
+  mutate(year = 2016, period = "2016-2017")
+
+write_csv(Stop_Frisk_2016_added, path = "data/Stop_Frisk_2016_added")
 
 
 ###Adding 2015 data into sf compiled dataset
@@ -260,7 +272,7 @@ SF2015brief$type[SF2015brief$type == "YES"]  <- "STOP WITH SEARCH OR FRISK"
 SF2015brief$type[SF2015brief$type == "NO"]  <- "Search WITHOUT Stop-Frisk"
 
   
-Stop_Frisk_Together <- rbind(sf, SF2015brief)%>%
+Stop_Frisk_Together <- rbind(sf, SF2015brief, Stop_Frisk_2016_added)%>%
   as_tibble() %>%
   arrange(year)
   
