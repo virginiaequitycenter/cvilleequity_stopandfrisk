@@ -249,9 +249,7 @@ ggplot(sf_race_year, aes(x = year, y = value, fill = race)) +
   geom_text(data = filter(sf_race_year, race == "Black"), 
             aes(x = year, y = label_pos, label = percent), 
             size = 3) +
-  facet_wrap(~ year)
-
-+
+  facet_wrap(~ year) +
   geom_text(data = labellingdata,
             aes(x = year, y = pos, label = label),
             inherit.aes = FALSE, size = 3)
