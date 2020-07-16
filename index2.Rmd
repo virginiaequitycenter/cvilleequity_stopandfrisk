@@ -32,6 +32,7 @@ beats <- readRDS("data/beat_pop_map.Rds")
 
 pal2 <- c("#52a2a9" ,"#d2a48b")
 
+
 sf_race <- sf %>%
   filter(race %in% c("B", "W")) %>%
   mutate(race = factor(race),
@@ -75,16 +76,15 @@ sf_summary_stats <- sf_summary_stats%>%
          label = Totals)
 
 ggplot(sf_summary_stats, aes(x = race, y = Totals, fill = race)) +
-  geom_bar(stat = "identity", width = 0.2) +
-  scale_fill_hue(c = 40) +
+  geom_bar(stat = "identity", width = 0.5) +
   coord_flip() +
   scale_fill_manual(values = pal2) +
-  geom_text(aes(y = Totals/1.2, label = label), size=7, color = "white") +
-  geom_text(aes(y = -50, label = race), size=5, fontface=1) +
+  geom_text(aes(y = Totals - 10, label = label), size=7, color = "white", hjust = 1) +
   ggtitle("Detentions by Charlottesville Police Officers from 2012-2017") +
   theme_void() +
   theme(legend.position = "none", 
-      plot.title = element_text(size=15, face=4, hjust = .5))
+        plot.title = element_text(size=15, face=4, hjust = .5),
+        axis.text.y = element_text(size=15, face=1, hjust = .5))
 ```
 
 
