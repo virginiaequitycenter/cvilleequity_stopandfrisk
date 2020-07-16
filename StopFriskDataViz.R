@@ -164,17 +164,7 @@ racetots <- racetots %>% mutate(percent = round((racetot/tots)*100,0),
   mutate(lab_height =  racetot/2)
 
 
-ggplot(sf_race, aes(x = type2, fill = race)) +
-  geom_bar(position = "dodge") + facet_wrap(~year) +
-  scale_fill_manual(values = pal2) +
-  labs(fill = "Race") +
-  theme(axis.title = element_blank()) +
-  geom_text(data = arrange(racetots, race), 
-            aes(x = type2, y = lab_height, fill = race, label = percent_lab), 
-            position = position_dodge(width = .85), size = 3, hjust = .5) +
-  geom_text(data = arrange(racetots, race),
-            aes(x = type2, y = racetot + 8, fill = race, label = racetot), 
-            position = position_dodge(width = .85), size = 4, hjust = .5)
+
 
 
 #By Year
@@ -259,3 +249,36 @@ scale_x_discrete(limits = c(" ", "Total",seq(2012,2017))) +
 
 
 
+
+#Stop/Frisk and no Stop/Frisk--------
+
+
+ggplot(sf_race, aes(x = type2, fill = race)) +
+  geom_bar(position = "dodge") + 
+  facet_wrap(~year) +
+  scale_fill_manual(values = pal2) +
+  labs(fill = "Race") +
+  theme(axis.title = element_blank()) +
+  geom_text(data = arrange(racetots, race), 
+            aes(x = type2, y = lab_height, fill = race, label = percent_lab), 
+            position = position_dodge(width = .85), size = 3, hjust = .5) +
+  geom_text(data = arrange(racetots, race),
+            aes(x = type2, y = racetot + 8, fill = race, label = racetot), 
+            position = position_dodge(width = .85), size = 4, hjust = .5)
+
+
+library(ggraph)
+library(igraph)
+library(tidyverse)
+
+sf_race_sfs <-sf_race %>%
+  group_by(type2, race) %>%
+  summarize(Stops = n())
+
+# Create data
+mygraph <- graph_from_data_frame(sf_race_year$value, vertices=sf_race_sfs$Stops)
+
+# Make the plot
+ggraph(mygraph, layout = 'circlepack') + 
+  geom_node_circle() +
+  theme_void()

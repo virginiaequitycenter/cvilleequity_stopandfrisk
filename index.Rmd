@@ -160,22 +160,6 @@ ggplot(sf_Per1000, aes(x = race, y = Per1000, fill = race)) +
 Detentions Relative to Population {data-orientation=rows}
 =====================================
 
-Row
------------------------------------------------------------------------
-
-### Detentions per 1000 population for Black residents (2-year period)
-```{r per 1000}
-bl_pc <- round(((nrow(filter(sf_race, race == "Black"))/2) / 8782)*1000,1)
-valueBox(bl_pc, icon = "fa-users")
-```
-
-
-### Detentions per 1000 population for White residents (2-year period)
-```{r}
-wh_pc <- round(((nrow(filter(sf_race, race == "White"))/2) / 32565)*1000,1)
-valueBox(wh_pc, icon = "fa-user")
-```
-
 
 Row {.tabset}
 -----------------------------------------------------------------------
@@ -284,8 +268,7 @@ ggplot(sf_race_2012, aes(x = group, y = value, fill = race)) +
 
 ```
 
-> **Missing data prior to July 2012**
-/n Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data. 
+> **Missing data prior to July 2012.** Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data. 
 
 ### 2013
 
@@ -306,6 +289,8 @@ ggplot(sf_race_2013, aes(x = group, y = value, fill = race)) +
 
 ```
 
+> Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data.
+
 ### 2014
 
 ```{r}
@@ -324,8 +309,7 @@ ggplot(sf_race_2014, aes(x = group, y = value, fill = race)) +
             aes(x = group, y = pos, label = label) ,inherit.aes = FALSE, size = 3, color = "white")
 ```
 
-> **Missing data after to June 2014**
-/n Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data. 
+> **Missing data after to June 2014.** Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data. 
 
 ### 2015
 
@@ -345,6 +329,8 @@ ggplot(sf_race_2015, aes(x = group, y = value, fill = race)) +
             aes(x = group, y = pos, label = label) ,inherit.aes = FALSE, size = 3, color = "white")
 ```
 
+> Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data.
+
 ### 2016
 
 ```{r}
@@ -362,6 +348,8 @@ ggplot(sf_race_2013, aes(x = group, y = value, fill = race)) +
   geom_text(data = labellingdata,
             aes(x = group, y = pos, label = label) ,inherit.aes = FALSE, size = 3, color = "white")
 ```
+
+> Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data.
 
 ### 2017
 
