@@ -89,28 +89,28 @@ Navigate to additional pages for further analysis:
 ### Detentions in Charlottesville, with and without Search/Frisk
 
 ```{r}
-totals <- sf %>% filter(type == "STOP WITH SEARCH OR FRISK") %>% 
-  group_by(year) %>% 
-  summarize(sfyes = n()) %>% 
-  left_join(sf %>% filter(type != "STOP WITH SEARCH OR FRISK") %>% 
-              group_by(year) %>% 
+totals <- sf %>% filter(type == "STOP WITH SEARCH OR FRISK") %>%
+  group_by(year) %>%
+  summarize(sfyes = n()) %>%
+  left_join(sf %>% filter(type != "STOP WITH SEARCH OR FRISK") %>%
+              group_by(year) %>%
               summarize(sfno = n())
-            ) %>% 
+            ) %>%
   mutate(total = sfyes+sfno,
          percentyes = round((sfyes/total)*100, 1),
          percentno = round((sfno/total)*100, 1))
 
 
-ggplot(sf, aes(x = year, fill = type)) + 
+ggplot(sf, aes(x = year, fill = type)) +
   geom_bar() +
   scale_fill_manual(values = pal2, name = "Search/Frisk", labels = c("No", "Yes")) +
-  scale_x_continuous(name = "Year", 
+  scale_x_continuous(name = "Year",
                      breaks = c(2012, 2013, 2014, 2015, 2016, 2017),
                      labels = c("2012\n (Jul-Dec)", "2013", "2014\n (Jan-Jun)", "2015", "2016", "2017")) +
   geom_text(aes(year, total, label = total, fill = NULL, vjust = -0.5), data = totals) +
   geom_text(aes(year, sfyes, label = percentyes, fill = NULL, vjust = 1.5), size = 3, data = totals) +
   geom_text(aes(year, total, label = percentno, fill = NULL, vjust = 1.25), size = 3, data = totals) +
-  theme(axis.title = element_blank(), 
+  theme(axis.title = element_blank(),
         legend.position = c(0.9, 0.9))
 ```
 
@@ -124,7 +124,7 @@ Row
 
 ### Detentions per 1000 population for Black residents per year
 ```{r}
-bl_pc <- round(((sf_race %>% filter(race == "Black") %>% 
+bl_pc <- round(((sf_race %>% filter(race == "Black") %>%
   summarize(n()) / 5) / 8782)*1000, 0)
 valueBox(bl_pc, icon = "fa-users")
 ```
@@ -132,7 +132,7 @@ valueBox(bl_pc, icon = "fa-users")
 
 ### Detentions per 1000 population for White residents per year
 ```{r}
-wh_pc <- round(((sf_race %>% filter(race == "White") %>% 
+wh_pc <- round(((sf_race %>% filter(race == "White") %>%
   summarize(n()) / 5) / 32565)*1000, 0)
 valueBox(wh_pc, icon = "fa-user")
 ```
@@ -189,7 +189,7 @@ ggplot(sf_race_all, aes(x = group, y = value, fill = race)) +
 sf_race_year <- sf_race %>%
   group_by(year, race) %>%
   summarize(value = n()) %>%
-  ungroup() %>% 
+  ungroup() %>%
   mutate(group = "detained")
 
 pop_year <- rbind(pop %>% mutate(year = 2012),
@@ -993,12 +993,12 @@ sf_race <- sf_race %>%
          offense7 = fct_infreq(offense7))
 
 # for annotation
-tots <- sf_race %>% filter(year != 2015) %>% 
-  group_by(offense7) %>% 
+tots <- sf_race %>% filter(year != 2015) %>%
+  group_by(offense7) %>%
   summarize(tots = n())
 
-racetots <- sf_race %>% filter(year != 2015) %>% 
-  group_by(offense7, race) %>% 
+racetots <- sf_race %>% filter(year != 2015) %>%
+  group_by(offense7, race) %>%
   summarize(racetot = n())
 
 racetots <- racetots %>% left_join(tots)
@@ -1024,17 +1024,17 @@ ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
 
 ```{r fig.height = 8, fig.width = 8}
 # for annotation
-tots <- sf_race %>% filter(year != 2015) %>% 
-  group_by(offense7, year) %>% 
+tots <- sf_race %>% filter(year != 2015) %>%
+  group_by(offense7, year) %>%
   summarize(tots = n())
 
-racetots <- sf_race %>% filter(year != 2015) %>% 
-  group_by(offense7, race, year) %>% 
+racetots <- sf_race %>% filter(year != 2015) %>%
+  group_by(offense7, race, year) %>%
   summarize(racetot = n())
 
 racetots <- racetots %>% left_join(tots)
 
-racetots <- racetots %>% ungroup() %>% 
+racetots <- racetots %>% ungroup() %>%
   mutate(percent = round((racetot/tots)*100,0),
          percent_lab = ifelse(tots < 10 & racetot < 5 ,"",  paste0(percent, "%")),
          race = fct_relevel(race, "White"),
