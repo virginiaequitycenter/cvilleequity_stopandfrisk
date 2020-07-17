@@ -177,6 +177,7 @@ ggplot(sf_race_all, aes(x = group, y = value, fill = race)) +
 ```
 
 > Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data.
+
 ### By Time Period
 
 ```{r}
