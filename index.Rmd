@@ -24,6 +24,23 @@ sflocations <- read_csv("data/sflocations.csv") %>% st_as_sf(
   ) %>%
   filter(!Year %in% c(2019, 2020))
 beats <- readRDS("data/beat_pop_map.Rds")
+
+# prep data
+sf_race <- sf %>%
+  filter(race %in% c("B", "W")) %>%
+  mutate(race = factor(race),
+         race = fct_recode(race,
+                           Black = "B",
+                           White = "W"),
+         race = fct_relevel(race, "White"),
+         type2 = factor(type),
+         type2 = fct_recode(type2,
+                            "Search/Frisk" = "STOP WITH SEARCH OR FRISK",
+                            "No Search/Frisk" = "Search WITHOUT Stop-Frisk"))
+
+pal1 <- c("#91c4f2", "#8e8dbe", "#a66b92", "#92d5e6")
+pal2 <- c("#8dd3c7" ,"#bebada")
+
 ```
 
 Introduction {data-orientation=rows}
@@ -35,7 +52,7 @@ Row
 ### Average Detentions per Month
 
 ```{r}
-avg <- round(nrow(sf)/44,1)
+avg <- round(nrow(sf)/59,1)
 valueBox(avg, icon = "fa-hand-paper")
 ```
 
@@ -49,18 +66,6 @@ valueBox(frisk, icon = "fa-search")
 ### Ratio of Black to White Citizens Detained
 
 ```{r}
-sf_race <- sf %>%
-  filter(race %in% c("B", "W")) %>%
-  mutate(race = factor(race),
-         race = fct_recode(race,
-                           Black = "B",
-                           White = "W"),
-         race = fct_relevel(race, "White"),
-         type2 = factor(type),
-         type2 = fct_recode(type2,
-                            "Search/Frisk" = "STOP WITH SEARCH OR FRISK",
-                            "No Search/Frisk" = "Search WITHOUT Stop-Frisk"))
-pal2 <- c("#8dd3c7" ,"#bebada")
 ratio <- round(nrow(filter(sf_race, race == "Black")) / nrow(filter(sf_race, race == "White")),1)
 valueBox(ratio, icon = "fa-user-friends")
 ```
@@ -72,10 +77,7 @@ Row
 
 A temporary detention involves a police officer holding and questioning an individual for a short amount of time. The police only need *reasonable suspicion* for a temporary detention. Detentions may be accompanied by some form of search or frisk, though not all detentions involve a search. Detentions can be dispatched in response to a call or initiated by an officer.
 
-This analysis is based on records of temporary detentions made by the City of Charlottesville Police. The data was received in response to Freedom of Information Act requests by Jeff Fogel made over multiple time periods. We have aggregated the data to two primary time periods:
-
-* Period 1: mid-July 2012 to mid-June 2014
-* Period 2: January 2016 to mid-October 2016 combined with January 2017-December 2017
+This analysis is based on records of temporary detentions made by the City of Charlottesville Police. The data was received in response to Freedom of Information Act requests by Jeff Fogel made over multiple time periods. Each data set was structured slightly differently, and the data for 2012 and 2014 covered only half of each year.
 
 Navigate to additional pages for further analysis:
 
@@ -87,23 +89,29 @@ Navigate to additional pages for further analysis:
 ### Detentions in Charlottesville, with and without Search/Frisk
 
 ```{r}
-# for annotation
-tots <- sf_race %>% group_by(period, type2) %>% summarize(tots = n())
-racetots <- sf_race %>% group_by(period, type2, race) %>% summarize(racetot = n())
-racetots <- racetots %>% left_join(tots)
-racetots <- racetots %>% mutate(percent = round((racetot/tots)*100,0),
-                                percent_lab = paste0(percent, "%"),
-                                race = fct_relevel(race, "White")) %>%
-  group_by(period, type2) %>%
-  arrange(period, type2, race) %>%
-  mutate(lab_height =  racetot/2)
-ggplot(sf_race, aes(x = type2, fill = race)) +
-  geom_bar(position = "dodge") + facet_wrap(~period) +
-  scale_fill_manual(values = pal2) +
-  labs(fill = "Race") +
-  theme(axis.title = element_blank()) +
-  geom_text(data = arrange(racetots, race), aes(x = type2, y = lab_height, fill = race, label = percent_lab), position = position_dodge(width = .85), size = 3, hjust = .5) +
- geom_text(data = arrange(racetots, race), aes(x = type2, y = racetot + 5, fill = race, label = racetot), position = position_dodge(width = .85), size = 4, hjust = .5)
+totals <- sf %>% filter(type == "STOP WITH SEARCH OR FRISK") %>% 
+  group_by(year) %>% 
+  summarize(sfyes = n()) %>% 
+  left_join(sf %>% filter(type != "STOP WITH SEARCH OR FRISK") %>% 
+              group_by(year) %>% 
+              summarize(sfno = n())
+            ) %>% 
+  mutate(total = sfyes+sfno,
+         percentyes = round((sfyes/total)*100, 1),
+         percentno = round((sfno/total)*100, 1))
+
+
+ggplot(sf, aes(x = year, fill = type)) + 
+  geom_bar() +
+  scale_fill_manual(values = pal2, name = "Search/Frisk", labels = c("No", "Yes")) +
+  scale_x_continuous(name = "Year", 
+                     breaks = c(2012, 2013, 2014, 2015, 2016, 2017),
+                     labels = c("2012\n (Jul-Dec)", "2013", "2014\n (Jan-Jun)", "2015", "2016", "2017")) +
+  geom_text(aes(year, total, label = total, fill = NULL, vjust = -0.5), data = totals) +
+  geom_text(aes(year, sfyes, label = percentyes, fill = NULL, vjust = 1.5), size = 3, data = totals) +
+  geom_text(aes(year, total, label = percentno, fill = NULL, vjust = 1.25), size = 3, data = totals) +
+  theme(axis.title = element_blank(), 
+        legend.position = c(0.9, 0.9))
 ```
 
 
@@ -114,16 +122,18 @@ Who? {data-orientation=rows}
 Row
 -----------------------------------------------------------------------
 
-### Detentions per 1000 population for Black residents (2-year period)
+### Detentions per 1000 population for Black residents per year
 ```{r}
-bl_pc <- round(((nrow(filter(sf_race, race == "Black"))/2) / 8782)*1000,1)
+bl_pc <- round(((sf_race %>% filter(race == "Black") %>% 
+  summarize(n()) / 5) / 8782)*1000, 0)
 valueBox(bl_pc, icon = "fa-users")
 ```
 
 
-### Detentions per 1000 population for White residents (2-year period)
+### Detentions per 1000 population for White residents per year
 ```{r}
-wh_pc <- round(((nrow(filter(sf_race, race == "White"))/2) / 32565)*1000,1)
+wh_pc <- round(((sf_race %>% filter(race == "White") %>% 
+  summarize(n()) / 5) / 32565)*1000, 0)
 valueBox(wh_pc, icon = "fa-user")
 ```
 
@@ -132,20 +142,11 @@ Row {.tabset}
 -----------------------------------------------------------------------
 
 ```{r}
-pop <- data.frame("race" = c("White", "Black", "Asian", "Multiracial", "Remaining"),
-                  "value" = c(32565, 8782, 3370, 1443, 327))
+pop <- data.frame("race" = c("White", "Black"),
+                  "value" = c(32565, 8782))
 pop <- pop %>%
-  mutate(race = factor(race, levels = c("Black", "White", "Multiracial", "Asian", "Remaining")),
-         group = "pop")
-pop3 <- pop %>%
-  mutate(race = fct_collapse(race,
-                             Remainig = c("Multiracial", "Asian", "Remaining"))) %>%
-  group_by(race) %>%
-  summarize(value = sum(value)) %>%
-  ungroup() %>% mutate(group = "pop")
-pop2 <- pop3 %>%
-  filter(race %in% c("Black", "White")) %>%
-  droplevels()
+  mutate(group = "pop")
+
 ```
 
 ### Detentions Relative to Population
@@ -157,7 +158,7 @@ sf_race_all <- sf_race %>%
   summarize(value = n()) %>%
   ungroup() %>%
   mutate(group = "total")
-sf_race_all <- rbind(sf_race_all, pop2) %>%
+sf_race_all <- rbind(sf_race_all, pop) %>%
   mutate(group = factor(group, levels = c("pop", "total")),
          race = fct_relevel(race, "White")) %>%
   arrange(group, desc(race)) %>%
@@ -165,7 +166,9 @@ sf_race_all <- rbind(sf_race_all, pop2) %>%
   mutate(label_pos = (cumsum(value) - value/2)/sum(value),
          percent = paste0(round(value/sum(value)*100,1),"%")
          )
+
 labellingdata <- data.frame(label = c("Population", "Detentions"), group = c("pop", "total"), pos = c(.90,.90) )
+
 ggplot(sf_race_all, aes(x = group, y = value, fill = race)) +
   geom_bar(position="fill", stat="identity") +
   scale_fill_manual(values = pal2, name = "Race") +
@@ -178,37 +181,45 @@ ggplot(sf_race_all, aes(x = group, y = value, fill = race)) +
 ```
 
 > Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data.
-### By Time Period
+
+
+### By Year
 
 ```{r}
-sf_race_period <- sf_race %>%
-  group_by(period, race) %>%
+sf_race_year <- sf_race %>%
+  group_by(year, race) %>%
   summarize(value = n()) %>%
-  ungroup() %>%
-  mutate(group = "period")
-pop2_p1 <- pop2 %>%
-  mutate(period = "2012-2014")
-pop2_p2 <- pop2 %>%
-  mutate(period = "2016-2017")
-sf_race_period <- rbind(sf_race_period, pop2_p1, pop2_p2) %>%
-  mutate(group = factor(group, levels = c("pop", "period")),
+  ungroup() %>% 
+  mutate(group = "detained")
+
+pop_year <- rbind(pop %>% mutate(year = 2012),
+                  pop %>% mutate(year = 2013),
+                  pop %>% mutate(year = 2014),
+                  pop %>% mutate(year = 2015),
+                  pop %>% mutate(year = 2016),
+                  pop %>% mutate(year = 2017))
+
+sf_race_year <- rbind(sf_race_year, pop_year) %>%
+  mutate(group = factor(group, levels = c("pop", "detained")),
          race = fct_relevel(race, "White")) %>%
-  arrange(group, period, desc(race)) %>%
-  group_by(group, period) %>%
+  arrange(group, year, desc(race)) %>%
+  group_by(group, year) %>%
   mutate(label_pos = (cumsum(value) - value/2)/sum(value),
          percent = paste0(round(value/sum(value)*100,1),"%")
-         )
-labellingdata <- data.frame(label = rep(c("Population", "Detentions"),2), group = rep(c("pop", "period"),2), pos = rep(c(.90,.90),2), period = rep(c("2012-2014", "2016-2017"), each = 2 ))
-ggplot(sf_race_period, aes(x = group, y = value, fill = race)) +
+  )
+
+labellingdata <- data.frame(label = rep(c("Population", "Detentions"),6), group = rep(c("pop", "detained"),6), pos = rep(c(.90,.90),6), year = rep(c("2012", "2013", "2014", "2015", "2016", "2017"), each = 2))
+
+ggplot(sf_race_year, aes(x = group, y = value, fill = race)) +
   geom_bar(position="fill", stat = "identity") +
   scale_fill_manual(values = pal2, name = "Race") +
   coord_polar("y", direction = 1) +
-  scale_x_discrete(limits = c(" ", "pop","period")) +
+  scale_x_discrete(limits = c(" ", "pop","detained")) +
   theme_void() +
-  geom_text(  data = filter(sf_race_period, race == "Black"), aes(x = group, y = label_pos, label = percent), size = 3) +
-    geom_text( data = labellingdata,
-             aes(x = group, y = pos, label = label) ,inherit.aes = FALSE, size = 3) +
-  facet_wrap(~period)
+  geom_text(data = filter(sf_race_year, race == "Black"), aes(x = group, y = label_pos, label = percent), size = 3) +
+  geom_text(data = labellingdata,
+            aes(x = group, y = pos, label = label), inherit.aes = FALSE, size = 3) +
+  facet_wrap(~year)
 ```
 
 ### By Stop and Frisk
@@ -220,9 +231,9 @@ sf_race_type <- sf_race %>%
   ungroup() %>%
   mutate(group = "type") %>%
   rename(type = type2)
-pop2_t1 <- pop2 %>%
+pop2_t1 <- pop %>%
   mutate(type = "No Search/Frisk")
-pop2_t2 <- pop2 %>%
+pop2_t2 <- pop %>%
   mutate(type = "Search/Frisk")
 sf_race_type <- rbind(sf_race_type, pop2_t1, pop2_t2) %>%
   mutate(group = factor(group, levels = c("pop", "type")),
@@ -964,7 +975,7 @@ Row {.tabset}
 
 ### Detention by Recorded Reason
 
-```{r}
+```{r, out.width="50%"}
 sf_race <- sf_race %>%
   mutate(offense7 = case_when(
     str_detect(offense, "Assault|Robbery|PURSE|Shots|Weapon") ~ "Person Crime",
@@ -974,19 +985,30 @@ sf_race <- sf_race %>%
     str_detect(offense, "Disorder|Drunk|Liquor|INDECENT|DIP") ~ "Public Disorder",
     str_detect(offense, "Suspicious|Supsicious") ~ "Suspicious Circumstance",
     TRUE ~ "Other"
-  ))
+  ),
+  offense7 = if_else(year == 2015, NA_character_, offense7))
+
 sf_race <- sf_race %>%
   mutate(offense7 = factor(offense7),
          offense7 = fct_infreq(offense7))
+
 # for annotation
-tots <- sf_race %>% group_by(offense7) %>% summarize(tots = n())
-racetots <- sf_race %>% group_by(offense7, race) %>% summarize(racetot = n())
+tots <- sf_race %>% filter(year != 2015) %>% 
+  group_by(offense7) %>% 
+  summarize(tots = n())
+
+racetots <- sf_race %>% filter(year != 2015) %>% 
+  group_by(offense7, race) %>% 
+  summarize(racetot = n())
+
 racetots <- racetots %>% left_join(tots)
+
 racetots <- racetots %>% mutate(percent = round((racetot/tots)*100,0),
                                 percent_lab = ifelse(tots < 40 & racetot < 15 ,"",  paste0(percent, "%")),
                                 race = fct_relevel(race, "White"),
                                 racetot = ifelse(race == "White", racetot*-1, racetot),
                                 lab_pos = racetot/2)
+
 ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
   geom_bar(stat = "identity") + labs(fill = "Race") +
   scale_fill_manual(values = pal2) +
@@ -996,41 +1018,57 @@ ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
   scale_y_continuous(labels = function(x){abs(x)}, limits = c(-120, 120))
 ```
 
+> The data from 2015 did not contain the reason for detention; detemtions from 2015 are not included here.
 
-### By Time Period
+### By Year
 
 ```{r fig.height = 8, fig.width = 8}
 # for annotation
-tots <- sf_race %>% group_by(offense7, period) %>% summarize(tots = n())
-racetots <- sf_race %>% group_by(offense7, race, period) %>% summarize(racetot = n())
+tots <- sf_race %>% filter(year != 2015) %>% 
+  group_by(offense7, year) %>% 
+  summarize(tots = n())
+
+racetots <- sf_race %>% filter(year != 2015) %>% 
+  group_by(offense7, race, year) %>% 
+  summarize(racetot = n())
+
 racetots <- racetots %>% left_join(tots)
-racetots <- racetots %>% ungroup() %>% mutate(percent = round((racetot/tots)*100,0),
-                                percent_lab = ifelse(tots < 40 & racetot < 10 ,"",  paste0(percent, "%")),
-                                race = fct_relevel(race, "White"),
-                                racetot = ifelse(race == "White", racetot*-1, racetot),
-                                lab_pos = racetot/2)
+
+racetots <- racetots %>% ungroup() %>% 
+  mutate(percent = round((racetot/tots)*100,0),
+         percent_lab = ifelse(tots < 10 & racetot < 5 ,"",  paste0(percent, "%")),
+         race = fct_relevel(race, "White"),
+         racetot = ifelse(race == "White", racetot*-1, racetot),
+         lab_pos = racetot/2)
+
 ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
   geom_bar(stat = "identity") + labs(fill = "Race") +
   scale_fill_manual(values = pal2) +
-  geom_text(data = racetots, aes(x = offense7, y = lab_pos, label = percent_lab), size = 3) +
+  geom_text(data = racetots, aes(x = offense7, y = lab_pos, label = percent_lab), size = 2) +
   coord_flip() +
   labs(y = "# Detentions", x = "Reason") +
-  scale_y_continuous(labels = function(x){abs(x)}, limits = c(-95, 95)) +
-  facet_wrap(~period, nrow = 2)
+  scale_y_continuous(labels = function(x){abs(x)}, limits = c(-50, 100)) +
+  facet_wrap(~year, nrow = 5)
 ```
 
 
 ### By Stop and Frisk
 
 ```{r fig.height = 7, fig.width = 8}
-tots <- sf_race %>% group_by(offense7, type2) %>% summarize(tots = n())
-racetots <- sf_race %>% group_by(offense7, race, type2) %>% summarize(racetot = n())
+tots <- sf_race %>% filter(year != 2015) %>%
+  group_by(offense7, type2) %>% summarize(tots = n())
+
+racetots <- sf_race %>% filter(year != 2015) %>%
+  group_by(offense7, race, type2) %>% summarize(racetot = n())
+
 racetots <- racetots %>% left_join(tots)
+
 racetots <- racetots %>% ungroup() %>% mutate(percent = round((racetot/tots)*100,0),
                                 percent_lab = ifelse(tots < 40 & racetot < 10 ,"",  paste0(percent, "%")),
                                 race = fct_relevel(race, "White"),
                                 racetot = ifelse(race == "White", racetot*-1, racetot),
                                 lab_pos = racetot/2)
+
 ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
   geom_bar(stat = "identity") + labs(fill = "Race") +
   scale_fill_manual(values = pal2) +
@@ -1044,7 +1082,7 @@ ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
 About {data-orientation=rows}
 =====================================
 
-The Charlottesville policing data was acquired by attorney Jeff Fogel through Freedom of Information Act requests. The site was created by [Michele Claibourn](https://mclaibourn.github.io/) and Sam Powers in a partnership between the [Equity Center](http://virginiaequitycenter.org/) at UVA and Jordy Yager's *[Determined](https://www.cvilletomorrow.org/articles/determined-stories-of-resilience-in-a-broken-ecosystem/)* series with Vinegar Hill Magazine and Charlottesville Tomorrow.
+The Charlottesville policing data was acquired by attorney Jeff Fogel through Freedom of Information Act requests. The site was created by [Michele Claibourn](https://mclaibourn.github.io/) and Sam Powers, with contributions from Enrique Unruh, in a partnership between the [Equity Center](http://virginiaequitycenter.org/) at UVA and Jordy Yager's *[Determined](https://www.cvilletomorrow.org/articles/determined-stories-of-resilience-in-a-broken-ecosystem/)* series with Vinegar Hill Magazine and Charlottesville Tomorrow.
 
 This is a work in progress and we plan to keep building and improving it. We appreciate all feedback --  questions, corrections, concerns, ideas to make it better. You can reach us at [CvilleEquityAtlas@virginia.edu](mailto:CvilleEquityAtlas@virginia.edu). The source code to generate the analysis and this site are available on [GitHub](https://github.com/virginiaequitycenter/cvilleequity_stopandfrisk).
 
@@ -1058,6 +1096,7 @@ This is a work in progress and we plan to keep building and improving it. We app
     + [Now that the disproportionate minority contact report has been released, what’s next?](https://www.cvilletomorrow.org/articles/now-that-the-disproportionate-minority-contact-report-has-been-released-whats-next/), February 24, 2020, Charlottesville Tomorrow
 * [Charlottesville Police Statistics](https://www.charlottesville.gov/327/Crime-Statistics)
     + We initially hoped to use the information reported in the reports that began Feburary 2019, but the number of monthly cases reported in these reports was four times the number in the earlier FOIA'd data; we chose to pause until we could understand more clearly how data generation process for these new reports differs from the process for the 2012-2017 data.
+* [Nathan Day's analysis of arrest record data](https://www.natedayta.com/2020/06/07/getting-arrested-in-charlottesville/) from Charlottesville's open data portal
 * News on Charlottesville's Civilian Review Board
     + [Initial and current Civilian Review Board members speak about next steps](https://www.nbc29.com/2020/06/05/initial-current-civilian-review-board-members-speak-about-next-steps/), June 5, 2020, NBC29
     + [Council appoints seven to Police CRB](https://www.dailyprogress.com/news/local/council-appoints-seven-to-police-crb/article_75ff0476-743a-577d-a68e-66a8feac8250.html), February 18, 2020, Daily Progress
