@@ -15,8 +15,6 @@ library(sf)
 library(htmltools)
 library(RColorBrewer)
 
-# I am demonstrating github
-
 
 sf <- readRDS("data/sf_combined.Rds")
 
@@ -120,7 +118,7 @@ Navigate to additional pages for further analysis:
 * **Why?** shows the reason recorded by the police for the detention across Black and White residents.
 
 
-### Detentions, with and without Search/Frisk, by Race
+### Detentions in Charlottesville, with and without Search/Frisk
 
 ```{r Detentions by Race per 1000}
 All <- data_frame(race = "All", Totals = sum(sf_summary_stats$Totals), 
