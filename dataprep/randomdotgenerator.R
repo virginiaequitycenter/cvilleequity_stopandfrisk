@@ -184,7 +184,7 @@ SF1214Locations <-
   SF1214 %>%
   mutate(BEAT_NO = str_replace_all(BEAT, "C", "")) %>%
   select(SFTYPE, OFFENSE, RACE, BEAT_NO, Year = YEAR, Date) %>%
-  arrange(BEAT_NO) %>%
+  arrange(Year, BEAT_NO) %>%
   mutate( Month = format(Date,"%m")) %>%
   add_column(lat = dots1214$lat, lon = dots1214$lon, beatnumdot = dots1214$BEAT_NO) %>%
   select(-Date) %>%
