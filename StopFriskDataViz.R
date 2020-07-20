@@ -6,6 +6,8 @@ library(htmltools)
 library(RColorBrewer)
 library(rmdformats)
 library(ggplot2)
+library(networkD3)
+library(dplyr)
 
 setwd("/Users/enriqueunruh/Documents/Equity Center/GitHub/cvilleequity_stopandfrisk")
 
@@ -267,18 +269,212 @@ ggplot(sf_race, aes(x = type2, fill = race)) +
             position = position_dodge(width = .85), size = 4, hjust = .5)
 
 
-library(ggraph)
-library(igraph)
-library(tidyverse)
-
-sf_race_sfs <-sf_race %>%
+# Old Stop and Frisk Vis--------
+sf_race_type <- sf_race %>%
   group_by(type2, race) %>%
-  summarize(Stops = n())
+  summarize(value = n()) %>%
+  ungroup() %>%
+  mutate(group = "type") %>%
+  rename(type = type2)
 
-# Create data
-mygraph <- graph_from_data_frame(sf_race_year$value, vertices=sf_race_sfs$Stops)
+pop2_t1 <- pop2 %>%
+  mutate(type = "No Search/Frisk")
+pop2_t2 <- pop2 %>%
+  mutate(type = "Search/Frisk")
 
-# Make the plot
-ggraph(mygraph, layout = 'circlepack') + 
-  geom_node_circle() +
-  theme_void()
+sf_race_type <- rbind(sf_race_type, pop2_t1, pop2_t2) %>%
+  mutate(group = factor(group, levels = c("pop", "type")),
+         race = fct_relevel(race, "White")) %>%
+  arrange(group, type, desc(race)) %>%
+  group_by(group, type) %>%
+  mutate(label_pos = (cumsum(value) - value/2)/sum(value), 
+         percent = paste0(round(value/sum(value)*100,1),"%")) 
+
+labellingdata <- data.frame(label = rep(c("Population", "Detentions"),2), group = rep(c("pop", "type"),2), pos = rep(c(.90,.90),2), type = rep(c("No Search/Frisk", "Search/Frisk"), each = 2 ))
+
+ggplot(sf_race_type, aes(x = group, y = value, fill = race)) +
+  geom_bar(position="fill", stat = "identity") +
+  scale_fill_manual(values = pal2, name = "Race") +
+  coord_polar("y", direction = 1) +
+  scale_x_discrete(limits = c(" ", "pop","type")) +
+  geom_text(  data = filter(sf_race_type, race == "Black"), aes(x = group, y = label_pos, label = percent), size = 3) +
+  geom_text( data = labellingdata,
+             aes(x = group, y = pos, label = label) ,inherit.aes = FALSE, size = 3) +
+  theme_void() +
+  facet_wrap(~type) 
+
+  
+
+#Stop and Frisk Sankey Diagram -----
+
+
+#Total
+
+sf_race_sfs <- sf_race %>%
+  group_by(race, type2) %>%
+  summarize(values = n())
+
+sf_nodes <- data.frame(
+  name=c(as.character(sf_race_sfs$race), 
+         as.character(sf_race_sfs$type2)) %>%
+    unique()
+)
+
+sf_race_sfs <- sf_race_sfs %>%
+  mutate(IDrace = match(race, sf_nodes$name)-1,
+         IDtype2 = match(type2, sf_nodes$name)-1)
+
+
+sf_race_sfs$group <- as.factor(c("a", "a", "b", "b"))
+
+sf_nodes$group <- as.factor(c("unique_group"))
+
+sf_sankey_color <- 'd3.scaleOrdinal() .domain(["a", "b", "unique_group"]) .range(["#95D7AE", "#87BFFF", "grey"])'
+
+# Make the Network
+sf_sankeyNetwork <- sankeyNetwork(Links = sf_race_sfs, Nodes = sf_nodes,
+                                  Source = "IDrace", Target = "IDtype2",
+                                  Value = "values", NodeID = "name", 
+                                  colourScale=sf_sankey_color, LinkGroup="group", NodeGroup="group",
+                                  fontSize = 20, nodeWidth=10, units = "Detentions")
+
+
+sf_sankeyNetwork
+
+
+#By Year
+
+sf_race_sfs_year <- sf_race %>%
+  group_by(race, year) %>%
+  summarize(values = n())
+
+
+sf_race_for_nodes <- sf_race %>%
+  group_by(race, year, type2) %>%
+  summarize(values = n())
+
+sf_nodes_year <- data.frame(
+  name=c(as.character(sf_race_for_nodes$race),
+         as.character(sf_race_for_nodes$year), 
+         as.character(sf_race_for_nodes$type2)) %>%
+    unique()
+)
+
+sf_race_sfs_type <- sf_race %>%
+  group_by(race,year, type2) %>%
+  summarize(values = n()) %>%
+  select(-race) %>%
+  transform(year = as.factor(year)) %>%
+  select(source = year, target = type2, values)
+
+
+sf_race_sfs_year <- sf_race_sfs_year %>%
+  rename(source = race, target = year) %>%
+  transform(source = as.factor(source)) %>%
+  rbind(sf_race_sfs_type)
+
+
+sf_race_sfs_year <- sf_race_sfs_year %>%
+  mutate(IDsource = match(source, sf_nodes_year$name -1),
+         IDtarget = match(target, sf_nodes_year$name)-1) %>%
+  transform(IDsource =  c(rep("0", 6), rep("1", 6), rep("2", 2), rep("3", 2),
+                          rep("4", 1), rep("5", 2), rep("6", 2), rep("7", 2),
+                          rep("2", 2), rep("3", 2), rep("4", 2), rep("5", 2), 
+                          rep("6", 2), rep("7", 2))
+            ) %>%
+  transform(IDsource = as.numeric(IDsource))
+  
+
+sf_race_sfs_year$group <- as.factor(c(rep("a", 6),
+                                      rep("b", 6),
+                                      rep("a", 11),
+                                      rep("b", 12)))
+
+sf_nodes_year$group <- as.factor(c("unique_group"))
+
+
+sf_sankey_color <- 'd3.scaleOrdinal() .domain(["a", "b", "unique_group"]) .range(["#95D7AE", "#87BFFF", "grey"])'
+
+# Make the Network
+sf_sankeyNetwork_year <- sankeyNetwork(Links = sf_race_sfs_year, Nodes = sf_nodes_year,
+                                  Source = "IDsource", Target = "IDtarget",
+                                  Value = "values", NodeID = "name", 
+                                  colourScale=sf_sankey_color, LinkGroup="group", NodeGroup="group",
+                                  fontSize = 10, nodeWidth=10, units = "Detentions")
+
+
+sf_sankeyNetwork_year
+
+
+#Black v. White Stop and Frisk
+
+sfs_race_black <- sf_race_sfs_year %>%
+  filter(source != "White", 
+         group == "b") %>%
+  transform(IDsource = IDsource-1,
+            IDtarget = IDtarget-1,
+            group = ifelse(source == "Black", "a", 
+                           ifelse(target == "No Search/Frisk", "b", "c")))
+
+sf_for_nodes_black <- sf_race %>%
+  group_by(race, year, type2) %>%
+  filter(race != "White") %>%
+  summarize(values = n()) 
+
+sf_nodes_black <- data.frame(
+  name=c(as.character(sf_for_nodes_black$race),
+         as.character(sf_for_nodes_black$year), 
+         as.character(sf_for_nodes_black$type2)) %>%
+    unique()
+)
+
+sf_nodes_black$group <- as.factor(c("unique_group"))
+
+sf_sankey_color <- 'd3.scaleOrdinal() .domain(["a", "b", "unique_group"]) .range(["#87BFFF", "#FDCA40", "grey", "#95D7AE"])'
+
+# Make the Network
+sf_sankeyNetwork_black <- sankeyNetwork(Links = sfs_race_black, Nodes = sf_nodes_black,
+                                       Source = "IDsource", Target = "IDtarget",
+                                       Value = "values", NodeID = "name", 
+                                       colourScale=sf_sankey_color, LinkGroup="group", NodeGroup="group",
+                                       fontSize = 10, nodeWidth=10, units = "Detentions")
+
+
+sf_sankeyNetwork_black
+
+#White
+sfs_race_white <- sf_race_sfs_year %>%
+  filter(source != "Black", 
+         group == "a") %>%
+  transform(IDsource = as.numeric(IDsource - 1),
+            IDtarget = IDtarget-1,
+            group = ifelse(source == "White", "a", 
+                           ifelse(target == "No Search/Frisk", "b", "c")),
+            IDsource = ifelse(IDsource < 0, 0, IDsource))
+
+sf_for_nodes_white <- sf_race %>%
+  group_by(race, year, type2) %>%
+  filter(race != "Black") %>%
+  summarize(values = n()) 
+
+sf_nodes_white <- data.frame(
+  name=c(as.character(sf_for_nodes_white$race),
+         as.character(sf_for_nodes_white$year), 
+         as.character(sf_for_nodes_white$type2)) %>%
+    unique()
+)
+
+sf_nodes_white$group <- as.factor(c("unique_group"))
+
+sf_sankey_color <- 'd3.scaleOrdinal() .domain(["a", "b", "unique_group"]) .range(["#87BFFF", "#FDCA40", "grey", "#95D7AE"])'
+
+# Make the Network
+sf_sankeyNetwork_white <- sankeyNetwork(Links = sfs_race_black, Nodes = sf_nodes_black,
+                                        Source = "IDsource", Target = "IDtarget",
+                                        Value = "values", NodeID = "name", 
+                                        colourScale=sf_sankey_color, LinkGroup="group", NodeGroup="group",
+                                        fontSize = 10, nodeWidth=10, units = "Detentions")
+
+
+sf_sankeyNetwork_white
+

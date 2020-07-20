@@ -452,7 +452,8 @@ sf_race_sfs_year <- sf_race_sfs_year %>%
   transform(IDsource = as.numeric(IDsource))
   
 
-sf_race_sfs_year$group <- as.factor(c(rep(c("a", "b"), 6),
+sf_race_sfs_year$group <- as.factor(c(rep("a", 6),
+                                      rep("b", 6),
                                       rep("a", 11),
                                       rep("b", 12)))
 
@@ -464,8 +465,9 @@ sf_sankey_color <- 'd3.scaleOrdinal() .domain(["a", "b", "unique_group"]) .range
 # Make the Network
 sf_sankeyNetwork_year <- sankeyNetwork(Links = sf_race_sfs_year, Nodes = sf_nodes_year,
                                   Source = "IDsource", Target = "IDtarget",
-                                  Value = "values", NodeID = "name", sinksRight = FALSE,
-                                  colourScale=sf_sankey_color, LinkGroup="group", NodeGroup="group",
+                                  Value = "values", NodeID = "name",
+                                  colourScale=sf_sankey_color, LinkGroup="group",
+                                  NodeGroup="group",
                                   fontSize = 10, nodeWidth=10, units = "Detentions")
 
 
