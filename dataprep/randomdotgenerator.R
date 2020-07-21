@@ -44,7 +44,7 @@ SF1920 %>%
   filter(Number > 0) %>%
   group_by(BEAT_NO, race, Month, Year ) %>%
   slice(rep(1:n(), each = Number)) %>%
-  arrange(BEAT_NO) %>%
+  arrange(Year,BEAT_NO) %>%
   add_column(lat = dots1920$lat, lon = dots1920$lon, beatnumdot = dots1920$BEAT_NO) %>% 
   mutate(SFTYPE = NA, OFFENSE = NA) %>%
   select(SFTYPE, OFFENSE, BEAT_NO, RACE = race, BEAT_NO, lat, lon, beatnumdot, Year, Abbrev = Month ) %>%
@@ -148,7 +148,8 @@ dots2012 <-
             as_tibble() %>%                                                           # convert to tibble
             setNames(c("lon","lat")) %>%                                              # set column names
             mutate(BEAT_NO = .x)  # add categorical party var  
-  ) %>% arrange(BEAT_NO)
+  ) %>% arrange(BEAT_NO) %>%
+  mutate(Year = 2012)
 
 dots2013 <-     
   map_df( unique(num2013$BEAT_NO),  # Okay, so for every Beat
@@ -162,7 +163,8 @@ dots2013 <-
             as_tibble() %>%                                                           # convert to tibble
             setNames(c("lon","lat")) %>%                                              # set column names
             mutate(BEAT_NO = .x)  # add categorical party var  
-  ) %>% arrange(BEAT_NO)
+  ) %>% arrange(BEAT_NO) %>%
+  mutate(Year = 2013)
 
 dots2014 <-     
   map_df( unique(num2014$BEAT_NO),  # Okay, so for every Beat
@@ -176,7 +178,8 @@ dots2014 <-
             as_tibble() %>%                                                           # convert to tibble
             setNames(c("lon","lat")) %>%                                              # set column names
             mutate(BEAT_NO = .x)  # add categorical party var  
-  ) %>% arrange(BEAT_NO)
+  ) %>% arrange(BEAT_NO)  %>%
+  mutate(Year = 2014)
 
 dots1214 <- bind_rows(dots2012, dots2013, dots2014)
 
@@ -186,7 +189,7 @@ SF1214Locations <-
   select(SFTYPE, OFFENSE, RACE, BEAT_NO, Year = YEAR, Date) %>%
   arrange(Year, BEAT_NO) %>%
   mutate( Month = format(Date,"%m")) %>%
-  add_column(lat = dots1214$lat, lon = dots1214$lon, beatnumdot = dots1214$BEAT_NO) %>%
+  left_join(dots1214) %>%
   select(-Date) %>%
   slice(sample(1:n())) # once map_df binds rows randomise order to avoid bias in plotting order
 
