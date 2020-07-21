@@ -288,7 +288,7 @@ ggplot(sf_race_2013, aes(x = group, y = value, fill = race)) +
 
 ### 2014
 
-```{r}
+```{r 2014}
 sf_race_2014 <- sf_race_year %>%
   filter(year %in% c("Total", "2014"))
 
@@ -308,7 +308,7 @@ ggplot(sf_race_2014, aes(x = group, y = value, fill = race)) +
 
 ### 2015
 
-```{r}
+```{r 2015}
 sf_race_2015 <- sf_race_year %>%
   filter(year %in% c("Total", "2015"))
 
@@ -328,7 +328,7 @@ ggplot(sf_race_2015, aes(x = group, y = value, fill = race)) +
 
 ### 2016
 
-```{r}
+```{r 2016}
 sf_race_2016 <- sf_race_year %>%
   filter(year %in% c("Total", "2016"))
 
@@ -348,7 +348,7 @@ ggplot(sf_race_2013, aes(x = group, y = value, fill = race)) +
 
 ### 2017
 
-```{r}
+```{r 2017}
 sf_race_2017 <- sf_race_year %>%
   filter(year %in% c("Total", "2017"))
 
@@ -1294,10 +1294,11 @@ Row {.tabset}
 
 ```{r}
 sf_race <- sf_race %>%
+  subset(offense != "No") %>%
   mutate(offense7 = case_when(
     str_detect(offense, "Assault|Robbery|PURSE|Shots|Weapon") ~ "Person Crime",
     str_detect(offense, "Burglary|Larceny|Trespass|VANDAL") ~ "Property Crime",
-    str_detect(offense, "Narcotic") ~ "Narcotics Related",
+    str_detect(offense, "Narcotic|Marijuana") ~ "Narcotics Related",
     str_detect(offense, "Traffic") ~ "Traffic Related",
     str_detect(offense, "Disorder|Drunk|Liquor|INDECENT|DIP") ~ "Public Disorder",
     str_detect(offense, "Suspicious|Supsicious") ~ "Suspicious Circumstance",
@@ -1309,22 +1310,30 @@ sf_race <- sf_race %>%
          offense7 = fct_infreq(offense7))
 
 # for annotation
-tots <- sf_race %>% group_by(offense7) %>% summarize(tots = n())
-racetots <- sf_race %>% group_by(offense7, race) %>% summarize(racetot = n())
+tots <- sf_race %>%
+  group_by(offense7) %>%
+  summarize(tots = n())
+
+racetots <- sf_race %>%
+  group_by(offense7, race) %>%
+  summarize(racetot = n())
+
 racetots <- racetots %>% left_join(tots)
+
 racetots <- racetots %>% mutate(percent = round((racetot/tots)*100,0),
                                 percent_lab = ifelse(tots < 40 & racetot < 15 ,"",  paste0(percent, "%")),
                                 race = fct_relevel(race, "White"),
                                 racetot = ifelse(race == "White", racetot*-1, racetot),
-                                lab_pos = racetot/2)
+                                lab_pos = racetot/2) %>%
+  arrange()
 
 ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
   geom_bar(stat = "identity") + labs(fill = "Race") +
-  scale_fill_manual(values = mycolors) +
+  scale_fill_manual(values = c("#95D7AE", "#87BFFF")) +
   geom_text(data = racetots, aes(x = offense7, y = lab_pos, label = percent_lab), size = 2) +
   coord_flip() +
   labs(y = "# Detentions", x = "Reason") +
-  scale_y_continuous(labels = function(x){abs(x)}, limits = c(-120, 120))
+  scale_y_continuous(labels = function(x){abs(x)}, limits = c(-130, 135))
 ```
 
 
@@ -1332,32 +1341,46 @@ ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
 
 ```{r fig.height = 8, fig.width = 8}
 # for annotation
-tots <- sf_race %>% group_by(offense7, period) %>% summarize(tots = n())
-racetots <- sf_race %>% group_by(offense7, race, period) %>% summarize(racetot = n())
+# for annotation
+tots <- sf_race %>% filter(year != 2015) %>%
+  group_by(offense7, year) %>%
+  summarize(tots = n())
+
+racetots <- sf_race %>% filter(year != 2015) %>%
+  group_by(offense7, race, year) %>%
+  summarize(racetot = n())
+
 racetots <- racetots %>% left_join(tots)
-racetots <- racetots %>% ungroup() %>% mutate(percent = round((racetot/tots)*100,0),
-                                percent_lab = ifelse(tots < 40 & racetot < 10 ,"",  paste0(percent, "%")),
-                                race = fct_relevel(race, "White"),
-                                racetot = ifelse(race == "White", racetot*-1, racetot),
-                                lab_pos = racetot/2)
+
+racetots <- racetots %>% ungroup() %>%
+  mutate(percent = round((racetot/tots)*100,0),
+         percent_lab = ifelse(tots < 10 & racetot < 5 ,"",  paste0(percent, "%")),
+         race = fct_relevel(race, "White"),
+         racetot = ifelse(race == "White", racetot*-1, racetot),
+         lab_pos = racetot/2)
 
 ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
   geom_bar(stat = "identity") + labs(fill = "Race") +
-  scale_fill_manual(values = mycolors) +
-  geom_text(data = racetots, aes(x = offense7, y = lab_pos, label = percent_lab), size = 3) +
+  scale_fill_manual(values = c("#95D7AE", "#87BFFF")) +
+  geom_text(data = racetots, aes(x = offense7, y = lab_pos, label = percent_lab), size = 2) +
   coord_flip() +
   labs(y = "# Detentions", x = "Reason") +
-  scale_y_continuous(labels = function(x){abs(x)}, limits = c(-95, 95)) +
-  facet_wrap(~period, nrow = 2) 
+  scale_y_continuous(labels = function(x){abs(x)}, limits = c(-50, 100)) +
+  facet_wrap(~year, nrow = 5)
 ```
 
 
 ### By Stop and Frisk 
 
 ```{r fig.height = 7, fig.width = 8}
-tots <- sf_race %>% group_by(offense7, type2) %>% summarize(tots = n())
-racetots <- sf_race %>% group_by(offense7, race, type2) %>% summarize(racetot = n())
+tots <- sf_race %>% filter(year != 2015) %>%
+  group_by(offense7, type2) %>% summarize(tots = n())
+
+racetots <- sf_race %>% filter(year != 2015) %>%
+  group_by(offense7, race, type2) %>% summarize(racetot = n())
+
 racetots <- racetots %>% left_join(tots)
+
 racetots <- racetots %>% ungroup() %>% mutate(percent = round((racetot/tots)*100,0),
                                 percent_lab = ifelse(tots < 40 & racetot < 10 ,"",  paste0(percent, "%")),
                                 race = fct_relevel(race, "White"),
@@ -1366,7 +1389,7 @@ racetots <- racetots %>% ungroup() %>% mutate(percent = round((racetot/tots)*100
 
 ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
   geom_bar(stat = "identity") + labs(fill = "Race") +
-  scale_fill_manual(values = mycolors) +
+  scale_fill_manual(values = (c("#95D7AE", "#87BFFF"))) +
   geom_text(data = racetots, aes(x = offense7, y = lab_pos, label = percent_lab), size = 3) +
   coord_flip() +
   labs(y = "# Detentions", x = "Reason") +
