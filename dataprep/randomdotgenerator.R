@@ -189,7 +189,7 @@ SF1214Locations <-
   select(SFTYPE, OFFENSE, RACE, BEAT_NO, Year = YEAR, Date) %>%
   arrange(Year, BEAT_NO) %>%
   mutate( Month = format(Date,"%m")) %>%
-  left_join(dots1214) %>%
+  add_column(lat = dots1214$lat, lon = dots1214$lon, beatnumdot = dots1214$BEAT_NO) %>%
   select(-Date) %>%
   slice(sample(1:n())) # once map_df binds rows randomise order to avoid bias in plotting order
 

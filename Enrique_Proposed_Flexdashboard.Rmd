@@ -612,14 +612,14 @@ ggplot(sfs, aes(x = reorder(NAME, -total), fill = RACE,
             aes(x = NAME, y = lab_pos, label = abs(RaceTot)), size = 3, inherit.aes = FALSE) +
   coord_flip() +
   scale_y_continuous(labels = function(x){abs(x)}, 
-                     limits = c(-360, 360), breaks = c(seq(-400, 400, 100), 0)) +
+                     limits = c(-100, 100), breaks = c(seq(-80, 80, 20), 0)) +
   scale_alpha_discrete(range = c(.6, 1)) +
-  annotate("text", x = 29, y = -150, label = "Black" ) +
-  annotate("text", x = 29, y = 150, label = "White" ) +
-  annotate("rect", xmin = 25, xmax = 26, ymin = 100, ymax = 140, alpha = 1, fill = "#87BFFF") +
-  annotate("text", x = 25.5, y = 150, label = "= With Stop and Frisk", size = 3, hjust = 0)+
-  annotate("rect", xmin = 23.5, xmax = 24.5, ymin = 100, ymax = 140, alpha = .6, fill = "#87BFFF") +
-  annotate("text", x = 24, y = 150, label = "= Without Stop and Frisk", size = 3, hjust = 0)+
+  annotate("text", x = 29, y = -25, label = "Black" ) +
+  annotate("text", x = 29, y = 25, label = "White" ) +
+  annotate("rect", xmin = 25, xmax = 26, ymin = 30, ymax = 40, alpha = 1, fill = "#87BFFF") +
+  annotate("text", x = 25.5, y = 45, label = "= With Stop and Frisk", size = 3, hjust = 0)+
+  annotate("rect", xmin = 23.5, xmax = 24.5, ymin = 30, ymax = 40, alpha = .6, fill = "#87BFFF") +
+  annotate("text", x = 24, y = 45, label = "= Without Stop and Frisk", size = 3, hjust = 0)+
   geom_hline(yintercept  = 0) +
   theme_minimal() +
   theme(
