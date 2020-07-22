@@ -1,0 +1,95 @@
+---
+title: "Stop and Frisk"
+output: 
+  html_notebook: 
+    toc: yes
+  html_document:
+      css: mystyle.css
+      toc: yes
+      toc_depth: 3
+      toc_float: true
+      includes:
+        before_body: before_body.html
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, error = FALSE)
+```
+
+<script>
+ <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</script>
+
+```{r cssscript}
+
+writeLines("@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+            body {
+                font-family: 'Open Sans', sans-serif;
+                padding-top: 56px;
+            }
+                
+       #navbartop {
+           background-color: rgba(35, 45, 75, .95);
+           color: white;
+              }",
+             con = "mystyle.css")
+
+before_body <- "before_body.html"
+writeLines(
+'<div class="navbar navbar-dark navbar-fixed-top" id = "navbartop" role="navigation">
+   <div class="navbar-header">
+      <a class="navbar-brand py-1" href="../../cvilleequity_covid/"  style = "color: white">CVILLE STOP & FRISK</a>
+   </div>
+<div id="navbar" class="navbar-collapse justify-content-between collapse">
+</div><!--/.nav-collapse -->
+</div><!--/.navbar -->
+', con = before_body)
+```
+
+```{r}
+library(tidyverse)
+library(leaflet)
+library(shiny)
+library(sf)
+library(htmltools)
+
+sflocations <- read_csv("data/finaldata/sflocations.csv") %>% st_as_sf(
+    coords = c("lon", "lat"),
+    crs = 4326,
+    remove = TRUE
+  )
+
+beats <- readRDS("beat_pop_map.Rds")
+
+```
+
+
+``` {r fig.height = 9, fig.width = 9}
+
+sliderInput('Year', 'Year', min = 2012, max = 2020, value = 8, step = 1)
+# output$leafletoutput <- 
+  
+  renderLeaflet({
+  y = input$Year
+  df = sflocations %>%
+    filter(Year == y)
+  
+ leaflet(data = beats) %>%
+  addProviderTiles("Stamen.Toner") %>%
+  addPolygons(
+    weight = 1,
+    fillOpacity = .1
+  ) %>%
+  addCircleMarkers(
+    data = df,
+    color = "red",
+    weight = 0,
+    radius = 2,
+    fillOpacity = .5,
+    label = ~htmlEscape(paste0(RACE, "\n",SFTYPE,"\n", OFFENSE))
+  )
+})
+
+#leafletOutput('leafletoutput', height=600)

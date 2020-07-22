@@ -430,7 +430,7 @@ sf_nodes_black <- data.frame(
 
 sf_nodes_black$group <- as.factor(c("unique_group"))
 
-sf_sankey_color <- 'd3.scaleOrdinal() .domain(["a", "b", "unique_group"]) .range(["#87BFFF", "#FDCA40", "grey", "#95D7AE"])'
+sf_sankey_color <- 'd3.scaleOrdinal() .domain(["a", "b", "unique_group"]) .range(["#87BFFF", "#E9B44C", "grey", "#9D6381"])'
 
 # Make the Network
 sf_sankeyNetwork_black <- sankeyNetwork(Links = sfs_race_black, Nodes = sf_nodes_black,
@@ -466,7 +466,7 @@ sf_nodes_white <- data.frame(
 
 sf_nodes_white$group <- as.factor(c("unique_group"))
 
-sf_sankey_color <- 'd3.scaleOrdinal() .domain(["a", "b", "unique_group"]) .range(["#87BFFF", "#FDCA40", "grey", "#95D7AE"])'
+sf_sankey_color <- 'd3.scaleOrdinal() .domain(["a", "b", "unique_group"]) .range(["#95D7AE", "#E9B44C", "grey", "#9D6381"])'
 
 # Make the Network
 sf_sankeyNetwork_white <- sankeyNetwork(Links = sfs_race_black, Nodes = sf_nodes_black,

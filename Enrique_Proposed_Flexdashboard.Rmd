@@ -72,7 +72,7 @@ Row
 ### Average Detentions per Month
 
 ```{r Detentions per Month}
-avg <- round(nrow(sf)/56,1) #Enrique added 12 months to denominator
+avg <- round(nrow(sf)/59,1) #Enrique added 12 months to denominator
 valueBox(avg, icon = "fa-hand-paper")
 ```
 
@@ -113,12 +113,73 @@ Row
 A temporary detention involves a police officer holding and questioning an individual for a short amount of time. To detain someone, police only need a *reasonable suspicion* and detentions are often accompanied by some form of *search or frisk*.
 
 
-We analyzed `r nrow(sf)` temporary detentions made by the City of Charlottesville Police Department between 2012-2017. The data was received in response to Freedom of Information Act requests by Jeff Fogel made over multiple time periods. We found that the CPD detain an average of **`r round(nrow(sf)/56,1)` individuals per month** with **`r paste0(round(nrow(filter(sf, type == "STOP WITH SEARCH OR FRISK"))/ nrow(sf)*100,0), "%")` being search or frisked.** Significiantly, our analysis finds a disproportionate of detentions of black citizens compared to white citizens. In total, **603 black people** were detained when compared to **259 white people** creating a black  to white detention **ratio of`r round(nrow(filter(sf_race, race == "Black")) / nrow(filter(sf_race, race == "White")),1)`**. 
+We analyzed `r nrow(sf)` temporary detentions made by the City of Charlottesville Police Department between 2012-2017. The data was received in response to Freedom of Information Act requests by Jeff Fogel made over multiple time periods. We found that the CPD detain an average of **`r round(nrow(sf)/59,1)` individuals per month** with **`r paste0(round(nrow(filter(sf, type == "STOP WITH SEARCH OR FRISK"))/ nrow(sf)*100,0), "%")` being search or frisked.** Significiantly, our analysis finds a disproportionate of detentions of black citizens compared to white citizens. In total, **603 black people** were detained when compared to **259 white people** creating a black  to white detention **ratio of `r round(nrow(filter(sf_race, race == "Black")) / nrow(filter(sf_race, race == "White")),1)`**. 
 
-Navigate to additional pages for further analysis on detentions compared to the Charlottesville population, Stop and Frisk rates, the locations of detentions, and the reasons officers gave for detentions.
+Navigate to additional pages for further analysis:
+
+* **Who?** compares the percent of Black and White detentions to the overall population in the city.
+* **What?** demonstrates proportion of detentions that lead to a search and frisk.
+* **Where?** visualizes where Black and White citizens are detained by the police.
+* **Why?** shows the reason recorded by the police for the detention across Black and White residents.
 
 
-### Detentions by Charlottesvile police officers per 1,000 residents
+### Detentions in Charlottesville, with and without Search/Frisk
+
+```{r}
+totals <- sf_race %>% 
+  filter(race == "Black") %>%
+  group_by(year) %>%
+  summarize(Black = n()) %>%
+  left_join(sf_race %>% filter(race != "Black") %>%
+              group_by(year) %>%
+              summarize(White = n())
+            ) %>%
+  mutate(total = Black+White,
+         percentBlack = round((Black/total)*100, 1),
+         percentWhite = round((White/total)*100, 1))
+
+pal2 <- c("#95D7AE", "#87BFFF")
+
+
+ggplot(sf_race, aes(x = year, fill = factor(race, levels = c("White", "Black")))) +
+  geom_bar() +
+  scale_fill_manual(values = pal2, name = "Race", labels = c("White", "Black")) +
+  theme_void() +
+  theme(axis.text.x = element_text(size= 10, face=1, hjust = .5),
+        legend.position = c(0.9, 0.9)) +
+  scale_x_continuous(name = "Year",
+                     breaks = c(2012, 2013, 2014, 2015, 2016, 2017),
+                     labels = c("2012\n (Jul-Dec)", "2013\n", "2014\n (Jan-Jun)", "2015\n", "2016\n", "2017\n")) +
+  geom_text(aes(year, total, label = total, fill = NULL, vjust = -0.5), data = totals) +
+  geom_text(aes(year, Black, label = paste0(percentBlack,"%"), fill = NULL, vjust = 2), size = 3.5, data = totals)
+  #geom_text(aes(year, total, label = paste0(percentWhite, "%"), fill = NULL, vjust = 1.1), size = 3, data = totals)
+```
+
+
+
+Who? {data-orientation=rows}
+=====================================
+
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+```{r}
+pop <- data.frame("race" = c("White", "Black", "Asian", "Multiracial", "Remaining"),
+                  "value" = c(32565, 8782, 3370, 1443, 327)) %>%
+  mutate(race = factor(race, levels = c("Black", "White", "Multiracial", "Asian", "Remaining")),
+         group = "pop") %>%
+  mutate(race = fct_collapse(race,
+                             Remaining = c("Multiracial", "Asian", "Remaining"))) %>%
+  group_by(race) %>%
+  summarize(value = sum(value)) %>%
+  ungroup() %>% mutate(group = "pop") %>%
+  filter(race %in% c("Black", "White")) %>%
+  droplevels()
+
+```
+
+### Detentions per 1,000 
 
 ```{r Detentions by Race per 1000}
 All <- data_frame(race = "All", Totals = sum(sf_summary_stats$Totals), 
@@ -150,36 +211,7 @@ ggplot(sf_Per1000, aes(x = race, y = Per1000, fill = race)) +
 
 ```
 
-
-
-Detentions Relative to Population {data-orientation=rows}
-=====================================
-
-
-Row {.tabset}
------------------------------------------------------------------------
-
-```{r}
-pop <- data.frame("race" = c("White", "Black", "Asian", "Multiracial", "Remaining"),
-                  "value" = c(32565, 8782, 3370, 1443, 327))
-
-pop <- pop %>%
-  mutate(race = factor(race, levels = c("Black", "White", "Multiracial", "Asian", "Remaining")),
-         group = "pop")
-
-pop3 <- pop %>%
-  mutate(race = fct_collapse(race,
-                             Remaining = c("Multiracial", "Asian", "Remaining"))) %>%
-  group_by(race) %>%
-  summarize(value = sum(value)) %>%
-  ungroup() %>% mutate(group = "pop")
-
-pop2 <- pop3 %>%
-  filter(race %in% c("Black", "White")) %>%
-  droplevels()
-```
-
-### Total
+### By Population
 
 ```{r}
 # total by race
@@ -189,7 +221,7 @@ sf_race_all <- sf_race %>%
   ungroup() %>%
   mutate(group = "total")
 
-sf_race_all <- rbind(sf_race_all, pop2) %>%
+sf_race_all <- rbind(sf_race_all, pop) %>%
   mutate(group = factor(group, levels = c("pop", "total")),
          race = fct_relevel(race, "White")) %>%
   arrange(group, desc(race)) %>%
@@ -219,155 +251,54 @@ ggplot(sf_race_all, aes(x = group, y = value, fill = race)) +
 
 > Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data.
 
-### 2012
+### By Year {data-height=600}
 
-
-```{r 2012, echo=FALSE}
-
+```{r By Year, echo=FALSE}
 sf_race_year <- sf_race %>%
+  filter(race %in% c("Black", "White")) %>%
   group_by(year, race) %>%
   summarize(value = n()) %>%
   ungroup() %>%
-  mutate(group = "")
+  mutate(group = "detained") 
 
-pop2_p1 <- pop2 %>%
-  mutate(period = "2012-2014")
-pop2_p2 <- pop2 %>%
-  mutate(period = "2016-2017")
+pop_year <- rbind(pop %>% mutate(year = 2012),
+                  pop %>% mutate(year = 2013),
+                  pop %>% mutate(year = 2014),
+                  pop %>% mutate(year = 2015),
+                  pop %>% mutate(year = 2016),
+                  pop %>% mutate(year = 2017))
 
-pop2_year <- pop2 %>%
-  mutate(year = "Total")
-
-sf_race_year <- rbind(sf_race_year, pop2_year) %>%
-  mutate(group = c(c(rep("year",12), rep("pop",2))),
-         race = fct_relevel(race, "White"))%>%
+sf_race_year <- rbind(sf_race_year, pop_year) %>%
+  mutate(group = factor(group, levels = c("pop", "detained")),
+         race = fct_relevel(race, "White")) %>%
   arrange(group, year, desc(race)) %>%
   group_by(group, year) %>%
-  mutate(label_pos = (cumsum(value) - value/2)/sum(value), 
+  mutate(label_pos = (cumsum(value) - value/2)/sum(value),
          percent = paste0(round(value/sum(value)*100,1),"%")
-         )
+  )
 
-sf_race_2012 <- sf_race_year %>%
-  filter(year %in% c("Total", "2012"))
+labellingdata <- data.frame(label = rep(c("Population", "Detentions"),6), group = rep(c("pop", "detained"),6), pos = rep(c(.90,.90),6), year = rep(c("2012", "2013", "2014", "2015", "2016", "2017"), each = 2))
 
-ggplot(sf_race_2012, aes(x = group, y = value, fill = race)) +
-  geom_bar(position="fill", stat="identity") +
+ggplot(sf_race_year, aes(x = group, y = value, fill = race)) +
+  geom_bar(position="fill", stat = "identity") +
   scale_fill_manual(values = pal2, name = "Race") +
   coord_polar("y", direction = 1) +
-  scale_x_discrete(limits = c(" ", "pop","year")) +
+  scale_x_discrete(limits = c(" ", "pop","detained")) +
   theme_void() +
-  geom_text(data = filter(sf_race_2012, race == "Black"), 
-            aes(x = group, y = label_pos, label = percent), size = 3, color = "white") +
-  geom_text(data = labellingdata,
-            aes(x = group, y = pos, label = label) ,inherit.aes = FALSE, size = 3, color = "white") 
-
+  geom_text(data = filter(sf_race_year, race == "Black"), aes(x = group, y = label_pos, label = percent), size = 3) +
+ ## aes(x = group, y = pos, label = label), inherit.aes = FALSE, size = 3) +
+  facet_wrap(~year, nrow = 2)
 ```
 
-> **Missing data prior to July 2012.** Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data. 
+>  Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data. **Missing data prior to July 2012 and data from June 2014 - December 2014**
 
-### 2013
 
-```{r 2013, echo=FALSE}
-sf_race_2013 <- sf_race_year %>%
-  filter(year %in% c("Total", "2013"))
 
-ggplot(sf_race_2013, aes(x = group, y = value, fill = race)) +
-  geom_bar(position="fill", stat="identity") +
-  scale_fill_manual(values = pal2, name = "Race") +
-  coord_polar("y", direction = 1) +
-  scale_x_discrete(limits = c(" ", "pop","year")) +
-  theme_void() +
-  geom_text(data = filter(sf_race_2013, race == "Black"), 
-            aes(x = group, y = label_pos, label = percent), size = 3, color = "white") +
-  geom_text(data = labellingdata,
-            aes(x = group, y = pos, label = label) ,inherit.aes = FALSE, size = 3, color = "white") 
-
-```
-
-> Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data.
-
-### 2014
-
-```{r 2014}
-sf_race_2014 <- sf_race_year %>%
-  filter(year %in% c("Total", "2014"))
-
-ggplot(sf_race_2014, aes(x = group, y = value, fill = race)) +
-  geom_bar(position="fill", stat="identity") +
-  scale_fill_manual(values = pal2, name = "Race") +
-  coord_polar("y", direction = 1) +
-  scale_x_discrete(limits = c(" ", "pop","year")) +
-  theme_void() +
-  geom_text(data = filter(sf_race_2014, race == "Black"), 
-            aes(x = group, y = label_pos, label = percent), size = 3, color = "white") +
-  geom_text(data = labellingdata,
-            aes(x = group, y = pos, label = label) ,inherit.aes = FALSE, size = 3, color = "white")
-```
-
-> **Missing data after to June 2014.** Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data. 
-
-### 2015
-
-```{r 2015}
-sf_race_2015 <- sf_race_year %>%
-  filter(year %in% c("Total", "2015"))
-
-ggplot(sf_race_2015, aes(x = group, y = value, fill = race)) +
-  geom_bar(position="fill", stat="identity") +
-  scale_fill_manual(values = pal2, name = "Race") +
-  coord_polar("y", direction = 1) +
-  scale_x_discrete(limits = c(" ", "pop","year")) +
-  theme_void() +
-  geom_text(data = filter(sf_race_2015, race == "Black"), 
-            aes(x = group, y = label_pos, label = percent), size = 3, color = "white") +
-  geom_text(data = labellingdata,
-            aes(x = group, y = pos, label = label) ,inherit.aes = FALSE, size = 3, color = "white")
-```
-
-> Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data.
-
-### 2016
-
-```{r 2016}
-sf_race_2016 <- sf_race_year %>%
-  filter(year %in% c("Total", "2016"))
-
-ggplot(sf_race_2013, aes(x = group, y = value, fill = race)) +
-  geom_bar(position="fill", stat="identity") +
-  scale_fill_manual(values = pal2, name = "Race") +
-  coord_polar("y", direction = 1) +
-  scale_x_discrete(limits = c(" ", "pop","year")) +
-  theme_void() +
-  geom_text(data = filter(sf_race_2016, race == "Black"), 
-            aes(x = group, y = label_pos, label = percent), size = 3, color = "white") +
-  geom_text(data = labellingdata,
-            aes(x = group, y = pos, label = label) ,inherit.aes = FALSE, size = 3, color = "white")
-```
-
-> Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data.
-
-### 2017
-
-```{r 2017}
-sf_race_2017 <- sf_race_year %>%
-  filter(year %in% c("Total", "2017"))
-
-ggplot(sf_race_2013, aes(x = group, y = value, fill = race)) +
-  geom_bar(position="fill", stat="identity") +
-  scale_fill_manual(values = pal2, name = "Race") +
-  coord_polar("y", direction = 1) +
-  scale_x_discrete(limits = c(" ", "pop","year")) +
-  theme_void() +
-  geom_text(data = filter(sf_race_2017, race == "Black"), 
-            aes(x = group, y = label_pos, label = percent), size = 3, color = "white") +
-  geom_text(data = labellingdata,
-            aes(x = group, y = pos, label = label) ,inherit.aes = FALSE, size = 3, color = "white")
-```
-
-> Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data.
-
-Stop and Frisk {data-orientation=rows}
+What? {data-orientation=rows}
 =====================================
+
+Row {.tabset}
+-----------------------------------------------------------------------
 
 ### Charlottesville Detentions with and without Stop and Frisk
 
@@ -405,10 +336,7 @@ sf_sankeyNetwork
 ```
 
 
-Row {data-height=700}
-----------------------------------------------
-
-### By Year
+### By Race by Year
 
 ```{r Stop and Frisk by year, echo=FALSE}
 sf_race_sfs_year <- sf_race %>%
@@ -460,23 +388,44 @@ sf_race_sfs_year$group <- as.factor(c(rep("a", 6),
 sf_nodes_year$group <- as.factor(c("unique_group"))
 
 
-sf_sankey_color <- 'd3.scaleOrdinal() .domain(["a", "b", "unique_group"]) .range(["#95D7AE", "#87BFFF", "grey"])'
+sfs_race_black <- sf_race_sfs_year %>%
+  filter(source != "White", 
+         group == "b") %>%
+  transform(IDsource = IDsource-1,
+            IDtarget = IDtarget-1,
+            group = ifelse(source == "Black", "a", 
+                           ifelse(target == "No Search/Frisk", "b", "c")))
+
+sf_for_nodes_black <- sf_race %>%
+  group_by(race, year, type2) %>%
+  filter(race != "White") %>%
+  summarize(values = n()) 
+
+sf_nodes_black <- data.frame(
+  name=c(as.character(sf_for_nodes_black$race),
+         as.character(sf_for_nodes_black$year), 
+         as.character(sf_for_nodes_black$type2)) %>%
+    unique()
+)
+
+sf_nodes_black$group <- as.factor(c("unique_group"))
+
+sf_sankey_color <- 'd3.scaleOrdinal() .domain(["a", "b", "unique_group"]) .range(["#87BFFF", "#E9B44C", "grey", "#9D6381"])'
 
 # Make the Network
-sf_sankeyNetwork_year <- sankeyNetwork(Links = sf_race_sfs_year, Nodes = sf_nodes_year,
-                                  Source = "IDsource", Target = "IDtarget",
-                                  Value = "values", NodeID = "name",
-                                  colourScale=sf_sankey_color, LinkGroup="group",
-                                  NodeGroup="group",
-                                  fontSize = 10, nodeWidth=10, units = "Detentions")
+sf_sankeyNetwork_black <- sankeyNetwork(Links = sfs_race_black, Nodes = sf_nodes_black,
+                                       Source = "IDsource", Target = "IDtarget",
+                                       Value = "values", NodeID = "name", 
+                                       colourScale=sf_sankey_color, LinkGroup="group", NodeGroup="group",
+                                       fontSize = 10, nodeWidth=10, units = "Detentions")
 
 
-sf_sankeyNetwork_year
+sf_sankeyNetwork_black
 ```
 
 > Data missing in 2012 prior to July and in 2014 after June. All year datasets except for 2015 only include detentions that lead to an arrest. As a results, the 2015 dataset contains an added number of detentions making it appear artifically larger.
 
-Locations of Dententions {data-orientation=rows}
+Where? {data-orientation=rows}
 ===================================== 
 
 ### Where Do Police Detain People?
@@ -652,21 +601,25 @@ sfs <-
   mutate(lab_pos = ifelse(RACE ==  "Black", RaceTot -2, RaceTot + 2))
 
 #pal2 <- c("#8dd3c7" ,"#bebada")
-#mycolors <- c("#87BFFF", "#95D7AE")
+mycolors <- c("#87BFFF", "#95D7AE")
 
-ggplot(sfs, aes(x = reorder(NAME, -total), fill = RACE, y = Counts, alpha = SFTYPE), color = "black") +
-  geom_bar(stat = "identity") + labs(fill = "Race") +
+ggplot(sfs, aes(x = reorder(NAME, -total), fill = RACE, 
+                y = Counts, alpha = SFTYPE), color = "black") +
+  geom_bar(stat = "identity") + 
+  labs(fill = "Race") +
   scale_fill_manual(values = mycolors) +
-  geom_text(data = sfs %>% select(NAME, lab_pos, RaceTot) %>% unique(), aes(x = NAME, y = lab_pos, label = abs(RaceTot)), size = 3, inherit.aes = FALSE) +
+  geom_text(data = sfs %>% select(NAME, lab_pos, RaceTot) %>% unique(), 
+            aes(x = NAME, y = lab_pos, label = abs(RaceTot)), size = 3, inherit.aes = FALSE) +
   coord_flip() +
-  scale_y_continuous(labels = function(x){abs(x)}, limits = c(-60, 60), breaks = c(seq(-40, 40, 20), 0)) +
+  scale_y_continuous(labels = function(x){abs(x)}, 
+                     limits = c(-360, 360), breaks = c(seq(-400, 400, 100), 0)) +
   scale_alpha_discrete(range = c(.6, 1)) +
-  annotate("text", x = 29, y = -15, label = "Black" ) +
-    annotate("text", x = 29, y = 15, label = "White" ) +
-   annotate("rect", xmin = 25, xmax = 26, ymin = 10, ymax = 14, alpha = 1, fill = "#8dd3c7") +
-   annotate("text", x = 25.5, y = 15, label = "= With Stop and Frisk", size = 3, hjust = 0)+
-    annotate("rect", xmin = 23.5, xmax = 24.5, ymin = 10, ymax = 14, alpha = .6, fill = "#8dd3c7") +
-   annotate("text", x = 24, y = 15, label = "= Without Stop and Frisk", size = 3, hjust = 0)+
+  annotate("text", x = 29, y = -150, label = "Black" ) +
+  annotate("text", x = 29, y = 150, label = "White" ) +
+  annotate("rect", xmin = 25, xmax = 26, ymin = 100, ymax = 140, alpha = 1, fill = "#87BFFF") +
+  annotate("text", x = 25.5, y = 150, label = "= With Stop and Frisk", size = 3, hjust = 0)+
+  annotate("rect", xmin = 23.5, xmax = 24.5, ymin = 100, ymax = 140, alpha = .6, fill = "#87BFFF") +
+  annotate("text", x = 24, y = 150, label = "= Without Stop and Frisk", size = 3, hjust = 0)+
   geom_hline(yintercept  = 0) +
   theme_minimal() +
   theme(
@@ -1279,7 +1232,7 @@ The Downtown Mall is a public space for free use by Charlottesville residents.
 
 
 
-Reasons for Detentions {data-orientation=rows}
+Why? {data-orientation=rows}
 =====================================
 
 ### What Reasons do Police Give for Detentions?
@@ -1294,27 +1247,27 @@ Row {.tabset}
 
 ```{r}
 sf_race <- sf_race %>%
-  subset(offense != "No") %>%
   mutate(offense7 = case_when(
     str_detect(offense, "Assault|Robbery|PURSE|Shots|Weapon") ~ "Person Crime",
     str_detect(offense, "Burglary|Larceny|Trespass|VANDAL") ~ "Property Crime",
-    str_detect(offense, "Narcotic|Marijuana") ~ "Narcotics Related",
+    str_detect(offense, "Narcotic") ~ "Narcotics Related",
     str_detect(offense, "Traffic") ~ "Traffic Related",
     str_detect(offense, "Disorder|Drunk|Liquor|INDECENT|DIP") ~ "Public Disorder",
     str_detect(offense, "Suspicious|Supsicious") ~ "Suspicious Circumstance",
     TRUE ~ "Other"
-  ))
+  ),
+  offense7 = if_else(year == 2015, NA_character_, offense7))
 
 sf_race <- sf_race %>%
   mutate(offense7 = factor(offense7),
          offense7 = fct_infreq(offense7))
 
 # for annotation
-tots <- sf_race %>%
+tots <- sf_race %>% filter(year != 2015) %>%
   group_by(offense7) %>%
   summarize(tots = n())
 
-racetots <- sf_race %>%
+racetots <- sf_race %>% filter(year != 2015) %>%
   group_by(offense7, race) %>%
   summarize(racetot = n())
 
@@ -1324,8 +1277,7 @@ racetots <- racetots %>% mutate(percent = round((racetot/tots)*100,0),
                                 percent_lab = ifelse(tots < 40 & racetot < 15 ,"",  paste0(percent, "%")),
                                 race = fct_relevel(race, "White"),
                                 racetot = ifelse(race == "White", racetot*-1, racetot),
-                                lab_pos = racetot/2) %>%
-  arrange()
+                                lab_pos = racetot/2)
 
 ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
   geom_bar(stat = "identity") + labs(fill = "Race") +
@@ -1333,7 +1285,8 @@ ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
   geom_text(data = racetots, aes(x = offense7, y = lab_pos, label = percent_lab), size = 2) +
   coord_flip() +
   labs(y = "# Detentions", x = "Reason") +
-  scale_y_continuous(labels = function(x){abs(x)}, limits = c(-130, 135))
+  scale_y_continuous(labels = function(x){abs(x)}, limits = c(-120, 120))
+
 ```
 
 
