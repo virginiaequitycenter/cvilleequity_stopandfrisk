@@ -260,11 +260,11 @@ sf <- read_rds("data/sf_combined.Rds")
 
 SF2015brief <- Stop_Frisk_2015_Final %>% 
   rename(type = SFType, beat = BEAT_NO, 
-         offense = Arrest, race = Race) %>% 
+         arrest = Arrest, race = Race) %>% 
   mutate(year = 2015, period = "2015", date = NA) %>% 
-  mutate(beat_letter = "C") %>%
+  mutate(beat_letter = "C", offense = NA) %>%
   unite(beat,beat_letter, beat, sep = "") %>%
-  select(date, year, period, type, beat, offense, race) %>%
+  select(date, year, period, type, beat, offense, race, arrest) %>%
   st_drop_geometry()
 
 #Matching variable names to larger dataset  
@@ -272,11 +272,50 @@ SF2015brief$type[SF2015brief$type == "YES"]  <- "STOP WITH SEARCH OR FRISK"
 SF2015brief$type[SF2015brief$type == "NO"]  <- "Search WITHOUT Stop-Frisk"
 
   
-Stop_Frisk_Together <- rbind(sf, SF2015brief, Stop_Frisk_2016_added)%>%
+
+
+##Adding Arrests ## ---------
+
+SF1214 <- read_csv("data/SF2014.csv") %>%
+  select(date = Date, year = YEAR, type = SFTYPE, 
+         beat = BEAT, offense = OFFENSE, race = RACE,
+         arrest = Arrest) %>%
+  mutate(period = "2012-2014")
+
+SF2015 <- SF2015brief %>%
+  transform(date = as.Date(date, "%m/%d/%y"),
+            offense = as.character(offense))
+
+
+Stop_Frisk_2016_arrests <- read_csv("data/2016 Stop and Frisk.csv") %>% 
+  select(date = "REPORT DATE", type = "Stop& Frisk", beat = BEAT, 
+         offense = OFFENSE, arrest = Arrest, race = RACE) %>%
+  mutate(period = "2016-2017", year = 2016) %>%
+  transform(date = as.Date(date, "%m/%d/%y")) %>%
+  filter(date > "2016-10-15")
+
+SF2016 <- read_csv("data/SF2016.csv") %>%
+  select(date = Date, type = "Stop & Frisk", beat = BEAT, 
+       offense = OFFENSE, arrest = Arrest, race = RACE) %>%
+  arrange(date) %>%
+  mutate(period = "2016-2017", year = 2016) %>%
+  mutate_at(vars("type"), 
+            funs(ifelse(is.na(.), "Search WITHOUT Stop-Frisk", "STOP WITH SEARCH OR FRISK"))) %>%
+  rbind(Stop_Frisk_2016_arrests)
+
+SF2017 <- read_csv("data/SF2017.csv") %>%
+  rename(type = SFTYPE, beat = BEAT_NO, offense = OFFENSE,
+       race = RACE) %>% 
+  mutate(year = 2017, date = NA, period = "2016-2017", arrest = NA) %>% 
+  select(date, year, period, type, beat, offense, race, arrest) 
+
+
+Stop_Frisk_Together <- rbind(SF1214, SF2015, SF2016, SF2017)%>%
   as_tibble() %>%
   arrange(year)
-  
+
 
 saveRDS(Stop_Frisk_Together, "data/sf_combined.Rds")
+
 
 

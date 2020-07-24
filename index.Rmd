@@ -110,8 +110,7 @@ ggplot(sf, aes(x = year, fill = type)) +
   geom_text(aes(year, total, label = total, fill = NULL, vjust = -0.5), data = totals) +
   geom_text(aes(year, sfyes, label = percentyes, fill = NULL, vjust = 1.5), size = 3, data = totals) +
   geom_text(aes(year, total, label = percentno, fill = NULL, vjust = 1.25), size = 3, data = totals) +
-  theme(axis.title = element_blank(),
-        legend.position = c(0.9, 0.9))
+  theme(axis.title = element_blank())
 ```
 
 
