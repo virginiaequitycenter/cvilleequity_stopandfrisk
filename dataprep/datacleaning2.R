@@ -49,8 +49,10 @@ SF2016 <- SF2016a %>% bind_rows(SF2016b)
 rm(SF2016a, SF2016b)
 
 # Additional 2016 records - November-December
-# is there code to generate this file (2016 Stop and Frisk.csv)?
-# this looks like it might only be adding November-December stops with search/frisk
+#   is there code to generate this file (2015_Stop_and_Frisk.csv)?
+#   or other documentation on how it was translated from the pdf?
+# also, this looks like it might only be adding November-December stops with search/frisk
+#   to what degree should we be worried about this distorting the 2016 records?
 SF2016_add <- read_csv("data/2016 Stop and Frisk.csv") 
 SF2016_add <- SF2016_add %>%
   rename(Date = `REPORT DATE`, 
@@ -147,6 +149,8 @@ SF2017_arrest <- SF2017_arrest %>%
 
 # SF 2015  ----
 # no beat, address (needs geocoding)
+#   is there code to generate this file (2015_Stop_and_Frisk.csv)?
+#   or other documentation on how it was translated from the pdf?
 SF2015_read <- read_csv("data/2015_Stop_and_Frisk.csv") 
 
 SF2015_clean <- SF2015_read %>%
@@ -226,8 +230,11 @@ SF2015brief <- SF2015 %>%
 SF_beat <- rbind(SF2014brief, SF2015brief, SF2016brief, SF2017brief)
 SF_arrest <- rbind(SF2014brief, SF2015brief, SF2016brief, SF2017brief_arrest)
 
-SF_arrest <- SF_arrest %>% 
-  mutate(arrest1 = ifelse(str_length(arrest)>2, 0, 1))
+# SF_arrest <- SF_arrest %>% 
+#   mutate(arrest1 = ifelse(str_length(arrest)>2, 0, 1))
+# Are NA's definitionally arrests or missing?
+# Are all of these outcomes equivalent to an arrest or are there other distinctions?
+
 
 saveRDS(SF_beat, "data/sf_combined.Rds")
 saveRDS(SF_arrest, "data/sf_arrest.Rds")
