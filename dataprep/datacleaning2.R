@@ -5,7 +5,7 @@
 ########################################
 
 library(tidyverse)
-library(openxlsx)
+library(readxl)
 library(ggmap)
 library(pdftools)
 library(sf)
@@ -52,7 +52,6 @@ rm(SF2016a, SF2016b)
 # is there code to generate this file (2016 Stop and Frisk.csv)?
 # this looks like it might only be adding November-December stops with search/frisk
 SF2016_add <- read_csv("data/2016 Stop and Frisk.csv") 
-
 SF2016_add <- SF2016_add %>%
   rename(Date = `REPORT DATE`, 
          `Dispatched/Self Initiated` = `Dispatched/Self-Initiated`) %>% 
@@ -137,9 +136,13 @@ SF2017 <- st_join(SF2017_sf, beatmap[c("BEAT_NO", "NAME")], left = TRUE)
 rm(SF2017_read, SF2017_clean, SF2017_sf, SF2017Locations, sf_for_join)
 
 
-# SF 2017 ---- 
+# SF 2017 (arrest) ---- 
 # no beat or address, but arrest (for use in outcome analysis)
-# TO BE ADDED
+SF2017_arrest <- read_xlsx("initial/July 11 2017 - Investigative Detention FOIA.xlsx")
+SF2017_arrest <- SF2017_arrest %>% 
+  rename(SFTYPE = `Stop & Frisk Type`) %>% 
+  mutate(SFTYPE = recode(SFTYPE,
+                         "Search WITHOUT Stop-Frisk" = "STOP WITHOUT SEARCH OR FRISK"))
 
 
 # SF 2015  ----
@@ -207,6 +210,11 @@ SF2017brief <- SF2017 %>%
   select(date, year, period, type, beat, offense, race, arrest) %>% 
   st_drop_geometry()
 
+SF2017brief_arrest <- SF2017_arrest %>% 
+  rename(date = Date, type = SFTYPE, offense = Offense, race = Race, arrest = Arrest) %>% 
+  mutate(year = 2017, period = "2016-2017", beat = NA) %>% 
+  select(date, year, period, type, beat, offense, race, arrest)
+
 SF2015brief <- SF2015 %>% 
   rename(type = SFTYPE, beat = BEAT_NO,
          race = Race, arrest = Arrest) %>% 
@@ -216,10 +224,13 @@ SF2015brief <- SF2015 %>%
 
 # combine
 SF_beat <- rbind(SF2014brief, SF2015brief, SF2016brief, SF2017brief)
-# SF_arrest <- rbind(SF2014brief, SF2016brief, SF2017brief2_arrest)
+SF_arrest <- rbind(SF2014brief, SF2015brief, SF2016brief, SF2017brief_arrest)
+
+SF_arrest <- SF_arrest %>% 
+  mutate(arrest1 = ifelse(str_length(arrest)>2, 0, 1))
 
 saveRDS(SF_beat, "data/sf_combined.Rds")
-# saveRDS(SF_arrest, "data/sf_arrest.Rds")
+saveRDS(SF_arrest, "data/sf_arrest.Rds")
 
 
 # check - change over time 
@@ -241,53 +252,5 @@ sf1920_data <- googlesheets4::read_sheet(url_sheet,
 sf1920_data <- sf1920_data %>% # remove summed row at bottom
   filter(!is.na(beat))
 # whoa
-
-
-
-
-
-##Adding Arrests ## ---------
-
-SF1214 <- read_csv("data/SF2014.csv") %>%
-  select(date = Date, year = YEAR, type = SFTYPE, 
-         beat = BEAT, offense = OFFENSE, race = RACE,
-         arrest = Arrest) %>%
-  mutate(period = "2012-2014")
-
-SF2015 <- SF2015brief %>%
-  transform(date = as.Date(date, "%m/%d/%y"),
-            offense = as.character(offense))
-
-
-Stop_Frisk_2016_arrests <- read_csv("data/2016 Stop and Frisk.csv") %>% 
-  select(date = "REPORT DATE", type = "Stop& Frisk", beat = BEAT, 
-         offense = OFFENSE, arrest = Arrest, race = RACE) %>%
-  mutate(period = "2016-2017", year = 2016) %>%
-  transform(date = as.Date(date, "%m/%d/%y")) %>%
-  filter(date > "2016-10-15")
-
-SF2016 <- read_csv("data/SF2016.csv") %>%
-  select(date = Date, type = "Stop & Frisk", beat = BEAT, 
-       offense = OFFENSE, arrest = Arrest, race = RACE) %>%
-  arrange(date) %>%
-  mutate(period = "2016-2017", year = 2016) %>%
-  mutate_at(vars("type"), 
-            funs(ifelse(is.na(.), "Search WITHOUT Stop-Frisk", "STOP WITH SEARCH OR FRISK"))) %>%
-  rbind(Stop_Frisk_2016_arrests)
-
-SF2017 <- read_csv("data/SF2017.csv") %>%
-  rename(type = SFTYPE, beat = BEAT_NO, offense = OFFENSE,
-       race = RACE) %>% 
-  mutate(year = 2017, date = NA, period = "2016-2017", arrest = NA) %>% 
-  select(date, year, period, type, beat, offense, race, arrest) 
-
-
-Stop_Frisk_Together <- rbind(SF1214, SF2015, SF2016, SF2017)%>%
-  as_tibble() %>%
-  arrange(year)
-
-
-saveRDS(Stop_Frisk_Together, "data/sf_combined.Rds")
-
 
 
