@@ -56,7 +56,7 @@ avg <- round(nrow(sf)/59,1)
 valueBox(avg, icon = "fa-hand-paper")
 ```
 
-### Percent of Detentions with Search or Frisk
+### Percent of Detentions include Search or Frisk
 ```{r}
 frisk <- round(nrow(filter(sf, type == "STOP WITH SEARCH OR FRISK")) /
                  nrow(sf)*100, 0)
@@ -81,35 +81,37 @@ This analysis is based on records of temporary detentions made by the City of Ch
 
 Navigate to additional pages for further analysis:
 
-* **Who?** compares the percent of Black and White detentions to the overall population in the city.
-* **Where?** visualizes where Black and White citizens are detained by the police.
-* **Why?** shows the reason recorded by the police for the detention across Black and White residents.
+* **Who?** Who is detained? How does the percent of Black and White citizens detained compare to the overall population in the city.
+* **Where?** Where are citizens detained? In what neighborhoods do detentions occur and how does this compare to the underlying population of that area?
+* **Why?** Why do police retain citizens? What reasons are recorded by the police for the detention across Black and White residents.
 
 
-### Detentions in Charlottesville, with and without Search/Frisk
+### Detentions in Charlottesville by Race
 
 ```{r}
-totals <- sf %>% filter(type == "STOP WITH SEARCH OR FRISK") %>%
+totals <- sf_race %>% filter(race == "Black") %>%
   group_by(year) %>%
-  summarize(sfyes = n()) %>%
-  left_join(sf %>% filter(type != "STOP WITH SEARCH OR FRISK") %>%
+  summarize(sfblack = n()) %>%
+  left_join(sf_race %>% filter(race != "Black") %>%
               group_by(year) %>%
-              summarize(sfno = n())
+              summarize(sfwhite = n())
             ) %>%
-  mutate(total = sfyes+sfno,
-         percentyes = round((sfyes/total)*100, 1),
-         percentno = round((sfno/total)*100, 1))
+  mutate(total = sfblack+sfwhite,
+         percentblack = round((sfblack/total)*100, 0),
+         percentwhite = round((sfwhite/total)*100, 0),
+         labelblack = ifelse(percentblack>10, paste0(percentblack, "%"), NA),
+         labelwhite = ifelse(percentwhite>10, paste0(percentwhite, "%"), NA)) 
 
 
-ggplot(sf, aes(x = year, fill = type)) +
+ggplot(sf_race, aes(x = year, fill = race)) +
   geom_bar() +
-  scale_fill_manual(values = pal2, name = "Search/Frisk", labels = c("No", "Yes")) +
+  scale_fill_manual(values = pal2) +
   scale_x_continuous(name = "Year",
                      breaks = c(2012, 2013, 2014, 2015, 2016, 2017),
                      labels = c("2012\n (Jul-Dec)", "2013", "2014\n (Jan-Jun)", "2015", "2016", "2017")) +
   geom_text(aes(year, total, label = total, fill = NULL, vjust = -0.5), data = totals) +
-  geom_text(aes(year, sfyes, label = percentyes, fill = NULL, vjust = 1.5), size = 3, data = totals) +
-  geom_text(aes(year, total, label = percentno, fill = NULL, vjust = 1.25), size = 3, data = totals) +
+  geom_text(aes(year, sfblack, label = labelblack, fill = NULL, vjust = 1.5), size = 3, data = totals) +
+  geom_text(aes(year, total, label = labelwhite, fill = NULL, vjust = 1.25), size = 3, data = totals) +
   theme(axis.title = element_blank())
 ```
 
@@ -1081,7 +1083,7 @@ ggplot(racetots, aes(x = offense7, fill = race, y = racetot)) +
   facet_wrap(~type2, nrow = 2)
 ```
 
-About {data-orientation=rows}
+Resources {data-orientation=rows}
 =====================================
 
 The Charlottesville policing data was acquired by attorney Jeff Fogel through Freedom of Information Act requests. The site was created by [Michele Claibourn](https://mclaibourn.github.io/) and Sam Powers, with contributions from Enrique Unruh, in a partnership between the [Equity Center](http://virginiaequitycenter.org/) at UVA and Jordy Yager's *[Determined](https://www.cvilletomorrow.org/articles/determined-stories-of-resilience-in-a-broken-ecosystem/)* series with Vinegar Hill Magazine and Charlottesville Tomorrow.
