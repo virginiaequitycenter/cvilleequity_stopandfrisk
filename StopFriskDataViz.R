@@ -363,7 +363,6 @@ sf_nodes_year <- data.frame(
 sf_race_sfs_type <- sf_race %>%
   group_by(race,year, type2) %>%
   summarize(values = n()) %>%
-  select(-race) %>%
   transform(year = as.factor(year)) %>%
   select(source = year, target = type2, values)
 
@@ -477,6 +476,58 @@ sf_sankeyNetwork_white <- sankeyNetwork(Links = sfs_race_black, Nodes = sf_nodes
 
 
 sf_sankeyNetwork_white
+
+
+##Arrest Numbers -------
+sf_arrests <- sf_race %>%
+  filter(!is.na(arrest)) %>%
+  group_by(race, type2) %>%
+  summarize(values = n()) %>%
+  transform(race = as.factor(race)) %>%
+  select(source = race, target = type2, values)
+
+sf_type_arrests <- sf %>%
+  filter(!is.na(arrest)) %>%
+  transform(arrest = ifelse(arrest == "No", "No", "Yes"),
+            type = ifelse(type == "Search WITHOUT Stop-Frisk", "No Search/Frisk", "Search/Frisk")) %>%
+  group_by(race, type, arrest) %>%
+  summarize(values = n()) %>%
+  transform(type = as.factor(type)) %>%
+  select(source = type, target = arrest, values)
+
+
+sf_arrests <- sf_arrests %>%
+  rbind(sf_arrests, sf_type_arrests)
+
+sf_arrests_nodes <- data.frame(
+  name=c(as.character(sf_arrests$source), 
+         as.character(sf_arrests$target)) %>%
+    unique()
+)
+
+
+sf_arrests <- sf_arrests %>%x
+  mutate(IDSource = match(source, sf_arrests_nodes$name)-1,
+         IDTarget = match(target, sf_arrests_nodes$name)-1)
+
+
+sf_arrests$group <- as.factor(c(rep(c("a", "a", "b", "b"),2), rep("b", 4), rep("a", 4)))
+
+
+sf_arrests_nodes$group <- as.factor(c("unique_group"))
+
+sf_sankey_color <- 'd3.scaleOrdinal() .domain(["a", "b", "unique_group"]) .range(["#95D7AE", "#87BFFF", "grey"])'
+
+# Make the Network
+sf_sankeyNetwork_arrests <- sankeyNetwork(Links = sf_arrests, Nodes = sf_arrests_nodes,
+                                  Source = "IDSource", Target = "IDTarget",
+                                  Value = "values", NodeID = "name", 
+                                  colourScale=sf_sankey_color, LinkGroup="group", NodeGroup="group",
+                                  fontSize = 20, nodeWidth=10, units = "Detentions")
+
+
+sf_sankeyNetwork_arrests
+  
 
 
 

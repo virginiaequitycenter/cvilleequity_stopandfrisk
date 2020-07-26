@@ -228,7 +228,8 @@ SF2015Locations <-
   SF2015 %>%
   mutate(SFType = str_replace_all(SFType, "YES", "STOP WITH SEARCH OR FRISK"))%>%
   mutate(SFType = str_replace_all(SFType, "NO", "Search WITHOUT Stop-Frisk"))%>%
-  select(SFTYPE = SFType, OFFENSE = Arrest, RACE = Race, BEAT_NO) %>%
+  mutate(OFFENSE = NA) %>%
+  select(SFTYPE = SFType, OFFENSE, RACE = Race, BEAT_NO) %>%
   arrange(BEAT_NO) %>%
   add_column(lat = dots2015$lat, lon = dots2015$lon, beatnumdot = dots2015$BEAT_NO, Year = 2015) %>%
   slice(sample(1:n()))
