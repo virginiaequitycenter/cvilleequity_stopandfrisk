@@ -14,6 +14,8 @@ setwd("/Users/enriqueunruh/Documents/Equity Center/GitHub/cvilleequity_stopandfr
 #Data Files
 sf <- readRDS("data/sf_combined.Rds")
 
+sf_arrests <- readRDS("data/sf_arrest.Rds")
+
 sflocations <- read_csv("data/sflocations.csv") %>% st_as_sf(
   coords = c("lon", "lat"),
   crs = 4326,
@@ -479,48 +481,59 @@ sf_sankeyNetwork_white
 
 
 ##Arrest Numbers -------
-sf_arrests <- sf_race %>%
+sf_arrests_sankey <- sf_arrests %>%
   filter(!is.na(arrest)) %>%
-  group_by(race, type2) %>%
-  summarize(values = n()) %>%
-  transform(race = as.factor(race)) %>%
-  select(source = race, target = type2, values)
+  filter(race %in% c("B", "W")) %>%
+  transform(arrest = str_replace_all(arrest, "no", "No"))  %>%
+  transform(arrest = str_replace_all(arrest, "NO", "No")) %>%
+  transform(type = ifelse(type == "Search WITHOUT Stop-Frisk", "No Search/Frisk", "Search/Frisk")) %>%
+  group_by(race, type) %>%
+  summarize(values = n())  %>% 
+  transform(values = as.numeric(values)) %>%
+  select(source = race, target = type, values)
 
-sf_type_arrests <- sf %>%
+sf_type_arrests <- sf_arrests %>%
   filter(!is.na(arrest)) %>%
-  transform(arrest = ifelse(arrest == "No", "No", "Yes"),
+  filter(race %in% c("B", "W")) %>%
+  transform(arrest = str_replace_all(arrest, "no", "No"))  %>%
+  transform(arrest = str_replace_all(arrest, "NO", "No")) %>%
+  transform(arrest = ifelse(arrest == "No", "No", "Arrested"),
             type = ifelse(type == "Search WITHOUT Stop-Frisk", "No Search/Frisk", "Search/Frisk")) %>%
   group_by(race, type, arrest) %>%
   summarize(values = n()) %>%
-  transform(type = as.factor(type)) %>%
+  transform(type = as.character(type),
+            values = as.numeric(values),
+            arrest = str_replace_all(arrest, "No", "Not Arrested")) %>%
   select(source = type, target = arrest, values)
 
 
-sf_arrests <- sf_arrests %>%
-  rbind(sf_arrests, sf_type_arrests)
+sf_arrests_sankey <- sf_arrests_sankey %>%
+  rbind(sf_type_arrests) %>%
+  transform(source = str_replace_all(source, "B", "Black"))  %>%
+  transform(source = str_replace_all(source, "W", "White"))
 
 sf_arrests_nodes <- data.frame(
-  name=c(as.character(sf_arrests$source), 
-         as.character(sf_arrests$target)) %>%
+  name=c(as.character(sf_arrests_sankey$source), 
+         as.character(sf_arrests_sankey$target)) %>%
     unique()
 )
 
 
-sf_arrests <- sf_arrests %>%x
+sf_arrests_sankey <- sf_arrests_sankey %>%
   mutate(IDSource = match(source, sf_arrests_nodes$name)-1,
          IDTarget = match(target, sf_arrests_nodes$name)-1)
 
 
-sf_arrests$group <- as.factor(c(rep(c("a", "a", "b", "b"),2), rep("b", 4), rep("a", 4)))
+sf_arrests_sankey$group <- as.factor(c(rep(c("a", "a", "b", "b")), rep("a", 4), rep("b", 4)))
 
 
 sf_arrests_nodes$group <- as.factor(c("unique_group"))
 
-sf_sankey_color <- 'd3.scaleOrdinal() .domain(["a", "b", "unique_group"]) .range(["#95D7AE", "#87BFFF", "grey"])'
+sf_sankey_color <- 'd3.scaleOrdinal() .domain(["a", "b", "unique_group"]) .range([ "#87BFFF", "#95D7AE", "grey"])'
 
 # Make the Network
-sf_sankeyNetwork_arrests <- sankeyNetwork(Links = sf_arrests, Nodes = sf_arrests_nodes,
-                                  Source = "IDSource", Target = "IDTarget",
+sf_sankeyNetwork_arrests <- sankeyNetwork(Links = sf_arrests_sankey, Nodes = sf_arrests_nodes,
+                                  Source = "IDSource", Target = "IDTarget", sinksRight=FALSE,
                                   Value = "values", NodeID = "name", 
                                   colourScale=sf_sankey_color, LinkGroup="group", NodeGroup="group",
                                   fontSize = 20, nodeWidth=10, units = "Detentions")
@@ -528,6 +541,17 @@ sf_sankeyNetwork_arrests <- sankeyNetwork(Links = sf_arrests, Nodes = sf_arrests
 
 sf_sankeyNetwork_arrests
   
+
+##Arrest Summaries
+sf_arrests_summaries <- sf_arrests %>%
+  filter(!is.na(arrest)) %>%
+  filter(race %in% c("B", "W"))  %>%
+  transform(arrest = str_replace_all(arrest, "no", "No"))  %>%
+  transform(arrest = str_replace_all(arrest, "NO", "No")) %>%
+  transform(arrest = ifelse(arrest == "No", "No", "Arrested"),
+            type = ifelse(type == "Search WITHOUT Stop-Frisk", "No Search/Frisk", "Search/Frisk")) %>%
+  group_by(race, type, arrest) %>%
+  summarize(values = n())
 
 
 
