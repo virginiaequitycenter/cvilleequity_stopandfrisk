@@ -145,7 +145,9 @@ ggplot(sf_race, aes(x = year, fill = factor(race, levels = c("White", "Black")))
   geom_bar() +
   scale_fill_manual(values = pal2, name = "Race", labels = c("White", "Black")) +
   theme_void() +
-  theme(axis.text.x = element_text(size= 10, face=1, hjust = .5)) +
+  theme(axis.text.x = element_text(size= 10, face=1, hjust = 0.5, vjust = -1),
+        axis.line.x = element_line(size = 0.25),
+        axis.ticks.x = element_line(size = 1, linetype = 1)) +
   scale_x_continuous(name = "Year",
                      breaks = c(2012, 2013, 2014, 2015, 2016, 2017),
                      labels = c("2012\n (Jul-Dec)", "2013\n", "2014\n (Jan-Jun)", "2015\n", "2016\n", "2017\n")) +
@@ -199,16 +201,24 @@ sf_Per1000 <- sf_Per1000 %>%
 pallete <- c("#87BFFF", "#FDCA40", "#95D7AE")
 
 ggplot(sf_Per1000, aes(x = race, y = Per1000, fill = race)) +
-  geom_bar(stat = "identity", width = 0.9) +
+  geom_bar(stat = "identity", width = 0.5) +
   coord_flip() +
   scale_fill_manual(values = pallete) +
   geom_text(aes(y = Per1000 - 1, label = Per1000), size=7, color = "white", hjust = 1) +
+  ggtitle("Detentions by Charlottesville police officers per 1,000 residents") +
   theme_void() +
   theme(legend.position = "none",
-        axis.text.y = element_text(size=15, face=1, hjust = .5))
+        axis.text.y = element_text(size=15, face=1, hjust = .5),
+        axis.line.x = element_line(size = 0.25),
+        axis.text.x = element_text(size = 10, face = 1, vjust = 7),
+        axis.ticks.x = element_line(size = 1),
+        plot.title = element_text(size = 13, face =4, hjust = .18)) 
+  
 
 
 ```
+
+> Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data.
 
 ### By Population
 
@@ -250,7 +260,7 @@ ggplot(sf_race_all, aes(x = group, y = value, fill = race)) +
 
 > Population estimates are from the 5-year [American Community Survey 2013-2017](https://data.census.gov/cedsci/table?q=b02001&g=0500000US51540&hidePreview=false&tid=ACSDT5Y2017.B02001&vintage=2017&layer=VT_2017_050_00_PY_D1&cid=B02001_001E&y=2017) estimates, to overlap with the time period of the detention data; population percents are based on only the Black and White populations of Charlottesville to align with data on race available in the detention data.
 
-### By Year {data-height=600}
+### By Year {data-height=700}
 
 ```{r By Year, echo=FALSE}
 sf_race_year <- sf_race %>%
@@ -284,8 +294,10 @@ ggplot(sf_race_year, aes(x = group, y = value, fill = race)) +
   coord_polar("y", direction = 1) +
   scale_x_discrete(limits = c(" ", "pop","detained")) +
   theme_void() +
-  geom_text(data = filter(sf_race_year, race == "Black"), aes(x = group, y = label_pos, label = percent), size = 3) +
- ## aes(x = group, y = pos, label = label), inherit.aes = FALSE, size = 3) +
+  geom_text(data = filter(sf_race_year, race == "Black"), 
+            aes(x = group, y = label_pos, label = percent), size = 2, color = "white") +
+  geom_text(data = labellingdata, aes(x = group, y = pos, label = label), 
+            inherit.aes = FALSE, size = 1.6, color = "white") +
   facet_wrap(~year, nrow = 2)
 ```
 
@@ -600,7 +612,7 @@ sfs <-
   mutate(lab_pos = ifelse(RACE ==  "Black", RaceTot -2, RaceTot + 2))
 
 #pal2 <- c("#8dd3c7" ,"#bebada")
-mycolors <- c("#87BFFF", "#95D7AE")
+mycolors <- c("#95D7AE", "#87BFFF")
 
 ggplot(sfs, aes(x = reorder(NAME, -total), fill = RACE, 
                 y = Counts, alpha = SFTYPE), color = "black") +
@@ -615,9 +627,9 @@ ggplot(sfs, aes(x = reorder(NAME, -total), fill = RACE,
   scale_alpha_discrete(range = c(.6, 1)) +
   annotate("text", x = 29, y = -25, label = "Black" ) +
   annotate("text", x = 29, y = 25, label = "White" ) +
-  annotate("rect", xmin = 25, xmax = 26, ymin = 30, ymax = 40, alpha = 1, fill = "#87BFFF") +
+  annotate("rect", xmin = 25, xmax = 26, ymin = 30, ymax = 40, alpha = 1, fill = "#95D7AE") +
   annotate("text", x = 25.5, y = 45, label = "= With Stop and Frisk", size = 3, hjust = 0)+
-  annotate("rect", xmin = 23.5, xmax = 24.5, ymin = 30, ymax = 40, alpha = .6, fill = "#87BFFF") +
+  annotate("rect", xmin = 23.5, xmax = 24.5, ymin = 30, ymax = 40, alpha = .6, fill = "#95D7AE") +
   annotate("text", x = 24, y = 45, label = "= Without Stop and Frisk", size = 3, hjust = 0)+
   geom_hline(yintercept  = 0) +
   theme_minimal() +
@@ -727,7 +739,7 @@ race.colors <- data.frame()
 
 #mycolors <- c("#6969B3", "#00AF98")
 racelevels <- names(race.df)
-racepal <- colorFactor(palette = mycolors,
+racepal <- colorFactor(palette = c("#87BFFF", "#95D7AE"),
                    domain = racelevels)
 
 names(race.df) %>%
@@ -859,7 +871,7 @@ race.colors <- data.frame()
 
 #mycolors <- c("#6969B3", "#00AF98")
 racelevels <- names(race.df)
-racepal <- colorFactor(palette = mycolors,
+racepal <- colorFactor(palette = c("#87BFFF", "#95D7AE"),
                    domain = racelevels)
 
 names(race.df) %>%
@@ -976,7 +988,7 @@ race.colors <- data.frame()
 
 #mycolors <- c("#6969B3", "#00AF98")
 racelevels <- names(race.df)
-racepal <- colorFactor(palette = mycolors,
+racepal <- colorFactor(palette = c("#87BFFF", "#95D7AE"),
                    domain = racelevels)
 
 names(race.df) %>%
@@ -1070,7 +1082,7 @@ race.colors <- data.frame()
 
 #mycolors <- c("#6969B3", "#00AF98")
 racelevels <- names(race.df)
-racepal <- colorFactor(palette = mycolors,
+racepal <- colorFactor(palette = c("#87BFFF", "#95D7AE"),
                    domain = racelevels)
 
 names(race.df) %>%
@@ -1168,7 +1180,7 @@ race.colors <- data.frame()
 
 #mycolors <- c("#6969B3", "#00AF98")
 racelevels <- names(race.df)
-racepal <- colorFactor(palette = mycolors,
+racepal <- colorFactor(palette = c("#87BFFF", "#95D7AE"),
                    domain = racelevels)
 
 names(race.df) %>%

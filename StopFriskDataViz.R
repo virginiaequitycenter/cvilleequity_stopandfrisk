@@ -544,14 +544,25 @@ sf_sankeyNetwork_arrests
 
 ##Arrest Summaries
 sf_arrests_summaries <- sf_arrests %>%
-  filter(!is.na(arrest)) %>%
   filter(race %in% c("B", "W"))  %>%
   transform(arrest = str_replace_all(arrest, "no", "No"))  %>%
   transform(arrest = str_replace_all(arrest, "NO", "No")) %>%
   transform(arrest = ifelse(arrest == "No", "No", "Arrested"),
-            type = ifelse(type == "Search WITHOUT Stop-Frisk", "No Search/Frisk", "Search/Frisk")) %>%
-  group_by(race, type, arrest) %>%
-  summarize(values = n())
+            type = ifelse(type == "Search WITHOUT Stop-Frisk", "No Search/Frisk", "Search/Frisk"))%>%
+  transform(arrest = ifelse(is.na(arrest), "No", arrest)) %>%
+  mutate(offense7 = case_when(
+    str_detect(offense, "Assault|Robbery|PURSE|Shots|Weapon") ~ "Person Crime",
+    str_detect(offense, "Burglary|Larceny|Trespass|VANDAL") ~ "Property Crime",
+    str_detect(offense, "Narcotic") ~ "Narcotics Related",
+    str_detect(offense, "Traffic") ~ "Traffic Related",
+    str_detect(offense, "Disorder|Drunk|Liquor|INDECENT|DIP") ~ "Public Disorder",
+    str_detect(offense, "Suspicious|Supsicious") ~ "Suspicious Circumstance",
+    TRUE ~ "Other"
+  )) %>%
+  group_by(type, arrest) %>%
+  filter(arrest == "No") %>%
+  summarize(values = n()) %>%
+  mutate(PercentArrests = values/451)
 
 
 
