@@ -8,6 +8,11 @@ library(rmdformats)
 library(ggplot2)
 library(networkD3)
 library(dplyr)
+library(htmlwidgets)
+library(htmltools)
+library(leaflet)
+library(geojsonio)
+
 
 setwd("/Users/enriqueunruh/Documents/Equity Center/GitHub/cvilleequity_stopandfrisk")
 
@@ -544,7 +549,7 @@ sf_sankeyNetwork_arrests
 
 ##Arrest Summaries
 sf_arrests_summaries <- sf_arrests %>%
-  filter(race %in% c("B", "W"))  %>%
+  filter(race %in% c("B", "W")) %>%
   transform(arrest = str_replace_all(arrest, "no", "No"))  %>%
   transform(arrest = str_replace_all(arrest, "NO", "No")) %>%
   transform(arrest = ifelse(arrest == "No", "No", "Arrested"),
@@ -564,7 +569,276 @@ sf_arrests_summaries <- sf_arrests %>%
   summarize(values = n()) %>%
   mutate(PercentArrests = values/451)
 
+sf_arrests_summons <- sf_arrests %>%
+  transform(arrest = ifelse(is.na(arrest), "No", arrest)) %>%
+  filter(race %in% c("B", "W")) %>%
+  mutate(arrests = case_when(
+    str_detect(arrest, "NO|no|No") ~ "Not Arrested",
+    str_detect(arrest, "Summons|Warning") ~ "Summoned/Warned",
+    TRUE ~ "Arrested"
+  )) %>%
+  transform(type = ifelse(type == "Search WITHOUT Stop-Frisk", "No Search/Frisk", "Search/Frisk"))%>%
+  mutate(offense7 = case_when(
+    str_detect(offense, "Assault|Robbery|PURSE|Shots|Weapon") ~ "Person Crime",
+    str_detect(offense, "Burglary|Larceny|Trespass|VANDAL") ~ "Property Crime",
+    str_detect(offense, "Narcotic") ~ "Narcotics Related",
+    str_detect(offense, "Traffic") ~ "Traffic Related",
+    str_detect(offense, "Disorder|Drunk|Liquor|INDECENT|DIP") ~ "Public Disorder",
+    str_detect(offense, "Suspicious|Supsicious") ~ "Suspicious Circumstance",
+    TRUE ~ "Other"
+  )) %>%
+  group_by(race, arrests) %>%
+  summarize(values = n()) #%>%
+  mutate(PercentArrests = values/451)
 
 
+
+
+#Map ------
+
+beats_data <- 
+  beats  %>% 
+  mutate(`Percent White` = round(whitepopE/totalpopE*100,2),
+         `Percent Black` = round(blackpopE/totalpopE*100,2)
+  ) %>%
+  mutate(popup = str_c("<strong>", NAME, "</strong>",
+                       "<br/>",
+                       "Percent White: ", paste0(`Percent White`, "%")) %>%
+           map(htmltools::HTML))
+
+colorswhite <- colorRampPalette(brewer.pal(9, "Greens"))(9)[2:6]
+whitepal <- colorBin(palette = colorswhite, domain = c(0,100), bins = 5)
+
+colorsblack<- colorRampPalette(brewer.pal(9, "Purples"))(9)[2:6]
+blackpal <- colorBin(palette = colorsblack, domain = c(0,100), bins = 5)
+
+
+bins <- c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
+pal <- colorBin(colorswhite, domain = beats_data$`Percent White`, bins = bins)
+
+leaflet(data = beats_data) %>%
+  addTiles() %>%
+  addPolygons(label = ~`popup`,
+              fillColor = ~whitepal(`Percent White`),
+              color = "#444444",
+              weight = 1,
+              smoothFactor = 0.5,
+              opacity = 1.0,
+              fillOpacity = 0.5,
+              highlightOptions = highlightOptions(color = "white",
+                                                  weight = 2,
+                                                  bringToFront = TRUE)) 
+
+
+
+l <-NULL
+
+
+
+race.beats <- list(
+  `Data Off` = beats_data %>% mutate(color = 0, df = "Data Off"),
+  `Percent White` = beats_data %>% mutate(color = `Percent White`, df = "Percent White"),
+  `Percent Black` = beats_data %>% mutate(color = `Percent Black`, df = "Percent Black")
+)
+
+beatscolorfunction <- function(listname, color){
+  case_when(
+    listname == names(race.beats)[2] ~   whitepal(color),
+    listname == names(race.beats)[3] ~   blackpal(color),
+    TRUE ~ "DCF0EF"
+  )
+}
+
+beatsopacityfunction <- function(listname){
+  case_when(
+    listname == names(race.beats)[2] ~   .5,
+    listname == names(race.beats)[3] ~  .5,
+    TRUE ~ 0.01
+  )
+}
+
+l <- leaflet() %>%
+  addProviderTiles("Stamen.Toner",
+                   options = providerTileOptions(minZoom = 13))   %>%
+  addMapPane("polygons", zIndex = 410) %>%
+  addMapPane("circlemarkers", zIndex = 420)  
+
+
+names(race.beats) %>%
+  purrr::walk( function(df) {
+    l <<- l %>%
+      addPolygons(
+        data = race.beats[[df]],
+        weight = 3,
+        fillOpacity = ~beatsopacityfunction(df),
+        color = ~beatscolorfunction(df, color),
+        group = df   ,
+        smoothFactor = 0.5,
+        label = ~htmlEscape(paste0(NAME,  ifelse(color == 0, "",
+                                                 ifelse(df  == "Percent White", paste0(": ", color, "% White"), paste0(": ", color, "% Black") )  )))
+      )
+  })
+
+## Add Race Dot Colors ## 
+
+sflocationsmap <- 
+  sflocations %>%
+  mutate(RACE = ifelse(RACE == "W", "White", "Black"))
+
+race.df <- split(sflocationsmap, sflocationsmap$RACE)
+race.colors <- data.frame()
+
+#mycolors <- c("#6969B3", "#00AF98")
+mycolors <- c("#87BFFF", "#95D7AE")
+
+racelevels <- names(race.df)
+racepal <- colorFactor(palette = mycolors,
+                       domain = racelevels)
+
+names(race.df) %>%
+  purrr::walk( function(df) {
+    l <<- l %>%
+      addCircleMarkers(
+        data = race.df[[df]],
+        color = ~racepal(df),
+        weight = 0,
+        radius = 2.5,
+        fillOpacity = 1,
+        group = df,
+        label = ~htmlEscape(paste0("Offense: ", OFFENSE))
+        
+      )
+    
+  })
+
+
+sf.df <- split(sflocationsmap, sflocationsmap$SFTYPE)
+sf.race.df   <- split(sf.df[["STOP WITH SEARCH OR FRISK"]], sf.df[["STOP WITH SEARCH OR FRISK"]]$RACE)
+
+names(sf.race.df) %>%
+  purrr::walk( function(df) {
+    l <<- l %>%
+      addCircleMarkers(
+        data = sf.race.df[[df]],
+        color =  "red",
+        weight = 1,
+        radius = 6,
+        fill = FALSE,
+        group = df
+      )
+  })
+
+
+
+html_legend <- "<svg width = '10' height = '10'> <circle cx='5' cy='5' r='5' stroke='red' fill = 'white' stroke-width = '1' /></svg> = Stop & Frisk"
+
+html_slider <- "L.control.slider(function(names(race.b) {console.log(value);}, {id:slider, 'vertical'});"
+
+l %>%
+  addLayersControl(
+    baseGroups =  names(race.beats),
+    overlayGroups =  c(names(race.df)),
+    options = layersControlOptions(collapsed = FALSE)
+  ) %>%
+  htmlwidgets::onRender("
+    function(el, x) {
+      this.on('baselayerchange', function(e) {
+        e.layer.bringToBack();
+      })
+    }") %>%
+  htmlwidgets::onRender("<script
+  src='https://code.jquery.com/jquery-3.3.1.min.js'
+  integrity='sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8='
+  crossorigin='anonymous'></script>
+  <link rel='stylesheet' href='https://unpkg.com/leaflet@1.4.0/dist/leaflet.css'
+  integrity='sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=='
+  crossorigin=''/>
+  <script src='https://unpkg.com/leaflet@1.4.0/dist/leaflet.js'
+  integrity='sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=='
+  crossorigin=''></script>
+  <script src='leaflet-timeline-slider.min.js'></script>
+  var mymap = this;
+  mymap.control.timelineSlider({
+ 
+  timelineItems: ['Day 1', 'The Next Day', 'Amazing Event', '1776', '12/22/63', '1984'],
+  extraChangeMapParams: {greeting: 'Hello World!'}, 
+  changeMap: changeMapFunction })
+  .addTo(mymap);") %>%
+  addLegend("bottomleft", pal = racepal, values = names(race.df),
+            title = "Race",
+            opacity = 1
+  ) #%>%
+  addControl(html = html_legend, position = "bottomright")
+
+  
+  #Build data.frame with 10 obs + 3 cols
+  power <- data.frame(
+    "Latitude" = c(33.515556, 38.060556, 47.903056, 49.71, 49.041667, 31.934167, 54.140586, 54.140586, 48.494444, 48.494444),
+    "Longitude" = c(129.837222, -77.789444, 7.563056, 8.415278, 9.175, -82.343889, 13.664422, 13.664422, 17.681944, 17.681944),
+    "start" = do.call(
+      "as.Date",
+      list(
+        x = c("15-Sep-1971", "1-Dec-1971", "1-Feb-1972", "1-Feb-1972", "1-Feb-1972", "1-Feb-1972", "1-Apr-1972", "1-Apr-1972", "24-Apr-1972", "24-Apr-1972"),
+        format = "%d-%b-%Y"
+      )
+    )
+  )
+  
+  # set start same as end
+  #  adjust however you would like
+  power$end <- power$start
+  
+  
+  # use geojsonio to convert our data.frame
+  #  to GeoJSON which timeline expects
+  power_geo <- geojson_json(power,lat="Latitude",lon="Longitude")
+  
+  # create a leaflet map on which we will build
+  leaf <- leaflet() %>%
+    addTiles()
+  
+  # add leaflet-timeline as a dependency
+  #  to get the js and css
+  leaf$dependencies[[length(leaf$dependencies)+1]] <- htmlDependency(
+    name = "leaflet-timeline",
+    version = "1.0.0",
+    src = c("href" = "http://skeate.github.io/Leaflet.timeline/"),
+    script = "javascripts/leaflet.timeline.js",
+    stylesheet = "stylesheets/leaflet.timeline.css"
+  )
+  
+  # use the new onRender in htmlwidgets to run
+  #  this code once our leaflet map is rendered
+  #  I did not spend time perfecting the leaflet-timeline
+  #  options
+  leaf %>%
+    setView(44.0665,23.74667,2) %>%
+    htmlwidgets::onRender(sprintf(
+      '
+function(el,x){
+    var power_data = %s;
+
+    var timeline = L.timeline(power_data, {
+      pointToLayer: function(data, latlng){
+        var hue_min = 120;
+        var hue_max = 0;
+        var hue = hue_min;
+        return L.circleMarker(latlng, {
+          radius: 10,
+          color: "hsl("+hue+", 100%%, 50%%)",
+          fillColor: "hsl("+hue+", 100%%, 50%%)"
+        });
+      },
+      steps: 1000,
+      duration: 10000,
+      showTicks: true
+    });
+    timeline.addTo(this);
+}
+    ',
+power_geo
+    ))
+
+leaf
 
 

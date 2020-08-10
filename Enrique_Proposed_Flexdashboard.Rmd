@@ -614,7 +614,7 @@ sfs <-
 #pal2 <- c("#8dd3c7" ,"#bebada")
 mycolors <- c("#95D7AE", "#87BFFF")
 
-ggplot(sfs, aes(x = reorder(NAME, -total), fill = RACE, 
+ggplot(sfs, aes(x = reorder(NAME, -total), fill = factor(RACE, levels = c("White", "Black")), 
                 y = Counts, alpha = SFTYPE), color = "black") +
   geom_bar(stat = "identity") + 
   labs(fill = "Race") +
