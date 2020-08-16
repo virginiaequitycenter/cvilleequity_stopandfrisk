@@ -79,7 +79,7 @@ ggplot(sf_summary_stats, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=race)) +
 ggplot(sf_summary_stats, aes(x = race, y = Totals, fill = race)) +
   geom_bar(stat = "identity", width = 0.9) +
   coord_flip() +
-  scale_fill_manual(values = pal2) +
+  scale_fill_manual(values = pallete) +
   geom_text(aes(y = Totals - 10, label = Totals), size=7, color = "white", hjust = 1) +
   ggtitle("Detentions by Charlottesville Police Officers from 2012-2017") +
   theme_void() +
@@ -746,99 +746,14 @@ l %>%
         e.layer.bringToBack();
       })
     }") %>%
-  htmlwidgets::onRender("<script
-  src='https://code.jquery.com/jquery-3.3.1.min.js'
-  integrity='sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8='
-  crossorigin='anonymous'></script>
-  <link rel='stylesheet' href='https://unpkg.com/leaflet@1.4.0/dist/leaflet.css'
-  integrity='sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=='
-  crossorigin=''/>
-  <script src='https://unpkg.com/leaflet@1.4.0/dist/leaflet.js'
-  integrity='sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=='
-  crossorigin=''></script>
-  <script src='leaflet-timeline-slider.min.js'></script>
-  var mymap = this;
-  mymap.control.timelineSlider({
- 
-  timelineItems: ['Day 1', 'The Next Day', 'Amazing Event', '1776', '12/22/63', '1984'],
-  extraChangeMapParams: {greeting: 'Hello World!'}, 
-  changeMap: changeMapFunction })
-  .addTo(mymap);") %>%
+  htmlwidgets::onRender() %>%
   addLegend("bottomleft", pal = racepal, values = names(race.df),
             title = "Race",
             opacity = 1
-  ) #%>%
+  ) %>%
   addControl(html = html_legend, position = "bottomright")
 
   
-  #Build data.frame with 10 obs + 3 cols
-  power <- data.frame(
-    "Latitude" = c(33.515556, 38.060556, 47.903056, 49.71, 49.041667, 31.934167, 54.140586, 54.140586, 48.494444, 48.494444),
-    "Longitude" = c(129.837222, -77.789444, 7.563056, 8.415278, 9.175, -82.343889, 13.664422, 13.664422, 17.681944, 17.681944),
-    "start" = do.call(
-      "as.Date",
-      list(
-        x = c("15-Sep-1971", "1-Dec-1971", "1-Feb-1972", "1-Feb-1972", "1-Feb-1972", "1-Feb-1972", "1-Apr-1972", "1-Apr-1972", "24-Apr-1972", "24-Apr-1972"),
-        format = "%d-%b-%Y"
-      )
-    )
-  )
   
-  # set start same as end
-  #  adjust however you would like
-  power$end <- power$start
-  
-  
-  # use geojsonio to convert our data.frame
-  #  to GeoJSON which timeline expects
-  power_geo <- geojson_json(power,lat="Latitude",lon="Longitude")
-  
-  # create a leaflet map on which we will build
-  leaf <- leaflet() %>%
-    addTiles()
-  
-  # add leaflet-timeline as a dependency
-  #  to get the js and css
-  leaf$dependencies[[length(leaf$dependencies)+1]] <- htmlDependency(
-    name = "leaflet-timeline",
-    version = "1.0.0",
-    src = c("href" = "http://skeate.github.io/Leaflet.timeline/"),
-    script = "javascripts/leaflet.timeline.js",
-    stylesheet = "stylesheets/leaflet.timeline.css"
-  )
-  
-  # use the new onRender in htmlwidgets to run
-  #  this code once our leaflet map is rendered
-  #  I did not spend time perfecting the leaflet-timeline
-  #  options
-  leaf %>%
-    setView(44.0665,23.74667,2) %>%
-    htmlwidgets::onRender(sprintf(
-      '
-function(el,x){
-    var power_data = %s;
-
-    var timeline = L.timeline(power_data, {
-      pointToLayer: function(data, latlng){
-        var hue_min = 120;
-        var hue_max = 0;
-        var hue = hue_min;
-        return L.circleMarker(latlng, {
-          radius: 10,
-          color: "hsl("+hue+", 100%%, 50%%)",
-          fillColor: "hsl("+hue+", 100%%, 50%%)"
-        });
-      },
-      steps: 1000,
-      duration: 10000,
-      showTicks: true
-    });
-    timeline.addTo(this);
-}
-    ',
-power_geo
-    ))
-
-leaf
 
 

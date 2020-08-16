@@ -104,7 +104,7 @@ totals <- sf_race %>% filter(race == "Black") %>%
 
 
 ggplot(sf_race, aes(x = year, fill = race)) +
-  geom_bar() +
+  geom_bar() #+
   scale_fill_manual(values = pal2) +
   scale_x_continuous(name = "Year",
                      breaks = c(2012, 2013, 2014, 2015, 2016, 2017),
@@ -172,7 +172,7 @@ labellingdata <- data.frame(label = c("Population", "Detentions"), group = c("po
 
 ggplot(sf_race_all, aes(x = group, y = value, fill = race)) +
   geom_bar(position="fill", stat="identity") +
-  scale_fill_manual(values = pal2, name = "Race") +
+  scale_fill_manual(values = pal2, name = "Race") #+
   coord_polar("y", direction = 1) +
   scale_x_discrete(limits = c(" ", "pop","total")) +
   theme_void() +

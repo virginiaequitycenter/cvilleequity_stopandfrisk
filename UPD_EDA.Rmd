@@ -1,0 +1,222 @@
+---
+title: "UPD Arrests Exploratory Analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#setup
+library(tidyverse)
+library(leaflet)
+library(sf)
+library(htmltools)
+library(ggplot2)
+library(ggmap)
+
+setwd("/Users/enriqueunruh/Documents/Equity Center/GitHub/cvilleequity_stopandfrisk")
+
+UPD_Arrests <- read_csv("data/UPD Data from Cav Daily/2019 Arrest Data Demographics.csv") %>%
+  select(starts_with("Arrest"))
+
+names(UPD_Arrests)[1] <- "Address"
+names(UPD_Arrests)[2] <- "Crime_Description"
+names(UPD_Arrests)[3] <- "Date"
+names(UPD_Arrests)[4] <- "Arrest_Type"
+names(UPD_Arrests)[5] <- "Age"
+names(UPD_Arrests)[6] <- "Ethnicity"
+names(UPD_Arrests)[7] <- "Race"
+names(UPD_Arrests)[8] <- "Sex"
+
+pal <- c("#EFAAC4","#4F4789","#87BFFF", "#95D7AE")
+
+
+Undergrad_Pop <- data.frame(Race = c("Asian or Pacific Islander", "Hispanic", "Black",  "White"),		
+                            values = c(2551, 1096, 1095, 9270)) %>%
+  mutate(Percentage = paste0((round(values/sum(values), 4)*100), "%"),
+         Group = "Undergrad_Pop",
+         label_pos = 1 - (cumsum(values) - values/2)/sum(values))
+
+UVA_Pop <- data.frame(Race = c("Asian or Pacific Islander", "Hispanic", "Black",  "White"),
+                      values = c(2551+331+343+345, 1096+346+163+80, 1095+325+812+108,
+                                 9270+3817+5361+2141)) %>%
+  mutate(Percentage = paste0((round(values/sum(values), 4)*100), "%"),
+         Group = "UVA_Pop",
+         label_pos = 1 - (cumsum(values) - values/2)/sum(values))
+
+
+
+```
+
+## Who is UPD Arresting?
+
+Arrest compared to total UVA Population:
+
+```{r UPD_Arrests_ByRace, echo=FALSE}
+UPD_Arrests_ByRace <- UPD_Arrests  %>%
+  transform(Race = ifelse(Ethnicity == "Hispanic Origin", "Hispanic", Race)) %>%
+  filter(Race %in% c("Black", "White", "Hispanic", "Asian or Pacific Islander")) %>%
+  group_by(Race) %>%
+  summarise(values = n()) %>%
+  transform(values = as.numeric(as.character(values)),
+            Race = as.factor(Race)) %>%
+ # mutate(#Total = (paste0((round(values/118, 4)*100), "%")),
+  mutate(Percentage = paste0((round(values/108, 4))*100, "%"),
+         Group = "ByRace/Ethnicity",
+         label_pos = 1 - (cumsum(values) - values/2)/sum(values)) %>%
+  arrange(desc(values)) %>%
+  rbind(UVA_Pop)
+
+labellingdata_uva <- data.frame(label = c("UVA\nPopulation", "UPD\nArrests"), Group = c("UVA_Pop", "ByRace/Ethnicity"), pos = c(.15,.15) )
+
+ggplot(UPD_Arrests_ByRace,
+       aes(x= Group, y = values, fill = factor(Race,
+                                               levels = c("Asian or Pacific Islander", "Hispanic", "Black", "White")))) +
+  geom_bar(position="fill", stat="identity") +
+  scale_fill_manual(values = pal, name = "Race/Ethnicity") +
+  coord_polar("y", direction = 1) +
+  scale_x_discrete(limits = c(" ", "UVA_Pop","ByRace/Ethnicity")) +
+  theme_void() +
+  geom_text(data = filter(UPD_Arrests_ByRace, Race %in% c("Black","White")),
+            aes(x = Group, y = label_pos,label = Percentage), size = 3.5, color = "white" ) +
+  geom_text(data = labellingdata_uva,
+          aes(x = Group, y = pos, label = label) ,inherit.aes = FALSE, size = 2.5, color = "White", fontface=2)  
+
+
+```
+
+Arrests of individuals age 18-22 compared to Undergraduate population:
+
+```{r UPD Arrest by Race 18-22, echo=FALSE}
+UPD_Arrests_ByRace_18_22 <- UPD_Arrests  %>%
+  transform(Race = ifelse(Ethnicity == "Hispanic Origin", "Hispanic", Race)) %>%
+  filter(Race %in% c("Black", "White", "Hispanic", "Asian or Pacific Islander")) %>%
+  transform(Age = as.numeric(Age)) %>%
+  filter(Age != is.na(Age)) %>%
+  mutate(AgeGroup = ifelse(Age < 23, "18-22", 
+                           ifelse((Age > 22 & Age < 33), "23-32", 
+                                  ifelse((Age > 32 & Age < 55), "33-54", "55+")))) %>%
+  filter(AgeGroup == "18-22") %>%
+  group_by(Race) %>%
+  summarise(values = n()) %>%
+  transform(values = as.numeric(as.character(values)),
+            Race = as.factor(Race)) %>%
+  mutate(Percentage = paste0((round(values/38, 4))*100, "%"),
+         Group = "ByRace/Ethnicity",
+         label_pos = 1 - (cumsum(values) - values/2)/sum(values)) %>%
+  arrange(desc(values)) %>%
+  rbind(Undergrad_Pop)         
+
+labellingdata_18_22 <- data.frame(label = c("Undergrad\nPopulation", "UPD\nArrests"), Group = c("Undergrad_Pop", "ByRace/Ethnicity"), pos = c(.15,.15) )
+  
+ggplot(UPD_Arrests_ByRace_18_22,
+       aes(x= Group, y = values, fill = factor(Race,
+                                               levels = c("Asian or Pacific Islander", "Hispanic", "Black", "White")))) +
+  geom_bar(position="fill", stat="identity") +
+  scale_fill_manual(values = pal, name = "Race/Ethnicity") +
+  coord_polar("y", direction = 1) +
+  scale_x_discrete(limits = c(" ", "Undergrad_Pop","ByRace/Ethnicity")) +
+  theme_void() +
+  geom_text(data = filter(UPD_Arrests_ByRace_18_22, Race %in% c("Black","White")),
+            aes(x = Group, y = label_pos, label = Percentage), size = 3.25, color = "white" ) +
+  geom_text(data = labellingdata_18_22,
+          aes(x = Group, y = pos, label = label) ,inherit.aes = FALSE, size = 2.5, color = "White", fontface=2)  
+```
+
+Arrests by UPD compared to Charlottesville population:
+
+```{r UPD Arrests by Race compared to Cville, echo=FALSE}
+UPD_Arrests_ByRace <- UPD_Arrests  %>%
+  transform(Race = ifelse(Ethnicity == "Hispanic Origin", "Hispanic", Race)) %>%
+  filter(Race %in% c("Black", "White", "Hispanic", "Asian or Pacific Islander")) %>%
+  group_by(Race) %>%
+  summarise(values = n()) %>%
+  transform(values = as.numeric(as.character(values)),
+            Race = as.factor(Race)) %>%
+ # mutate(#Total = (paste0((round(values/118, 4)*100), "%")),
+  mutate(Percentage = paste0((round(values/108, 4))*100, "%"),
+         Group = "ByRace/Ethnicity",
+         label_pos = 1 - (cumsum(values) - values/2)/sum(values)) %>%
+  arrange(desc(values)) %>%
+  rbind(UVA_Pop)
+
+labellingdata_cville <- data.frame(label = c("Cville\nPopulation", "UPD\nArrests"), Group = c("UVA_Pop", "ByRace/Ethnicity"), pos = c(.15,.15) )
+
+
+ggplot(UPD_Arrests_ByRace,
+       aes(x= Group, y = values, fill = factor(Race,
+                                               levels = c("Asian or Pacific Islander", "Hispanic", "Black", "White")))) +
+  geom_bar(position="fill", stat="identity") +
+  scale_fill_manual(values = pal, name = "Race/Ethnicity") +
+  coord_polar("y", direction = 1) +
+  scale_x_discrete(limits = c(" ", "UVA_Pop","ByRace/Ethnicity")) +
+  theme_void() +
+  geom_text(data = filter(UPD_Arrests_ByRace, Race %in% c("Black","White")),
+            aes(x = Group, y = label_pos,label = Percentage), size = 3.5, color = "white" ) +
+  geom_text(data = labellingdata_cville,
+          aes(x = Group, y = pos, label = label) ,inherit.aes = FALSE, size = 2.5, color = "White", fontface=2)
+```
+
+
+
+## Map of UPD Arrests by Race
+
+```{r Map, echo=FALSE}
+UPD_Arrest_Geo <- read_csv("data/UPD_Arrests_Geo.csv")
+
+
+UPD_Arrest_Location <- UPD_Arrests %>%
+  filter(Crime_Description != is.na(Crime_Description)) %>%
+  add_column(lon = UPD_Arrest_Geo$lon, lat = UPD_Arrest_Geo$lat) %>%
+  transform(Race = ifelse(Ethnicity == "Hispanic Origin", "Hispanic", Race)) %>%
+  filter(Race %in% c("Black", "White", "Hispanic", "Asian or Pacific Islander")) %>%
+  group_by(Address, lon, lat, Race) %>%
+  summarise(Total = n())
+
+
+UPD_Arrest_Map <- leaflet(data = UPD_Arrest_Location) %>%
+  addTiles() %>%
+  addProviderTiles("CartoDB.Positron",
+                   options = providerTileOptions(minZoom = 13))   %>%
+  addMapPane("polygons", zIndex = 410) %>%
+  addMapPane("circlemarkers", zIndex = 420) 
+
+
+UPD_race.df <- split(UPD_Arrest_Location, UPD_Arrest_Location$Race)
+
+UPD_pal <- c("#EFAAC4","#87BFFF","#4F4789","#95D7AE")
+
+UPD_racelevels <- names(UPD_race.df)
+UPD_racepal <- colorFactor(palette = UPD_pal,
+                           domain = UPD_racelevels)
+
+names(UPD_race.df) %>%
+  purrr::walk( function(df) {
+    UPD_Arrest_Map <<- UPD_Arrest_Map %>%
+      addCircleMarkers(
+        data = UPD_race.df[[df]],
+        color = ~UPD_racepal(df),
+        weight = 0,
+        radius = 3.5,
+        fillOpacity = 1,
+        group = df,
+        label = ~htmlEscape(paste0("Total:", Total))
+        
+      )
+    
+  })
+
+
+UPD_Arrest_Map <- UPD_Arrest_Map %>%
+  addLayersControl(
+    overlayGroups =  names(UPD_race.df),
+    options = layersControlOptions(collapsed = FALSE)
+  ) %>%
+  addLegend("bottomright", pal = UPD_racepal, values = names(UPD_race.df),
+            title = "Race",
+            opacity = 1
+  ) 
+
+UPD_Arrest_Map
+```
+
+
